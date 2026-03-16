@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>World Model & VLA 论文综述 (2024–2026)</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #23273a;
+      --border: #2e3350;
+      --accent: #6366f1;
+      --accent2: #22d3ee;
+      --accent3: #f59e0b;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --tag-vla: #4f46e5;
+      --tag-wm: #0891b2;
+      --tag-fusion: #7c3aed;
+      --tag-ad: #059669;
+      --tag-eff: #b45309;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 60%, #0c1a2e 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 48px 32px 36px;
+      text-align: center;
+    }
+    header h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, #818cf8, #22d3ee);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    header .subtitle {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+    header .meta {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+    header .meta span {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    /* Nav */
+    nav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.88rem;
+      padding: 14px 16px;
+      white-space: nowrap;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    nav a:hover { color: var(--text); border-color: var(--accent); }
+
+    /* Layout */
+    .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+
+    /* Section */
+    section { margin-bottom: 48px; }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-header h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .section-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    /* Overview cards */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .overview-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .overview-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+    .overview-card p { font-size: 0.875rem; color: var(--muted); line-height: 1.6; }
+    .overview-card.vla { border-left: 3px solid var(--tag-vla); }
+    .overview-card.wm { border-left: 3px solid var(--tag-wm); }
+    .overview-card.fusion { border-left: 3px solid var(--tag-fusion); }
+
+    /* Subsection */
+    .subsection { margin-bottom: 32px; }
+    .subsection-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--accent2);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .subsection-title::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 16px;
+      background: var(--accent2);
+      border-radius: 2px;
+    }
+
+    /* Paper cards */
+    .paper-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 14px;
+    }
+    .paper-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 18px;
+      transition: border-color 0.2s, transform 0.15s;
+      position: relative;
+    }
+    .paper-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+    .paper-card .date {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-family: monospace;
+    }
+    .paper-card h4 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+    .paper-card .summary {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.55;
+      margin-bottom: 10px;
+    }
+    .paper-card .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .paper-card .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tag {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .tag.vla { background: #312e81; color: #a5b4fc; }
+    .tag.wm { background: #164e63; color: #67e8f9; }
+    .tag.fusion { background: #4c1d95; color: #c4b5fd; }
+    .tag.ad { background: #064e3b; color: #6ee7b7; }
+    .tag.eff { background: #451a03; color: #fcd34d; }
+    .tag.rl { background: #450a0a; color: #fca5a5; }
+    .tag.nav { background: #1e1b4b; color: #a5b4fc; }
+    .arxiv-link {
+      font-size: 0.75rem;
+      color: var(--accent);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .arxiv-link:hover { text-decoration: underline; }
+    .paper-card.hot::after {
+      content: '🔥';
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      font-size: 0.85rem;
+    }
+    .paper-card.foundation { border-color: #4f46e5; }
+
+    /* Trend cards */
+    .trend-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 14px;
+    }
+    .trend-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+    }
+    .trend-card h4 {
+      font-size: 0.92rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .trend-card p { font-size: 0.83rem; color: var(--muted); line-height: 1.6; }
+    .trend-card .examples {
+      margin-top: 10px;
+      font-size: 0.78rem;
+      color: #6366f1;
+      font-style: italic;
+    }
+
+    /* Method table */
+    .method-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+    .method-table th {
+      background: var(--surface2);
+      color: var(--muted);
+      font-weight: 600;
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .method-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    .method-table tr:hover td { background: var(--surface2); }
+
+    /* Hot list */
+    .hot-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+    }
+    .hot-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent3);
+      border-radius: 8px;
+      padding: 14px 16px;
+      display: flex;
+      gap: 12px;
+    }
+    .hot-item .num {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--accent3);
+      line-height: 1;
+      min-width: 28px;
+    }
+    .hot-item .info h5 { font-size: 0.88rem; font-weight: 600; margin-bottom: 4px; }
+    .hot-item .info p { font-size: 0.78rem; color: var(--muted); }
+    .hot-item .info a { color: var(--accent); text-decoration: none; font-size: 0.75rem; }
+
+    /* Footer */
+    footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 24px 32px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    @media (max-width: 640px) {
+      header h1 { font-size: 1.4rem; }
+      .container { padding: 20px 16px; }
+      .paper-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>World Model &amp; Vision-Language-Action</h1>
+  <p class="subtitle">具身智能领域论文综述 · 2024年1月 — 2026年3月</p>
+  <div class="meta">
+    <span>📅 整理日期：2026-03-14</span>
+    <span>📄 收录论文：40+</span>
+    <span>🔍 来源：ArXiv · HuggingFace</span>
+  </div>
+</header>
+
+<nav>
+  <a href="#overview">领域概述</a>
+  <a href="#vla">VLA 方向</a>
+  <a href="#wm">World Model</a>
+  <a href="#fusion">WM+VLA 融合</a>
+  <a href="#trends">趋势分析</a>
+  <a href="#hot">近期热点</a>
+</nav>
+
+<div class="container">
+
+  <!-- ===== OVERVIEW ===== -->
+  <section id="overview">
+    <div class="section-header">
+      <div class="section-icon" style="background:#1e1b4b">🌐</div>
+      <h2>领域概述</h2>
+    </div>
+    <div class="overview-grid">
+      <div class="overview-card vla">
+        <h3>🤖 VLA 主线</h3>
+        <p>以预训练语言/视觉大模型为骨干，直接从多模态观测预测机器人动作。强调零样本泛化、语言指令跟随与多任务通用性。代表作：OpenVLA、UniVLA。</p>
+      </div>
+      <div class="overview-card wm">
+        <h3>🌍 World Model 主线</h3>
+        <p>建模环境状态转移动态，为规划、强化学习和数据增强提供"内部仿真器"。可大幅减少真实机器人交互成本。代表作：DreamerV3、PlayWorld。</p>
+      </div>
+      <div class="overview-card fusion">
+        <h3>🔗 深度融合趋势</h3>
+        <p>2025-2026年的核心趋势：World Model 作为 RL 训练环境为 VLA 后训练，潜在空间 CoT 替代文本 CoT，VLA 策略与 WM 迭代协同改进。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== VLA ===== -->
+  <section id="vla">
+    <div class="section-header">
+      <div class="section-icon" style="background:#312e81">🤖</div>
+      <h2>VLA 方向重要论文</h2>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">基础 / 奠基性工作</div>
+      <div class="paper-grid">
+        <div class="paper-card foundation">
+          <div class="date">2024-06</div>
+          <h4>OpenVLA: An Open-Source Vision-Language-Action Model</h4>
+          <p class="summary">开源 7B 参数 VLA，基于 BridgeData V2 + OXE 数据集预训练，成为后续研究标准基线。Stanford / UC Berkeley。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag vla">VLA</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2406.09246" target="_blank">↗ 2406.09246</a>
+          </div>
+        </div>
+        <div class="paper-card">
+          <div class="date">2025-05-09</div>
+          <h4>UniVLA: Learning to Act Anywhere with Task-centric Latent Actions</h4>
+          <p class="summary">任务中心潜在动作表示，无需大量动作标注数据，通用跨环境机器人控制。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag vla">VLA</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2505.06111" target="_blank">↗ 2505.06111</a>
+          </div>
+        </div>
+        <div class="paper-card">
+          <div class="date">2025-09-29</div>
+          <h4>Emergent World Representations in OpenVLA</h4>
+          <p class="summary">分析基于 RL 训练的 VLA 是否隐式学到世界内部表征，揭示 VLA 的涌现能力。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag vla">VLA</span><span class="tag rl">RL</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2509.24559" target="_blank">↗ 2509.24559</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">高效推理 / 架构创新</div>
+      <div class="paper-grid">
+        <div class="paper-card">
+          <div class="date">2026-03-11</div>
+          <h4>DepthCache: Depth-Guided Training-Free Visual Token Merging</h4>
+          <p class="summary">利用深度引导的 Token 合并降低 VLA 推理延迟，无需重新训练，即插即用。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag vla">VLA</span><span class="tag eff">效率</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.10469" target="_blank">↗ 2603.10469</a>
+          </div>
+        </div>
+        <div class="paper-card">
+          <div class="date">2026-03-10</div>
+          <h4>AR-VLA: True Autoregressive Action Expert for VLA</h4>
+          <p class="summary">独立自回归 Action Expert，以连续 causal 序列生成动作，条件化于可刷新的视觉-语言前缀。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag vla">VLA</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.10126" target="_blank">↗ 2603.10126</a>
+          </div>
+        </div>
+        <div class="paper-card">
+          <div class="date">2026-03-09</div>
+          <h4>SaiVLA-0: Cerebrum–Pons–Cerebellum Tripartite Architecture</h4>
+          <p class="summary">神经科学启发三部件：大脑（VLM冻结提供语义先验）+ 桥脑（适配实时本体感觉）+ 小脑（精确动作执行）。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag vla">VLA</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.08124" target="_blank">↗ 2603.08124</a>
+          </div>
+        </div>
+        <div class="paper-card">
+          <div class="date">2026-03-10</div>
+          <h4>Cross-Hand Latent Representation for VLA</h4>
+          <p class="summary">跨手型潜在表征，提升灵巧操作中的视觉-动作对齐，支持多指手协调。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag vla">VLA</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.10158" target="_blank">↗ 2603.10158</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">视觉感知增强</div>
+      <div class="paper-grid">
+        <div class="paper-card hot">
+          <div class="date">2026-03-12</div>
+          <h4>SaPaVe: Active Perception and Manipulation in VLA</h4>
+          <p class="summary">统一语义驱动的主动感知与视点不变执行，端到端框架解决遮挡和视点变化问题。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag vla">VLA</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.12193" target="_blank">↗ 2603.12193</a>
+          </div>
+        </div>
+        <div class="paper-card hot">
+          <div class="date">2026-03-11</div>
+          <h4>FutureVLA: Joint Visuomotor Prediction for VLA</h4>
+          <p class="summary">联合视动预测，显式建模未来视觉-运动的紧密关联，提升长程操作准确性。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag vla">VLA</span><span class="tag fusion">融合</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.10712" target="_blank">↗ 2603.10712</a>
+          </div>
+        </div>
+        <div class="paper-card">
+          <div class="date">2026-03-10</div>
+          <h4>GST-VLA: Structured Gaussian Spatial Tokens for 3D Depth-Aware VLA</h4>
+          <p class="summary">将 2D patch token 提升为带几何结构的 3D Gaussian 空间 token，弥补平面感知的几何缺失。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag vla">VLA</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.09079" target="_blank">↗ 2603.09079</a>
+          </div>
+        </div>
+        <div class="paper-card">
+          <div class="date">2026-03-11</div>
+          <h4>Overcoming Visual Clutter via Concept-Gated Visual Distillation</h4>
+          <p class="summary">概念门控视觉蒸馏解决复杂背景导致的"精度-推理差距"，背景特征稀释问题。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag vla">VLA</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.10340" target="_blank">↗ 2603.10340</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">持续学习 / 后训练</div>
+      <div class="paper-grid">
+        <div class="paper-card">
+          <div class="date">2026-03-12</div>
+          <h4>Simple Recipe Works: VLA as Natural Continual Learners with RL</h4>
+          <p class="summary">展示 VLA 天然适合持续强化学习，无需特殊持续学习算法设计，简单 RL 微调即可。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag vla">VLA</span><span class="tag rl">RL</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.11653" target="_blank">↗ 2603.11653</a>
+          </div>
+        </div>
+        <div class="paper-card">
+          <div class="date">2026-03-10</div>
+          <h4>DexHiL: Human-in-the-Loop Framework for VLA Post-Training</h4>
+          <p class="summary">人在回路的 VLA 后训练框架，高效适配灵巧操作复杂下游任务。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag vla">VLA</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.09121" target="_blank">↗ 2603.09121</a>
+          </div>
+        </div>
+        <div class="paper-card">
+          <div class="date">2026-03-10</div>
+          <h4>See, Plan, Rewind: Progress-Aware VLA Models</h4>
+          <p class="summary">显式任务进度建模，感知可量化的里程碑，实现错误检测与可恢复的鲁棒操作。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag vla">VLA</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.09292" target="_blank">↗ 2603.09292</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">自动驾驶 VLA</div>
+      <div class="paper-grid">
+        <div class="paper-card hot">
+          <div class="date">2026-03-11</div>
+          <h4>DynVLA: Learning World Dynamics for Action Reasoning in AD</h4>
+          <p class="summary">提出 Dynamics CoT：先预测紧凑世界动态 token，再生成驾驶动作，物理接地决策。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag vla">VLA</span><span class="tag ad">自动驾驶</span><span class="tag fusion">WM</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.11041" target="_blank">↗ 2603.11041</a>
+          </div>
+        </div>
+        <div class="paper-card">
+          <div class="date">2026-03-10</div>
+          <h4>StyleVLA: Driving Style-Aware Vision Language Action Model</h4>
+          <p class="summary">驾驶风格感知的 VLA，支持保守/激进等个性化驾驶行为适配。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag vla">VLA</span><span class="tag ad">自动驾驶</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.09482" target="_blank">↗ 2603.09482</a>
+          </div>
+        </div>
+        <div class="paper-card">
+          <div class="date">2026-03-10</div>
+          <h4>EvoDriveVLA: Evolving Autonomous Driving VLA</h4>
+          <p class="summary">协同感知-规划蒸馏框架，解决视觉编码器解冻后性能退化与长程规划不稳定问题。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag vla">VLA</span><span class="tag ad">自动驾驶</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.09465" target="_blank">↗ 2603.09465</a>
+          </div>
+        </div>
+        <div class="paper-card">
+          <div class="date">2026-03-09</div>
+          <h4>SAMoE-VLA: Scene Adaptive MoE for Autonomous Driving</h4>
+          <p class="summary">场景自适应混合专家 VLA，不同驾驶场景路由不同专家子网络。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag vla">VLA</span><span class="tag ad">自动驾驶</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.08113" target="_blank">↗ 2603.08113</a>
+          </div>
+        </div>
+        <div class="paper-card">
+          <div class="date">2026-03-10</div>
+          <h4>NS-VLA: Towards Neuro-Symbolic VLA</h4>
+          <p class="summary">神经符号融合，学习可复用的操作原语，提升对新任务的组合泛化能力。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag vla">VLA</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.09542" target="_blank">↗ 2603.09542</a>
+          </div>
+        </div>
+        <div class="paper-card">
+          <div class="date">2026-03-09</div>
+          <h4>ΔVLA: Prior-Guided VLA via World Knowledge Variation</h4>
+          <p class="summary">利用世界知识变化量（Δ）作为先验引导预测范式，建模未来视觉状态或世界模型变化。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag vla">VLA</span><span class="tag fusion">WM</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.08361" target="_blank">↗ 2603.08361</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== WORLD MODEL ===== -->
+  <section id="wm">
+    <div class="section-header">
+      <div class="section-icon" style="background:#164e63">🌍</div>
+      <h2>World Model 方向重要论文</h2>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">机器人操作 World Model</div>
+      <div class="paper-grid">
+        <div class="paper-card hot">
+          <div class="date">2026-03-09</div>
+          <h4>PlayWorld: Learning Robot World Models from Autonomous Play</h4>
+          <p class="summary">从机器人自主探索数据（无需任务标注）学习通用仿真世界模型，大规模数据利用。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag wm">WM</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.09030" target="_blank">↗ 2603.09030</a>
+          </div>
+        </div>
+        <div class="paper-card hot">
+          <div class="date">2026-03-11</div>
+          <h4>ResWM: Residual-Action World Model for Visual RL</h4>
+          <p class="summary">残差动作世界模型，基于原始视觉观测进行强化学习，提升连续控制中的样本效率。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag wm">WM</span><span class="tag rl">RL</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.11110" target="_blank">↗ 2603.11110</a>
+          </div>
+        </div>
+        <div class="paper-card">
+          <div class="date">2026-03-09</div>
+          <h4>MetaWorld-X: Hierarchical World Modeling for Humanoid Loco-Manipulation</h4>
+          <p class="summary">VLM 协调多专家的层级世界模型，用于人形机器人同步运动与操作任务。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag wm">WM</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.08572" target="_blank">↗ 2603.08572</a>
+          </div>
+        </div>
+        <div class="paper-card">
+          <div class="date">2026-03-12</div>
+          <h4>SPIRAL: Self-Improving Action World Models via Reflective Planning</h4>
+          <p class="summary">自我改进的闭环动作世界模型框架，结合反思规划实现长程可控视频生成。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag wm">WM</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.08403" target="_blank">↗ 2603.08403</a>
+          </div>
+        </div>
+        <div class="paper-card">
+          <div class="date">2026-02-11</div>
+          <h4>H-WM: Robotic Task and Motion Planning via Hierarchical World Model</h4>
+          <p class="summary">层级世界模型引导任务规划与运动规划，超越纯视频生成或语言预测的现有方法。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag wm">WM</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2602.11291" target="_blank">↗ 2602.11291</a>
+          </div>
+        </div>
+        <div class="paper-card">
+          <div class="date">2026-03-12</div>
+          <h4>ARROW: Augmented Replay for Robust World Models</h4>
+          <p class="summary">持续强化学习场景下，通过增强回放机制保持世界模型在新旧任务上的鲁棒性。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag wm">WM</span><span class="tag rl">RL</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.11395" target="_blank">↗ 2603.11395</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">自动驾驶 World Model</div>
+      <div class="paper-grid">
+        <div class="paper-card hot">
+          <div class="date">2026-03-10</div>
+          <h4>Latent World Models for AD: Unified Taxonomy &amp; Evaluation ⭐综述</h4>
+          <p class="summary">自动驾驶潜在世界模型统一分类体系与评估框架，覆盖 VLA 系统，梳理开放挑战。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag wm">WM</span><span class="tag ad">自动驾驶</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.09086" target="_blank">↗ 2603.09086</a>
+          </div>
+        </div>
+        <div class="paper-card">
+          <div class="date">2026-03-07</div>
+          <h4>Kinematics-Aware Latent World Models for Data-Efficient AD</h4>
+          <p class="summary">运动学感知的潜在世界模型，将车辆运动学约束融入状态预测，提升数据效率。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag wm">WM</span><span class="tag ad">自动驾驶</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.07264" target="_blank">↗ 2603.07264</a>
+          </div>
+        </div>
+        <div class="paper-card">
+          <div class="date">2026-03-06</div>
+          <h4>WorldCache: Accelerating World Models via Heterogeneous Token Caching</h4>
+          <p class="summary">异构 Token 缓存策略加速扩散世界模型，实现交互式使用与长程滚动预测。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag wm">WM</span><span class="tag eff">效率</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.06331" target="_blank">↗ 2603.06331</a>
+          </div>
+        </div>
+        <div class="paper-card">
+          <div class="date">2026-03-05</div>
+          <h4>Planning in 8 Tokens: Compact Discrete Tokenizer for Latent World Model</h4>
+          <p class="summary">超紧凑离散 token 化方案，将规划状态压缩至 8 个 token，大幅降低世界模型规划计算开销。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag wm">WM</span><span class="tag eff">效率</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.05438" target="_blank">↗ 2603.05438</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">导航 World Model</div>
+      <div class="paper-grid">
+        <div class="paper-card">
+          <div class="date">2026-03-10</div>
+          <h4>RAE-NWM: Navigation World Model in Dense Visual Representation</h4>
+          <p class="summary">密集视觉表征空间中的导航世界模型，动作条件化状态转移用于目标导航规划。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag wm">WM</span><span class="tag nav">导航</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.09241" target="_blank">↗ 2603.09241</a>
+          </div>
+        </div>
+        <div class="paper-card">
+          <div class="date">2026-03-08</div>
+          <h4>MWM: Mobile World Models for Action-Conditioned Consistent Prediction</h4>
+          <p class="summary">移动端动作条件化一致性世界模型，在移动导航中提供时序连贯的未来预测。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag wm">WM</span><span class="tag nav">导航</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.07799" target="_blank">↗ 2603.07799</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FUSION ===== -->
+  <section id="fusion">
+    <div class="section-header">
+      <div class="section-icon" style="background:#4c1d95">🔗</div>
+      <h2>WM + VLA 深度融合（2026年最热方向）</h2>
+    </div>
+    <p style="color:var(--muted);font-size:0.875rem;margin-bottom:20px">
+      核心范式：用真实数据训练世界模型 → 在世界模型中进行 RL 后训练 VLA → 无需大量真实机器人交互
+    </p>
+    <div class="paper-grid">
+      <div class="paper-card hot">
+        <div class="date">2026-03-11</div>
+        <h4>World2Act: Latent Action Post-Training via Skill-Compositional World Models</h4>
+        <p class="summary">技能组合世界模型用于 VLA 后训练，自适应处理分布外环境变化，提升策略鲁棒性。</p>
+        <div class="footer">
+          <div class="tags"><span class="tag fusion">WM+VLA</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2603.10422" target="_blank">↗ 2603.10422</a>
+        </div>
+      </div>
+      <div class="paper-card hot">
+        <div class="date">2026-03-09</div>
+        <h4>AtomVLA: Scalable Post-Training via Predictive Latent World Models</h4>
+        <p class="summary">预测性潜在世界模型可扩展地提升 VLA 多步行为的鲁棒性与指令跟随能力。</p>
+        <div class="footer">
+          <div class="tags"><span class="tag fusion">WM+VLA</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2603.08519" target="_blank">↗ 2603.08519</a>
+        </div>
+      </div>
+      <div class="paper-card hot">
+        <div class="date">2026-03-03</div>
+        <h4>Chain of World: World Model Thinking in Latent Motion</h4>
+        <p class="summary">将 CoT 从语言 token 迁移到潜在运动空间，引入时序因果结构，VLA 先"想"再"做"。</p>
+        <div class="footer">
+          <div class="tags"><span class="tag fusion">WM+VLA</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2603.03195" target="_blank">↗ 2603.03195</a>
+        </div>
+      </div>
+      <div class="paper-card">
+        <div class="date">2026-03-02</div>
+        <h4>LaST-VLA: Thinking in Latent Spatio-Temporal Space</h4>
+        <p class="summary">用潜在时空表征替代文本 CoT，消除语义-感知鸿沟，用于自动驾驶 VLA。</p>
+        <div class="footer">
+          <div class="tags"><span class="tag fusion">WM+VLA</span><span class="tag ad">自动驾驶</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2603.01928" target="_blank">↗ 2603.01928</a>
+        </div>
+      </div>
+      <div class="paper-card">
+        <div class="date">2026-02-15</div>
+        <h4>WoVR: World Models as Reliable Simulators for Post-Training VLA with RL</h4>
+        <p class="summary">世界模型替代真实环境，为 VLA 提供 RL 训练沙箱，大幅降低真实机器人交互需求。</p>
+        <div class="footer">
+          <div class="tags"><span class="tag fusion">WM+VLA</span><span class="tag rl">RL</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2602.13977" target="_blank">↗ 2602.13977</a>
+        </div>
+      </div>
+      <div class="paper-card">
+        <div class="date">2026-02-12</div>
+        <h4>VLAW: Iterative Co-Improvement of VLA Policy and World Model</h4>
+        <p class="summary">VLA 策略与世界模型双向迭代协同改进，线上交互数据循环提升两者质量。</p>
+        <div class="footer">
+          <div class="tags"><span class="tag fusion">WM+VLA</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2602.12063" target="_blank">↗ 2602.12063</a>
+        </div>
+      </div>
+      <div class="paper-card">
+        <div class="date">2026-02-11</div>
+        <h4>RISE: Self-Improving Robot Policy with Compositional World Model</h4>
+        <p class="summary">组合式世界模型驱动机器人策略自我改进，解决接触丰富动态操作任务的 VLA 脆弱性。</p>
+        <div class="footer">
+          <div class="tags"><span class="tag fusion">WM+VLA</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2602.11075" target="_blank">↗ 2602.11075</a>
+        </div>
+      </div>
+      <div class="paper-card">
+        <div class="date">2026-02-11</div>
+        <h4>Scaling World Model for Hierarchical Manipulation Policies</h4>
+        <p class="summary">层级操作策略的世界模型扩展，解决 OOD 场景下 VLA 脆弱性，仅需少量真实数据。</p>
+        <div class="footer">
+          <div class="tags"><span class="tag fusion">WM+VLA</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2602.10983" target="_blank">↗ 2602.10983</a>
+        </div>
+      </div>
+      <div class="paper-card">
+        <div class="date">2026-02-10</div>
+        <h4>VLA-JEPA: Enhancing VLA with Latent World Model</h4>
+        <p class="summary">JEPA 风格潜在世界模型预训练，超越像素级变化的动作-感知对齐目标。</p>
+        <div class="footer">
+          <div class="tags"><span class="tag fusion">WM+VLA</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2602.10098" target="_blank">↗ 2602.10098</a>
+        </div>
+      </div>
+      <div class="paper-card">
+        <div class="date">2026-02-25</div>
+        <h4>World Guidance: World Modeling in Condition Space for Action Generation</h4>
+        <p class="summary">在条件空间中建模未来观测，将世界模型预测作为 VLA 动作生成的引导信号。</p>
+        <div class="footer">
+          <div class="tags"><span class="tag fusion">WM+VLA</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2602.22010" target="_blank">↗ 2602.22010</a>
+        </div>
+      </div>
+      <div class="paper-card">
+        <div class="date">2026-02-12</div>
+        <h4>GigaBrain-0.5M: VLA Learns From World Model-Based RL</h4>
+        <p class="summary">基于世界模型 RL 的 VLA 训练，解决单步 chunk 动作预测的场景理解局限。</p>
+        <div class="footer">
+          <div class="tags"><span class="tag fusion">WM+VLA</span><span class="tag rl">RL</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2602.12099" target="_blank">↗ 2602.12099</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TRENDS ===== -->
+  <section id="trends">
+    <div class="section-header">
+      <div class="section-icon" style="background:#713f12">📈</div>
+      <h2>趋势分析</h2>
+    </div>
+    <div class="trend-grid">
+      <div class="trend-card">
+        <h4>🔥 WM 成为 VLA 后训练标配</h4>
+        <p>WoVR、VLAW、RISE、AtomVLA 等在2026年初密集爆发，核心范式：用真实数据训世界模型 → WM 中 RL 后训练 VLA → 无需大量真实机器人交互。</p>
+        <p class="examples">代表：WoVR / VLAW / RISE / AtomVLA / World2Act</p>
+      </div>
+      <div class="trend-card">
+        <h4>💭 潜在空间 CoT 替代文本 CoT</h4>
+        <p>将 Chain-of-Thought 从语言 token 迁移到潜在动态/时空表征，减少语义-感知鸿沟，更直接地建模物理因果。</p>
+        <p class="examples">代表：Chain of World / LaST-VLA / DynVLA</p>
+      </div>
+      <div class="trend-card">
+        <h4>📐 3D / 空间感知注入</h4>
+        <p>VLA 的 2D patch token 缺乏几何结构，GST-VLA 等工作将深度/高斯空间结构显式引入 token，弥补几何缺失。</p>
+        <p class="examples">代表：GST-VLA / FutureVLA</p>
+      </div>
+      <div class="trend-card">
+        <h4>🚗 自动驾驶 VLA 热潮</h4>
+        <p>2026年3月出现多篇 AD-VLA，将机器人 VLA 范式迁移到自动驾驶。个性化、场景自适应、WM 结合成为子方向热点。</p>
+        <p class="examples">代表：DynVLA / StyleVLA / EvoDriveVLA / SAMoE-VLA</p>
+      </div>
+      <div class="trend-card">
+        <h4>⚡ 推理效率优化</h4>
+        <p>VLA/WM 的 token 冗余问题引起关注，DepthCache、WorldCache 等工作专注免训练加速，Planning in 8 Tokens 探索极致压缩。</p>
+        <p class="examples">代表：DepthCache / WorldCache / Planning in 8 Tokens</p>
+      </div>
+      <div class="trend-card">
+        <h4>🧠 神经科学 / 符号融合</h4>
+        <p>SaiVLA 的大脑-桥脑-小脑三层架构、NS-VLA 的神经符号设计，体现将结构先验显式引入 VLA 的趋势。</p>
+        <p class="examples">代表：SaiVLA-0 / NS-VLA</p>
+      </div>
+    </div>
+
+    <div style="margin-top:32px">
+      <div class="subsection-title">关键方法对比</div>
+      <div style="overflow-x:auto">
+        <table class="method-table">
+          <thead>
+            <tr>
+              <th>方法类型</th>
+              <th>代表工作</th>
+              <th>核心思路</th>
+              <th>主要优势</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="tag vla">端到端 VLA</span></td>
+              <td>OpenVLA, UniVLA</td>
+              <td>预训练 VLM + 动作预测头</td>
+              <td>强泛化、语言指令跟随</td>
+            </tr>
+            <tr>
+              <td><span class="tag fusion">WM for RL</span></td>
+              <td>WoVR, VLAW, GigaBrain</td>
+              <td>世界模型仿真 → RL 训练 VLA</td>
+              <td>无需大量真实机器人交互</td>
+            </tr>
+            <tr>
+              <td><span class="tag fusion">潜在动态 CoT</span></td>
+              <td>Chain of World, DynVLA</td>
+              <td>预测潜在动态 → 条件化动作</td>
+              <td>减少语义-感知鸿沟</td>
+            </tr>
+            <tr>
+              <td><span class="tag vla">空间增强 VLA</span></td>
+              <td>GST-VLA, FutureVLA</td>
+              <td>几何/深度结构注入 token</td>
+              <td>提升 3D 操作精度</td>
+            </tr>
+            <tr>
+              <td><span class="tag rl">持续学习 VLA</span></td>
+              <td>Simple Recipe, DexHiL</td>
+              <td>RL 微调 / 人机协同后训练</td>
+              <td>适应新任务无灾难遗忘</td>
+            </tr>
+            <tr>
+              <td><span class="tag wm">层级规划 WM</span></td>
+              <td>MetaWorld-X, H-WM</td>
+              <td>高层语义规划 + 低层运动执行</td>
+              <td>长程任务分解与执行</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== HOT ===== -->
+  <section id="hot">
+    <div class="section-header">
+      <div class="section-icon" style="background:#7c2d12">🔥</div>
+      <h2>近期热点 TOP 8（2026-03）</h2>
+    </div>
+    <div class="hot-list">
+      <div class="hot-item">
+        <div class="num">1</div>
+        <div class="info">
+          <h5>World2Act</h5>
+          <p>技能组合 WM 用于 VLA 后训练新框架</p>
+          <a href="https://arxiv.org/abs/2603.10422" target="_blank">↗ 2603.10422</a>
+        </div>
+      </div>
+      <div class="hot-item">
+        <div class="num">2</div>
+        <div class="info">
+          <h5>AtomVLA</h5>
+          <p>预测潜在世界模型提升多步任务鲁棒性</p>
+          <a href="https://arxiv.org/abs/2603.08519" target="_blank">↗ 2603.08519</a>
+        </div>
+      </div>
+      <div class="hot-item">
+        <div class="num">3</div>
+        <div class="info">
+          <h5>FutureVLA</h5>
+          <p>联合视动预测，未来感知与动作深度绑定</p>
+          <a href="https://arxiv.org/abs/2603.10712" target="_blank">↗ 2603.10712</a>
+        </div>
+      </div>
+      <div class="hot-item">
+        <div class="num">4</div>
+        <div class="info">
+          <h5>DynVLA</h5>
+          <p>自动驾驶 Dynamics CoT，先预测动态再决策</p>
+          <a href="https://arxiv.org/abs/2603.11041" target="_blank">↗ 2603.11041</a>
+        </div>
+      </div>
+      <div class="hot-item">
+        <div class="num">5</div>
+        <div class="info">
+          <h5>SaPaVe</h5>
+          <p>主动感知 + VLA，统一感知-执行端到端框架</p>
+          <a href="https://arxiv.org/abs/2603.12193" target="_blank">↗ 2603.12193</a>
+        </div>
+      </div>
+      <div class="hot-item">
+        <div class="num">6</div>
+        <div class="info">
+          <h5>PlayWorld</h5>
+          <p>从自主探索数据学习世界模型，无需任务标注</p>
+          <a href="https://arxiv.org/abs/2603.09030" target="_blank">↗ 2603.09030</a>
+        </div>
+      </div>
+      <div class="hot-item">
+        <div class="num">7</div>
+        <div class="info">
+          <h5>Chain of World</h5>
+          <p>潜在运动空间的世界模型推理 CoT</p>
+          <a href="https://arxiv.org/abs/2603.03195" target="_blank">↗ 2603.03195</a>
+        </div>
+      </div>
+      <div class="hot-item">
+        <div class="num">8</div>
+        <div class="info">
+          <h5>ResWM</h5>
+          <p>残差动作世界模型，视觉 RL 新基线</p>
+          <a href="https://arxiv.org/abs/2603.11110" target="_blank">↗ 2603.11110</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  数据来源：ArXiv API (cs.RO / cs.CV / cs.AI) · HuggingFace Trending Papers &nbsp;|&nbsp;
+  整理日期：2026-03-14 &nbsp;|&nbsp;
+  收录论文 40+ 篇
+</footer>
+
+</body>
+</html>
