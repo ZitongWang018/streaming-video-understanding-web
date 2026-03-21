@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LingBot 系列工作深度解析 | World Model & VLA</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #23273a;
+      --border: #2e3350;
+      --accent: #6366f1;
+      --accent2: #22d3ee;
+      --accent3: #f59e0b;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --lb-vla: #7c3aed;
+      --lb-world: #0891b2;
+      --lb-va: #059669;
+      --lb-depth: #c2410c;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.7;
+    }
+
+    /* ===== Header ===== */
+    header {
+      background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 50%, #0c1a2e 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 52px 32px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(99,102,241,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .logo-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .org-badge {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 6px 18px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    header h1 {
+      font-size: 2.2rem;
+      font-weight: 900;
+      background: linear-gradient(90deg, #a78bfa, #22d3ee, #f59e0b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+      letter-spacing: -0.02em;
+    }
+    header .subtitle {
+      color: var(--muted);
+      font-size: 1rem;
+      margin-bottom: 20px;
+    }
+    .header-tags {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .header-tag {
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1px solid;
+    }
+    .ht-vla { background: rgba(124,58,237,0.2); border-color: #7c3aed; color: #c4b5fd; }
+    .ht-world { background: rgba(8,145,178,0.2); border-color: #0891b2; color: #67e8f9; }
+    .ht-va { background: rgba(5,150,105,0.2); border-color: #059669; color: #6ee7b7; }
+    .ht-depth { background: rgba(194,65,12,0.2); border-color: #c2410c; color: #fed7aa; }
+
+    /* ===== Nav ===== */
+    nav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-back {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      padding: 14px 16px 14px 0;
+      border-right: 1px solid var(--border);
+      margin-right: 16px;
+      white-space: nowrap;
+    }
+    .nav-back:hover { color: var(--text); }
+    nav a.tab {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.88rem;
+      padding: 14px 16px;
+      white-space: nowrap;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    nav a.tab:hover { color: var(--text); border-color: var(--accent); }
+
+    /* ===== Container ===== */
+    .container { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+
+    /* ===== Overview section ===== */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-bottom: 40px;
+    }
+    .ov-card {
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid;
+      cursor: pointer;
+      text-decoration: none;
+      display: block;
+      transition: transform 0.15s, opacity 0.15s;
+    }
+    .ov-card:hover { transform: translateY(-3px); opacity: 0.95; }
+    .ov-vla { background: rgba(124,58,237,0.12); border-color: #7c3aed; }
+    .ov-world { background: rgba(8,145,178,0.12); border-color: #0891b2; }
+    .ov-va { background: rgba(5,150,105,0.12); border-color: #059669; }
+    .ov-depth { background: rgba(194,65,12,0.12); border-color: #c2410c; }
+    .ov-card .ov-icon { font-size: 1.8rem; margin-bottom: 10px; }
+    .ov-card .ov-name { font-size: 1.05rem; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+    .ov-card .ov-sub { font-size: 0.78rem; color: var(--muted); margin-bottom: 10px; line-height: 1.5; }
+    .ov-card .ov-stats { display: flex; gap: 12px; flex-wrap: wrap; }
+    .ov-stat { font-size: 0.75rem; font-weight: 600; }
+    .ov-stat span { color: var(--muted); font-weight: 400; }
+
+    /* ===== Section headers ===== */
+    .paper-section { margin-bottom: 60px; scroll-margin-top: 60px; }
+    .ps-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid;
+    }
+    .ps-header.vla { border-color: var(--lb-vla); }
+    .ps-header.world { border-color: var(--lb-world); }
+    .ps-header.va { border-color: var(--lb-va); }
+    .ps-header.depth { border-color: var(--lb-depth); }
+
+    .ps-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      flex-shrink: 0;
+    }
+    .ps-icon.vla { background: rgba(124,58,237,0.2); }
+    .ps-icon.world { background: rgba(8,145,178,0.2); }
+    .ps-icon.va { background: rgba(5,150,105,0.2); }
+    .ps-icon.depth { background: rgba(194,65,12,0.2); }
+
+    .ps-title-block h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 4px; }
+    .ps-title-block .ps-en { font-size: 0.82rem; color: var(--muted); font-family: monospace; margin-bottom: 8px; }
+    .ps-title-block .ps-links { display: flex; flex-wrap: wrap; gap: 10px; }
+    .ps-link {
+      font-size: 0.78rem;
+      color: var(--accent2);
+      text-decoration: none;
+      border: 1px solid rgba(34,211,238,0.3);
+      border-radius: 12px;
+      padding: 3px 10px;
+      transition: background 0.2s;
+    }
+    .ps-link:hover { background: rgba(34,211,238,0.1); }
+
+    /* ===== Info blocks ===== */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 640px) {
+      .info-grid { grid-template-columns: 1fr; }
+    }
+    .info-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+    }
+    .info-block h4 {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .info-block p { font-size: 0.875rem; color: var(--text); line-height: 1.65; }
+    .info-block ul { list-style: none; }
+    .info-block ul li {
+      font-size: 0.875rem;
+      color: var(--text);
+      padding: 4px 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .info-block ul li:last-child { border: none; }
+    .info-block ul li::before { content: '▸'; color: var(--accent3); flex-shrink: 0; margin-top: 1px; }
+
+    /* ===== Metric table ===== */
+    .metric-section { margin-bottom: 20px; }
+    .metric-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--accent2);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .metric-title::before {
+      content: '';
+      display: inline-block;
+      width: 3px;
+      height: 14px;
+      background: var(--accent2);
+      border-radius: 2px;
+    }
+    .mtable {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      margin-bottom: 16px;
+    }
+    .mtable th {
+      background: var(--surface2);
+      color: var(--muted);
+      font-weight: 600;
+      padding: 8px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .mtable td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    .mtable tr:hover td { background: var(--surface2); }
+    .mtable .best { color: #4ade80; font-weight: 700; }
+    .mtable .ours-row td { background: rgba(99,102,241,0.08); }
+    .mtable .ours-row td:first-child { font-weight: 700; color: var(--accent); }
+
+    /* ===== Architecture box ===== */
+    .arch-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      font-size: 0.875rem;
+    }
+    .arch-box h4 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 14px;
+    }
+    .arch-flow {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .arch-node {
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1px solid;
+      text-align: center;
+    }
+    .an-blue { background: rgba(8,145,178,0.15); border-color: #0891b2; color: #67e8f9; }
+    .an-purple { background: rgba(124,58,237,0.15); border-color: #7c3aed; color: #c4b5fd; }
+    .an-green { background: rgba(5,150,105,0.15); border-color: #059669; color: #6ee7b7; }
+    .an-orange { background: rgba(194,65,12,0.15); border-color: #c2410c; color: #fed7aa; }
+    .an-gray { background: var(--surface2); border-color: var(--border); color: var(--muted); }
+    .arch-arrow { color: var(--muted); font-size: 1.1rem; }
+    .arch-note { font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
+
+    /* ===== Key insight ===== */
+    .insight-box {
+      background: rgba(99,102,241,0.08);
+      border: 1px solid rgba(99,102,241,0.3);
+      border-left: 3px solid var(--accent);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      font-size: 0.875rem;
+      color: var(--text);
+      line-height: 1.65;
+    }
+    .insight-box strong { color: var(--accent2); }
+
+    /* ===== Comparison section ===== */
+    .compare-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 48px;
+    }
+    .compare-section h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .compare-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+    }
+    .cg-item {
+      text-align: center;
+      padding: 16px;
+      background: var(--bg);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .cg-item .cg-name { font-size: 0.9rem; font-weight: 700; margin-bottom: 8px; }
+    .cg-item .cg-role { font-size: 0.78rem; color: var(--muted); margin-bottom: 12px; line-height: 1.5; }
+    .cg-item .cg-arrow { color: var(--accent3); font-size: 1.2rem; margin: 0 4px; }
+
+    /* ===== Footer ===== */
+    footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 24px 32px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    @media (max-width: 640px) {
+      header h1 { font-size: 1.5rem; }
+      .container { padding: 24px 16px; }
+      .ps-header { flex-direction: column; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo-row">
+    <div class="org-badge">
+      <span>🤖</span>
+      <span>Robbyant Team</span>
+    </div>
+    <div class="org-badge">
+      <span>⭐</span>
+      <span>3.2k ~ 4k Stars</span>
+    </div>
+    <div class="org-badge">
+      <span>📅</span>
+      <span>2026-01 ~ 2026-03</span>
+    </div>
+  </div>
+  <h1>LingBot 系列工作深度解析</h1>
+  <p class="subtitle">Robbyant 团队 · 四项 VLA / World Model 前沿工作全面分析</p>
+  <div class="header-tags">
+    <span class="header-tag ht-vla">🤖 LingBot-VLA · 实用 VLA 基础模型</span>
+    <span class="header-tag ht-world">🌍 LingBot-World · 开源世界模型</span>
+    <span class="header-tag ht-va">🎬 LingBot-VA · 因果视频-动作世界模型</span>
+    <span class="header-tag ht-depth">📐 LingBot-Depth · 深度感知基础模型</span>
+  </div>
+</header>
+
+<nav>
+  <a class="nav-back" href="index.html">← 返回总览</a>
+  <a class="tab" href="#vla">LingBot-VLA</a>
+  <a class="tab" href="#world">LingBot-World</a>
+  <a class="tab" href="#va">LingBot-VA</a>
+  <a class="tab" href="#depth">LingBot-Depth</a>
+  <a class="tab" href="#summary">综合评析</a>
+</nav>
+
+<div class="container">
+
+  <!-- ===== Overview Cards ===== -->
+  <div class="overview-grid" style="margin-top:8px">
+    <a class="ov-card ov-vla" href="#vla">
+      <div class="ov-icon">🤖</div>
+      <div class="ov-name">LingBot-VLA</div>
+      <div class="ov-sub">实用 VLA 基础模型<br>20,000小时双臂机器人数据预训练</div>
+      <div class="ov-stats">
+        <div class="ov-stat">961 <span>⭐ Stars</span></div>
+        <div class="ov-stat">arXiv: <span>2601.18692</span></div>
+      </div>
+    </a>
+    <a class="ov-card ov-world" href="#world">
+      <div class="ov-icon">🌍</div>
+      <div class="ov-name">LingBot-World</div>
+      <div class="ov-sub">开源世界模型仿真器<br>&lt;1s 延迟，16fps 实时交互</div>
+      <div class="ov-stats">
+        <div class="ov-stat">3.2k <span>⭐ Stars</span></div>
+        <div class="ov-stat">arXiv: <span>2601.20540</span></div>
+      </div>
+    </a>
+    <a class="ov-card ov-va" href="#va">
+      <div class="ov-icon">🎬</div>
+      <div class="ov-name">LingBot-VA</div>
+      <div class="ov-sub">因果视频-动作世界模型<br>RoboTwin 2.0 超越90%阈值</div>
+      <div class="ov-stats">
+        <div class="ov-stat">836 <span>⭐ Stars</span></div>
+        <div class="ov-stat">arXiv: <span>2601.21998</span></div>
+      </div>
+    </a>
+    <a class="ov-card ov-depth" href="#depth">
+      <div class="ov-icon">📐</div>
+      <div class="ov-name">LingBot-Depth</div>
+      <div class="ov-sub">掩码深度建模空间感知<br>3M RGB-D 数据集训练</div>
+      <div class="ov-stats">
+        <div class="ov-stat">957 <span>⭐ Stars</span></div>
+        <div class="ov-stat">arXiv: <span>2601.17895</span></div>
+      </div>
+    </a>
+  </div>
+
+  <div class="insight-box" style="margin-bottom:40px">
+    <strong>LingBot 系列的整体设计思路：</strong> Robbyant 团队围绕"实用主义机器人 AI"构建了一个垂直整合的技术栈——从底层空间感知（Depth）→ 视频生成基础设施（World）→ 因果视频-动作联合建模（VA）→ 面向双臂操作的 VLA 基础模型（VLA），四个工作相互依赖、形成完整闭环。其中 LingBot-VLA 直接集成 LingBot-Depth 作为视觉增强模块，体现了系统级设计思维。
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- 1. LingBot-VLA -->
+  <!-- ===================================================== -->
+  <section class="paper-section" id="vla">
+    <div class="ps-header vla">
+      <div class="ps-icon vla">🤖</div>
+      <div class="ps-title-block">
+        <h2>LingBot-VLA</h2>
+        <div class="ps-en">A Pragmatic VLA Foundation Model · arXiv:2601.18692 · 2026-01-27</div>
+        <div class="ps-links">
+          <a class="ps-link" href="https://arxiv.org/abs/2601.18692" target="_blank">↗ arXiv</a>
+          <a class="ps-link" href="https://github.com/Robbyant/lingbot-vla" target="_blank">↗ GitHub</a>
+          <a class="ps-link" href="https://technology.robbyant.com/lingbot-vla" target="_blank">↗ 项目主页</a>
+          <a class="ps-link" href="https://huggingface.co/collections/robbyant/lingbot-vla" target="_blank">↗ HuggingFace</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Core Idea -->
+    <div class="insight-box">
+      <strong>核心出发点：</strong>现有 VLA 研究大多依赖有限的仿真数据或小规模真实数据，缺乏"实用主义"视角——即面向真实双臂机器人大规模部署所需的数据规模、训练效率与跨平台泛化能力。LingBot-VLA 以 <strong>2 万小时真实数据预训练</strong>为核心，配合深度感知增强，在工业可用性上迈出关键一步。
+    </div>
+
+    <div class="info-grid">
+      <div class="info-block">
+        <h4>🏗️ 模型架构</h4>
+        <ul>
+          <li>基座模型：Qwen2.5-VL-3B-Instruct（视觉语言模型）</li>
+          <li>动作生成：Flow Matching（连续动作轨迹）</li>
+          <li>动作空间：75 维（max_action_dim），支持 14 维目标机器人</li>
+          <li>深度分支：LingBot-Depth（MoRGBD）+ MoGe-2 单目深度估计</li>
+          <li>深度注入：Query-based Distillation，8 个可学习任务 Token</li>
+          <li>两版模型：w/ Depth 和 w/o Depth</li>
+        </ul>
+      </div>
+      <div class="info-block">
+        <h4>📦 训练数据</h4>
+        <ul>
+          <li>规模：<strong>20,000 小时</strong>真实世界操作数据</li>
+          <li>覆盖：9 种主流双臂机器人配置</li>
+          <li>评测数据集：GM-100（3 个机器人平台真实世界测试集）</li>
+          <li>仿真评测：RoboTwin 2.0（干净 + 随机化场景）</li>
+        </ul>
+      </div>
+      <div class="info-block">
+        <h4>⚡ 训练效率</h4>
+        <ul>
+          <li>vs. Qwen2.5-VL-3B-π：<strong>1.5–2.8×</strong> 吞吐量提升</li>
+          <li>vs. PaliGemma-3B-pt-224-π：<strong>1.5–2.8×</strong> 吞吐量提升</li>
+          <li>分布式：FSDP2 + torch.compile + Flash Attention</li>
+          <li>线性扩展至 256 GPU，接近理论极限</li>
+        </ul>
+      </div>
+      <div class="info-block">
+        <h4>🔑 深度注入创新</h4>
+        <ul>
+          <li>MoRGBD：RGB-D 联合特征融合骨干</li>
+          <li>对比学习辅助损失（weight=0.3）</li>
+          <li>深度监督损失（weight=0.002）</li>
+          <li>8 个任务 Token + 图像 Token 跨模态对齐</li>
+          <li>VLM 内嵌深度蒸馏，训练和推理通用</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Architecture flow -->
+    <div class="arch-box">
+      <h4>🔄 数据流与架构</h4>
+      <div class="arch-flow">
+        <div class="arch-node an-blue">RGB 图像</div>
+        <div class="arch-arrow">+</div>
+        <div class="arch-node an-orange">原始深度图</div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node an-orange">MoGe-2<br><small>单目深度</small></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node an-orange">MoRGBD<br><small>LingBot-Depth</small></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node an-green">深度 Token<br><small>8 learnable</small></div>
+      </div>
+      <div class="arch-flow">
+        <div class="arch-node an-blue">RGB 图像</div>
+        <div class="arch-arrow">+</div>
+        <div class="arch-node an-gray">语言指令</div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node an-purple">Qwen2.5-VL-3B<br><small>视觉语言骨干</small></div>
+        <div class="arch-arrow">+</div>
+        <div class="arch-node an-green">深度 Token<br><small>Query Distill</small></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node an-purple">Flow Matching<br><small>动作解码</small></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node an-blue">动作输出<br><small>14/75 维</small></div>
+      </div>
+      <div class="arch-note">深度分支可选插拔：w/o Depth 版本跳过 MoRGBD，直接以 RGB 特征输入 VLM；w/ Depth 版本引入对比学习对齐 RGB-D 特征。</div>
+    </div>
+
+    <!-- Performance tables -->
+    <div class="metric-section">
+      <div class="metric-title">GM-100 真实世界评测（3 平台平均成功率）</div>
+      <table class="mtable">
+        <thead>
+          <tr><th>模型</th><th>Agibot G1 SR</th><th>AgileX SR</th><th>Galaxea R1Pro SR</th><th>平均 SR</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>WALL-OSS</td><td>8.75%</td><td>8.16%</td><td>14.13%</td><td>10.35%</td></tr>
+          <tr><td>GR00T N1.6</td><td>12.63%</td><td>10.52%</td><td>24.83%</td><td>15.99%</td></tr>
+          <tr><td>π0.5</td><td>21.98%</td><td>34.82%</td><td>26.14%</td><td>27.65%</td></tr>
+          <tr class="ours-row"><td>LingBot-VLA (w/o Depth)</td><td>30.04%</td><td>36.31%</td><td>34.71%</td><td><span class="best">33.69%</span></td></tr>
+          <tr class="ours-row"><td>LingBot-VLA (w/ Depth)</td><td>30.47%</td><td>40.36%</td><td>35.40%</td><td><span class="best">35.41%</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="metric-section">
+      <div class="metric-title">RoboTwin 2.0 仿真评测（平均成功率，50 任务）</div>
+      <table class="mtable">
+        <thead>
+          <tr><th>模型</th><th>Clean SR (%)</th><th>Rand. SR (%)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>π0.5</td><td>82.74%</td><td>76.76%</td></tr>
+          <tr class="ours-row"><td>LingBot-VLA (w/o Depth)</td><td>86.50%</td><td>85.34%</td></tr>
+          <tr class="ours-row"><td>LingBot-VLA (w/ Depth)</td><td><span class="best">88.56%</span></td><td><span class="best">86.68%</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="info-block" style="margin-bottom:8px">
+      <h4>💡 亮点总结</h4>
+      <ul>
+        <li>迄今为止最大规模双臂机器人真实数据预训练（20,000 小时），体现"实用主义"工程思维</li>
+        <li>深度感知原生集成：不是后处理，而是训练阶段的 Query Distillation，避免推理时的模态对齐开销</li>
+        <li>在 GM-100 超越 π0.5 平均 +7.76% SR（w/ Depth），跨平台泛化能力突出</li>
+        <li>训练效率 1.5–2.8× 提升，FSDP2 分布式扩展至 256 GPU，接近线性</li>
+        <li>完整开源：代码 + 权重 + 评估套件（HuggingFace + ModelScope）</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===================================================== -->
+  <!-- 2. LingBot-World -->
+  <!-- ===================================================== -->
+  <section class="paper-section" id="world">
+    <div class="ps-header world">
+      <div class="ps-icon world">🌍</div>
+      <div class="ps-title-block">
+        <h2>LingBot-World</h2>
+        <div class="ps-en">Advancing Open-source World Models · arXiv:2601.20540 · 2026-01-29</div>
+        <div class="ps-links">
+          <a class="ps-link" href="https://arxiv.org/abs/2601.20540" target="_blank">↗ arXiv</a>
+          <a class="ps-link" href="https://github.com/Robbyant/lingbot-world" target="_blank">↗ GitHub</a>
+          <a class="ps-link" href="https://technology.robbyant.com/lingbot-world" target="_blank">↗ 项目主页</a>
+          <a class="ps-link" href="https://huggingface.co/collections/robbyant/lingbot-world" target="_blank">↗ HuggingFace</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-box">
+      <strong>核心出发点：</strong>现有世界模型（如 Sora、Genie 等）要么不开源，要么缺少实时交互能力。LingBot-World 旨在构建一个 <strong>完全开源的顶级世界模拟器</strong>，同时满足：高保真多样环境渲染、分钟级长时记忆一致性、以及 <strong>&lt;1 秒延迟的实时交互</strong>。这是 WM 用于机器人学习和游戏/内容创作的共同需求。
+    </div>
+
+    <div class="info-grid">
+      <div class="info-block">
+        <h4>🏗️ 技术基础</h4>
+        <ul>
+          <li>构建于 <strong>Wan2.2</strong> 视频生成框架（DiT 架构）</li>
+          <li>分辨率：480P 和 720P 双档</li>
+          <li>帧率：16 fps，延迟 &lt;1 秒</li>
+          <li>最大时长：961 帧 ≈ 1 分钟（分钟级记忆）</li>
+          <li>分布式：FSDP + Ulysses 序列并行</li>
+        </ul>
+      </div>
+      <div class="info-block">
+        <h4>🎮 控制信号类型</h4>
+        <ul>
+          <li><strong>Base (Cam)：</strong>相机位姿条件（fx/fy/cx/cy + 4×4 变换矩阵）</li>
+          <li><strong>Base (Act)：</strong>动作条件（机器人动作序列）</li>
+          <li><strong>Fast 版本：</strong>待发布（极速推理优化）</li>
+          <li>支持无控制信号的自由生成模式</li>
+        </ul>
+      </div>
+      <div class="info-block">
+        <h4>🌈 环境多样性</h4>
+        <ul>
+          <li>写实环境（室内、室外、自然场景）</li>
+          <li>科幻/科学可视化场景</li>
+          <li>卡通/游戏风格环境</li>
+          <li>机器人操作场景（用于 LingBot-VA 数据生成）</li>
+          <li>长时记忆一致性：场景状态在分钟级保持连贯</li>
+        </ul>
+      </div>
+      <div class="info-block">
+        <h4>🚀 开放程度</h4>
+        <ul>
+          <li>完整代码 + 权重（Apache 2.0 License）</li>
+          <li>4-bit NF4 量化版本（社区贡献，显存友好）</li>
+          <li>HuggingFace + ModelScope 双平台托管</li>
+          <li>3.2k Stars（最高星标 LingBot 作品）</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Architecture flow -->
+    <div class="arch-box">
+      <h4>🔄 架构与推理流程</h4>
+      <div class="arch-flow">
+        <div class="arch-node an-blue">初始图像</div>
+        <div class="arch-arrow">+</div>
+        <div class="arch-node an-gray">文本提示</div>
+        <div class="arch-arrow">+</div>
+        <div class="arch-node an-orange">控制信号<br><small>相机位姿 / 动作</small></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node an-purple">Wan2.2 DiT<br><small>扩散 Transformer</small></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node an-green">连贯视频帧<br><small>480P/720P · 16fps</small></div>
+      </div>
+      <div class="arch-flow" style="margin-top:10px">
+        <div class="arch-node an-green">视频输出</div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node an-blue">ViPE 位姿估计<br><small>（可选，逆向获取姿态）</small></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node an-orange">相机轨迹<br><small>闭环控制输入</small></div>
+      </div>
+      <div class="arch-note" style="margin-top:12px">
+        LingBot-World 可与 LingBot-VA 协同工作：World 负责生成多样化的机器人操作视频场景，VA 在这些场景上进行因果动作建模，从而形成"虚拟数据生成 → 策略训练"的闭环。
+      </div>
+    </div>
+
+    <div class="info-block">
+      <h4>💡 亮点总结</h4>
+      <ul>
+        <li>目前开源社区中实时性最强的世界模型（&lt;1s 延迟 @16fps），填补闭源与开源差距</li>
+        <li>分钟级时序一致性（961帧），远超同期开源 WM 的短时窗口限制（通常16-64帧）</li>
+        <li>双控制信号：相机位姿（用于内容创作/VR）+ 机器人动作（用于机器人学习），一套模型两种用途</li>
+        <li>社区活跃度高（3.2k Stars，263 Forks），已出现量化版本等社区贡献</li>
+        <li>作为 LingBot-VA 的数据生成基础设施，与系列内其他工作深度耦合</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===================================================== -->
+  <!-- 3. LingBot-VA -->
+  <!-- ===================================================== -->
+  <section class="paper-section" id="va">
+    <div class="ps-header va">
+      <div class="ps-icon va">🎬</div>
+      <div class="ps-title-block">
+        <h2>LingBot-VA</h2>
+        <div class="ps-en">Causal World Modeling for Robot Control · arXiv:2601.21998 · 2026-01-29</div>
+        <div class="ps-links">
+          <a class="ps-link" href="https://arxiv.org/abs/2601.21998" target="_blank">↗ arXiv</a>
+          <a class="ps-link" href="https://github.com/Robbyant/lingbot-va" target="_blank">↗ GitHub</a>
+          <a class="ps-link" href="https://technology.robbyant.com/lingbot-va" target="_blank">↗ 项目主页</a>
+          <a class="ps-link" href="https://huggingface.co/collections/robbyant/lingbot-va" target="_blank">↗ HuggingFace</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-box">
+      <strong>核心出发点：</strong>传统 VLA 将视觉感知和动作预测分离建模，忽视了"视觉动态"和"机器人动作"在时间维度上的内在因果关联。LingBot-VA 提出 <strong>因果视频-动作世界模型</strong>：在单一自回归模型中，将未来视觉帧预测与动作预测 <strong>交织为统一序列</strong>，让模型显式建模"动作如何改变视觉世界"的因果链，从而大幅提升长程操作成功率。
+    </div>
+
+    <div class="info-grid">
+      <div class="info-block">
+        <h4>🏗️ 核心架构：MoT 双流</h4>
+        <ul>
+          <li>骨干：<strong>Wan2.2</strong> 视觉 Transformer</li>
+          <li>架构：<strong>双流 Mixture-of-Transformers (MoT)</strong></li>
+          <li>视频流：处理视觉潜在序列（VAE 压缩）</li>
+          <li>动作流：处理动作 token 序列（独立参数）</li>
+          <li>交互：共享位置编码 + 跨流注意力</li>
+          <li>自回归交织：视频帧 ↔ 动作 token 交替生成</li>
+        </ul>
+      </div>
+      <div class="info-block">
+        <h4>⚡ 高效推理机制</h4>
+        <ul>
+          <li><strong>异步执行（Async Execution）：</strong>视频帧生成与动作预测并行</li>
+          <li><strong>KV Cache：</strong>跨 chunk 缓存，避免重复计算历史上下文</li>
+          <li>单 GPU 推理 VRAM：~24GB（offload 模式）</li>
+          <li>图像转视频动作（i2av）生成：~18GB VRAM</li>
+          <li>Server-Client 分离架构：仿真环境与模型独立部署</li>
+        </ul>
+      </div>
+      <div class="info-block">
+        <h4>📦 训练细节</h4>
+        <ul>
+          <li>动作空间：30 维（左/右臂 EEF×7 + joints×7 + gripper×1，各臂共 15）</li>
+          <li>视频处理：VAE 潜在编码，256×256 降采样，5-15 fps</li>
+          <li>数据格式：LeRobot 格式 + 动作分割配置 (action_config)</li>
+          <li>分布式：FSDP 8/多 GPU，梯度累积支持大批量</li>
+          <li>后训练数据集：RoboTwin Clean + Augmented (HuggingFace 开放)</li>
+        </ul>
+      </div>
+      <div class="info-block">
+        <h4>🌟 "因果"的关键创新</h4>
+        <ul>
+          <li>序列格式：[o₀, a₀, o₁, a₁, ..., oₜ, aₜ] 交织生成</li>
+          <li>动作 token 以过去的所有视觉帧为条件</li>
+          <li>视觉帧以过去动作为条件，建模世界动态</li>
+          <li>区分概念：视频=世界状态 vs. 动作=控制信号，不混用</li>
+          <li>解决 WM 和 VLA 无法互通的关键断层</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Architecture flow -->
+    <div class="arch-box">
+      <h4>🔄 因果序列建模流程</h4>
+      <div class="arch-flow">
+        <div class="arch-node an-blue">观测 o₀<br><small>VAE 潜在帧</small></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node an-purple">MoT 双流<br><small>视频流 + 动作流</small></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node an-green">动作 a₀</div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node an-blue">预测 o₁<br><small>下一帧</small></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node an-green">动作 a₁</div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node an-gray">...循环</div>
+      </div>
+      <div class="arch-note" style="margin-top:12px">
+        <strong>KV Cache 加速：</strong>历史帧的注意力键值缓存，新帧只需计算增量注意力，推理效率大幅提升。
+        <strong>异步执行：</strong>在生成下一帧视频的同时，并行执行当前动作（GPU 利用率最大化）。
+      </div>
+    </div>
+
+    <!-- Performance tables -->
+    <div class="metric-section">
+      <div class="metric-title">RoboTwin 2.0 仿真评测（50 任务平均成功率）</div>
+      <table class="mtable">
+        <thead>
+          <tr><th>模型</th><th>Easy SR (%)</th><th>Hard SR (%)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>X-VLA</td><td>72.9</td><td>72.8</td></tr>
+          <tr><td>π0</td><td>65.9</td><td>58.4</td></tr>
+          <tr><td>π0.5</td><td>82.7</td><td>76.8</td></tr>
+          <tr><td>Motus</td><td>88.7</td><td>87.0</td></tr>
+          <tr class="ours-row"><td>LingBot-VA</td><td><span class="best">92.9 (+4.2)</span></td><td><span class="best">91.6 (+4.6)</span></td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:0.78rem;color:var(--muted);margin-top:6px">⭐ 首个在 RoboTwin 2.0 中同时超越 90% 阈值的工作（Easy + Hard）</p>
+    </div>
+
+    <div class="metric-section">
+      <div class="metric-title">LIBERO 评测（平均成功率，4 子集）</div>
+      <table class="mtable">
+        <thead>
+          <tr><th>模型</th><th>Spatial</th><th>Object</th><th>Goal</th><th>Long</th><th>Avg</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>OpenVLA</td><td>84.7</td><td>88.4</td><td>79.2</td><td>53.7</td><td>76.5</td></tr>
+          <tr><td>π0</td><td>96.8</td><td>98.8</td><td>95.8</td><td>85.2</td><td>94.1</td></tr>
+          <tr><td>π0.5</td><td>98.8</td><td>98.2</td><td>98.0</td><td>92.4</td><td>96.9</td></tr>
+          <tr><td>X-VLA</td><td>98.2</td><td>98.6</td><td>97.8</td><td>97.6</td><td>98.1</td></tr>
+          <tr class="ours-row"><td>LingBot-VA</td><td><span class="best">98.5</span></td><td><span class="best">99.6</span></td><td>97.2</td><td><span class="best">98.5</span></td><td><span class="best">98.5</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="metric-section">
+      <div class="metric-title">真实世界灵巧操作（6 任务，vs. π0.5）</div>
+      <table class="mtable">
+        <thead>
+          <tr><th>任务</th><th>π0.5 SR</th><th>LingBot-VA SR</th><th>π0.5 PS</th><th>LingBot-VA PS</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Make Breakfast（长程）</td><td>70.0%</td><td class="best">75.0%</td><td>73.0%</td><td class="best">97.0%</td></tr>
+          <tr><td>Pick Screws（长程）</td><td>50.0%</td><td class="best">70.0%</td><td>74.0%</td><td class="best">82.5%</td></tr>
+          <tr><td>Insert Tube（精度）</td><td>30.0%</td><td class="best">40.0%</td><td>79.2%</td><td class="best">85.8%</td></tr>
+          <tr><td>Unpack Delivery（精度）</td><td>25.0%</td><td class="best">65.0%</td><td>73.0%</td><td class="best">84.5%</td></tr>
+          <tr><td>Fold Clothes（变形）</td><td>30.0%</td><td class="best">35.0%</td><td>62.9%</td><td>48.8%</td></tr>
+          <tr><td>Fold Pants（变形）</td><td>30.0%</td><td class="best">70.0%</td><td>30.0%</td><td class="best">76.7%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="info-block">
+      <h4>💡 亮点总结</h4>
+      <ul>
+        <li>史上首个在 RoboTwin 2.0 Easy+Hard 双超 90% 的工作，长程操作能力显著领先</li>
+        <li>MoT 双流架构的核心创新：视频帧和动作 token 共享 Transformer 但独立参数，保持概念清晰性的同时实现联合建模</li>
+        <li>KV Cache + 异步执行：解决视频生成模型用于机器人控制时推理延迟过高的工程难题</li>
+        <li>在真实操作中 Fold Pants 任务 SR 从 30% → 70%（+133%），长程和精度任务均显著提升</li>
+        <li>数据格式完全开放（LeRobot 格式 + 训练集 HuggingFace），社区可直接复现</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===================================================== -->
+  <!-- 4. LingBot-Depth -->
+  <!-- ===================================================== -->
+  <section class="paper-section" id="depth">
+    <div class="ps-header depth">
+      <div class="ps-icon depth">📐</div>
+      <div class="ps-title-block">
+        <h2>LingBot-Depth</h2>
+        <div class="ps-en">Masked Depth Modeling for Spatial Perception · arXiv:2601.17895 · 2026-01</div>
+        <div class="ps-links">
+          <a class="ps-link" href="https://arxiv.org/abs/2601.17895" target="_blank">↗ arXiv</a>
+          <a class="ps-link" href="https://github.com/Robbyant/lingbot-depth" target="_blank">↗ GitHub</a>
+          <a class="ps-link" href="https://technology.robbyant.com/lingbot-depth" target="_blank">↗ 项目主页</a>
+          <a class="ps-link" href="https://huggingface.co/collections/robbyant/lingbot-depth" target="_blank">↗ HuggingFace</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-box">
+      <strong>核心出发点：</strong>机器人传感器获取的深度数据普遍存在噪声、缺失和精度不足问题（尤其是结构光/ToF 传感器在反光、薄边缘、远距场景下的失效）。LingBot-Depth 通过 <strong>掩码深度建模（Masked Depth Modeling, MDM）</strong> 自监督预训练，在统一潜在空间联合对齐 RGB 外观与深度几何，从根本上提升传感器深度的质量，为下游机器人任务提供度量精确的 3D 感知基础。
+    </div>
+
+    <div class="info-grid">
+      <div class="info-block">
+        <h4>🏗️ 模型架构</h4>
+        <ul>
+          <li>编码器：<strong>Vision Transformer Large</strong>（DINOv2 骨干）</li>
+          <li>创新：<strong>深度感知注意力机制</strong>（Depth-aware Attention）</li>
+          <li>解码器：多尺度特征金字塔 + 深度回归头</li>
+          <li>预训练：<strong>掩码深度重建</strong>自监督目标（MAE 范式延伸）</li>
+          <li>输入：RGB [B,3,H,W] + 原始深度图 [B,H,W] + 相机内参</li>
+          <li>输出：精化深度图 [B,H,W] + 3D 点云 [B,H,W,3]</li>
+        </ul>
+      </div>
+      <div class="info-block">
+        <h4>📦 训练数据</h4>
+        <ul>
+          <li>总规模：<strong>3M RGB-D 样本</strong></li>
+          <li>真实采集：200万 样本（住宅、办公室、商业环境）</li>
+          <li>仿真渲染：100万 样本（完美 GT 深度）</li>
+          <li>采集设备：Intel RealSense + Orbbec Gemini + Azure Kinect</li>
+          <li>覆盖：多种传感器类型、光照条件、场景复杂度</li>
+          <li>数据集计划 2026 年 3 月中开放（待许可）</li>
+        </ul>
+      </div>
+      <div class="info-block">
+        <h4>🔑 掩码深度建模（MDM）</h4>
+        <ul>
+          <li>灵感来源：MAE（Masked Autoencoder）的掩码重建范式</li>
+          <li>掩码策略：随机遮挡深度图的连续区域</li>
+          <li>重建目标：从 RGB + 部分深度还原完整度量深度</li>
+          <li>跨模态注意力：深度查询 Token 对齐 RGB 空间对应区域</li>
+          <li>深度感知可视化：不同查询点关注不同空间区域，语义一致</li>
+        </ul>
+      </div>
+      <div class="info-block">
+        <h4>🤖 下游任务应用</h4>
+        <ul>
+          <li><strong>深度补全/精化：</strong>填补缺失区域，度量精度优化</li>
+          <li><strong>场景重建：</strong>高保真室内 3D 建图，强深度先验</li>
+          <li><strong>4D 点跟踪：</strong>动态目标（人体运动）的度量空间追踪</li>
+          <li><strong>灵巧抓取：</strong>钢杯/玻璃杯/玩具车精确几何理解</li>
+          <li><strong>LingBot-VLA 集成：</strong>作为 MoRGBD 子模块注入 VLA</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Architecture flow -->
+    <div class="arch-box">
+      <h4>🔄 Masked Depth Modeling 预训练与推理</h4>
+      <div class="arch-flow">
+        <div class="arch-node an-blue">RGB 图像<br><small>[B,3,H,W]</small></div>
+        <div class="arch-arrow">+</div>
+        <div class="arch-node an-orange">噪声/缺失深度<br><small>[B,H,W] meters</small></div>
+        <div class="arch-arrow">+</div>
+        <div class="arch-node an-gray">相机内参<br><small>[B,3,3] 归一化</small></div>
+      </div>
+      <div class="arch-flow" style="margin-top:8px">
+        <div class="arch-arrow" style="font-size:0.9rem">↓ ViT-L 编码器（DINOv2）</div>
+      </div>
+      <div class="arch-flow" style="margin-top:8px">
+        <div class="arch-node an-purple">统一潜在空间<br><small>RGB-D 跨模态对齐</small></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node an-orange">深度回归头<br><small>多尺度特征金字塔</small></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node an-green">精化深度<br><small>度量精确</small></div>
+        <div class="arch-arrow">+</div>
+        <div class="arch-node an-green">3D 点云<br><small>[B,H,W,3]</small></div>
+      </div>
+      <div class="arch-note" style="margin-top:12px">
+        预训练时：随机掩码深度图 → 重建完整深度（自监督）。
+        精化/补全时：输入残缺传感器深度 → 输出高质量度量深度。
+        集成到 LingBot-VLA 时：作为 MoRGBD 子模块，输出深度特征注入 Query Distillation 层。
+      </div>
+    </div>
+
+    <div class="metric-section">
+      <div class="metric-title">模型版本与应用场景</div>
+      <table class="mtable">
+        <thead>
+          <tr><th>模型</th><th>适用场景</th><th>特点</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>LingBot-Depth-v0.5 ⭐推荐</td><td>通用深度精化 + 补全</td><td>修复 v0.1 bug，综合性能最强</td></tr>
+          <tr><td>LingBot-Depth-v0.1</td><td>通用深度精化</td><td>初代版本</td></tr>
+          <tr><td>LingBot-Depth-DC</td><td>稀疏深度补全（RGB-D 传感器缺失）</td><td>针对稀疏输入优化</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="info-block">
+      <h4>💡 亮点总结</h4>
+      <ul>
+        <li>首个将 MAE 掩码自监督范式专门用于 RGB-D 联合建模的机器人深度感知基础模型</li>
+        <li>统一潜在空间的 RGB-Depth 对齐：深度查询 Token 的注意力可视化证明了跨模态空间对应关系</li>
+        <li>度量精确输出：不是相对深度，而是实际米制深度，可直接用于点云重建和抓取规划</li>
+        <li>作为系列工作的感知基础组件，被 LingBot-VLA 作为 MoRGBD 子模块直接集成，体现模块化设计</li>
+        <li>3M 规模混合数据集（真实 2M + 仿真 1M），跨传感器、跨场景的强泛化能力</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===================================================== -->
+  <!-- 5. Comprehensive Analysis -->
+  <!-- ===================================================== -->
+  <section class="paper-section" id="summary">
+    <div class="ps-header" style="border-color:#f59e0b">
+      <div class="ps-icon" style="background:rgba(245,158,11,0.15)">🔍</div>
+      <div class="ps-title-block">
+        <h2>综合评析与技术关系</h2>
+        <div class="ps-en">Cross-Work Analysis · LingBot Series System Design</div>
+      </div>
+    </div>
+
+    <!-- System Architecture -->
+    <div class="compare-section" style="margin-bottom:32px">
+      <h3>🏛️ 四项工作的系统关系</h3>
+      <div class="compare-grid">
+        <div class="cg-item">
+          <div class="cg-name" style="color:#fed7aa">📐 LingBot-Depth</div>
+          <div class="cg-role">空间感知基础模块<br>掩码深度建模<br>3M 数据预训练</div>
+          <div class="cg-arrow">↓ 集成为 MoRGBD</div>
+        </div>
+        <div class="cg-item">
+          <div class="cg-name" style="color:#67e8f9">🌍 LingBot-World</div>
+          <div class="cg-role">世界仿真引擎<br>Wan2.2 扩散生成<br>实时交互 &lt;1s</div>
+          <div class="cg-arrow">↓ 提供多样场景数据</div>
+        </div>
+        <div class="cg-item">
+          <div class="cg-name" style="color:#6ee7b7">🎬 LingBot-VA</div>
+          <div class="cg-role">因果视频-动作建模<br>MoT 双流架构<br>RoboTwin 92.9%</div>
+          <div class="cg-arrow">↓ WM建模能力上移</div>
+        </div>
+        <div class="cg-item">
+          <div class="cg-name" style="color:#c4b5fd">🤖 LingBot-VLA</div>
+          <div class="cg-role">实用 VLA 基础模型<br>20,000h 真实数据<br>Depth 原生集成</div>
+          <div class="cg-arrow">↑ 最终决策输出</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comparison table -->
+    <div style="overflow-x:auto;margin-bottom:32px">
+      <table class="mtable">
+        <thead>
+          <tr>
+            <th>维度</th>
+            <th>LingBot-VLA</th>
+            <th>LingBot-World</th>
+            <th>LingBot-VA</th>
+            <th>LingBot-Depth</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>主要任务</strong></td>
+            <td>VLA 策略执行</td>
+            <td>视觉世界仿真</td>
+            <td>视频+动作联合建模</td>
+            <td>深度感知精化</td>
+          </tr>
+          <tr>
+            <td><strong>核心创新</strong></td>
+            <td>大规模真实数据 + 深度增强</td>
+            <td>实时 &lt;1s + 分钟级记忆</td>
+            <td>因果交织自回归 + MoT</td>
+            <td>掩码深度自监督 MDM</td>
+          </tr>
+          <tr>
+            <td><strong>基础骨干</strong></td>
+            <td>Qwen2.5-VL-3B</td>
+            <td>Wan2.2 DiT</td>
+            <td>Wan2.2 + MoT</td>
+            <td>DINOv2 ViT-L</td>
+          </tr>
+          <tr>
+            <td><strong>动作生成</strong></td>
+            <td>Flow Matching</td>
+            <td>无（纯生成）</td>
+            <td>自回归 token</td>
+            <td>无（感知模块）</td>
+          </tr>
+          <tr>
+            <td><strong>关键数据</strong></td>
+            <td>20,000h 真实双臂</td>
+            <td>互联网多样视频</td>
+            <td>RoboTwin + LIBERO</td>
+            <td>3M RGB-D（2M+1M）</td>
+          </tr>
+          <tr>
+            <td><strong>GitHub Stars</strong></td>
+            <td>961</td>
+            <td>3,200</td>
+            <td>836</td>
+            <td>957</td>
+          </tr>
+          <tr>
+            <td><strong>代表指标</strong></td>
+            <td>GM-100 Avg SR 35.4%</td>
+            <td>&lt;1s 延迟 @16fps</td>
+            <td>RoboTwin Easy 92.9%</td>
+            <td>4D 跟踪 + 灵巧抓取</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- vs. Competitors -->
+    <div class="insight-box" style="background:rgba(34,211,238,0.05);border-color:rgba(34,211,238,0.3);border-left-color:var(--accent2)">
+      <strong>与同期竞品的差异化定位：</strong><br><br>
+      <strong>vs. π0/π0.5（Physical Intelligence）：</strong> 都是通用 VLA 基础模型，但 LingBot-VLA 强调"实用主义"——更大规模真实数据、更高训练效率、Depth 原生集成。在 GM-100 上 LingBot-VLA-Depth 平均 SR 35.4% vs. π0.5 的 27.7%。<br><br>
+      <strong>vs. GR00T N1（NVIDIA）：</strong> 都针对双臂/人形机器人，但 LingBot-VLA 的 20,000 小时真实数据规模远超 GR00T N1 的仿真主导路线，跨平台真实泛化能力更强。<br><br>
+      <strong>vs. Genie/WorldDreamer（Google）：</strong> LingBot-World 是同类中最快开源的实用级世界模型，弥补了闭源 WM 在机器人学习社区的空白，且直接支持机器人动作条件控制。<br><br>
+      <strong>LingBot-VA vs. LingBot-VLA：</strong> 两者定位互补——VA 是 WM+VLA 深度融合的"统一模型"路线（视频与动作共建模），VLA 是纯 VLA 路线（视觉-语言-动作 Flow Matching），VA 在长程操作上优势更大，VLA 在实际双臂机器人部署上更成熟。
+    </div>
+
+    <div class="info-block">
+      <h4>🔮 研究启示与未来方向</h4>
+      <ul>
+        <li><strong>系统级设计：</strong>四项工作组成完整技术栈（感知→仿真→建模→策略），研究者可在任意层次接入或替换模块</li>
+        <li><strong>WM×VLA 融合路线：</strong>LingBot-VA 的因果交织架构是最接近"完全融合"的范式，预计是未来主流方向</li>
+        <li><strong>深度感知的价值再认知：</strong>Depth 增强在 GM-100 上给 VLA 带来 +1.7% 平均 SR，在结构化真实场景中几何信息至关重要</li>
+        <li><strong>数据规模的决定性作用：</strong>20,000h 真实数据 vs. 2,000h 仿真数据的质量对比，再次验证了 RT-1 的核心结论</li>
+        <li><strong>开源生态建设：</strong>所有 4 个工作均 Apache 2.0 开源，相比 π0、GR00T N1 等工业系统开放程度更高</li>
+        <li><strong>待补足：</strong>LingBot-VA 在 Fold Clothes 上 SR 仅 35%（PS 48.8%），可变形物体操作仍是开放问题；LingBot-World 的 Fast 版本尚待发布</li>
+      </ul>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  数据来源：Robbyant GitHub Org (github.com/orgs/Robbyant) · arXiv 技术报告 &nbsp;|&nbsp;
+  整理日期：2026-03-21 &nbsp;|&nbsp;
+  <a href="index.html" style="color:var(--accent);text-decoration:none">← 返回 World Model & VLA 总览</a>
+</footer>
+
+</body>
+</html>
