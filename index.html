@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>World Model & VLA 论文综述 (2024–2026)</title>
+  <title>World Model & VLA 论文综述 (2018–2026)</title>
   <style>
     :root {
       --bg: #0f1117;
@@ -216,6 +216,7 @@
     .tag.eff { background: #451a03; color: #fcd34d; }
     .tag.rl { background: #450a0a; color: #fca5a5; }
     .tag.nav { background: #1e1b4b; color: #a5b4fc; }
+    .tag.classic { background: #3b1f00; color: #fbbf24; }
     .arxiv-link {
       font-size: 0.75rem;
       color: var(--accent);
@@ -233,6 +234,14 @@
       font-size: 0.85rem;
     }
     .paper-card.foundation { border-color: #4f46e5; }
+    .paper-card.classic-star { border-color: #f59e0b; border-width: 2px; }
+    .paper-card.classic-star::after {
+      content: '⭐';
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      font-size: 0.85rem;
+    }
 
     /* Trend cards */
     .trend-grid {
@@ -286,6 +295,60 @@
     }
     .method-table tr:hover td { background: var(--surface2); }
 
+    /* Timeline */
+    .timeline {
+      position: relative;
+      padding-left: 28px;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 10px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--border);
+    }
+    .timeline-item {
+      position: relative;
+      margin-bottom: 16px;
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -22px;
+      top: 6px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 2px solid var(--bg);
+    }
+    .timeline-item.gold::before { background: var(--accent3); }
+    .timeline-year {
+      font-size: 0.7rem;
+      color: var(--accent3);
+      font-family: monospace;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .timeline-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .timeline-desc {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .timeline-link {
+      font-size: 0.72rem;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .timeline-link:hover { text-decoration: underline; }
+
     /* Hot list */
     .hot-list {
       display: grid;
@@ -333,16 +396,18 @@
 
 <header>
   <h1>World Model &amp; Vision-Language-Action</h1>
-  <p class="subtitle">具身智能领域论文综述 · 2024年1月 — 2026年3月</p>
+  <p class="subtitle">具身智能领域论文综述 · 2018年 — 2026年3月</p>
   <div class="meta">
-    <span>📅 整理日期：2026-03-14</span>
-    <span>📄 收录论文：40+</span>
+    <span>📅 整理日期：2026-03-21</span>
+    <span>📄 收录论文：75+</span>
     <span>🔍 来源：ArXiv · HuggingFace</span>
+    <span>🕐 覆盖范围：2018–2026</span>
   </div>
 </header>
 
 <nav>
   <a href="#overview">领域概述</a>
+  <a href="#classics">经典奠基</a>
   <a href="#vla">VLA 方向</a>
   <a href="#wm">World Model</a>
   <a href="#fusion">WM+VLA 融合</a>
@@ -361,15 +426,196 @@
     <div class="overview-grid">
       <div class="overview-card vla">
         <h3>🤖 VLA 主线</h3>
-        <p>以预训练语言/视觉大模型为骨干，直接从多模态观测预测机器人动作。强调零样本泛化、语言指令跟随与多任务通用性。代表作：OpenVLA、UniVLA。</p>
+        <p>以预训练语言/视觉大模型为骨干，直接从多模态观测预测机器人动作。强调零样本泛化、语言指令跟随与多任务通用性。代表作：RT-2、OpenVLA、π0、Gemini Robotics。</p>
       </div>
       <div class="overview-card wm">
         <h3>🌍 World Model 主线</h3>
-        <p>建模环境状态转移动态，为规划、强化学习和数据增强提供"内部仿真器"。可大幅减少真实机器人交互成本。代表作：DreamerV3、PlayWorld。</p>
+        <p>建模环境状态转移动态，为规划、强化学习和数据增强提供"内部仿真器"。可大幅减少真实机器人交互成本。代表作：DreamerV3、Genie、PlayWorld。</p>
       </div>
       <div class="overview-card fusion">
         <h3>🔗 深度融合趋势</h3>
         <p>2025-2026年的核心趋势：World Model 作为 RL 训练环境为 VLA 后训练，潜在空间 CoT 替代文本 CoT，VLA 策略与 WM 迭代协同改进。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CLASSICS ===== -->
+  <section id="classics">
+    <div class="section-header">
+      <div class="section-icon" style="background:#78350f">⭐</div>
+      <h2>经典奠基论文（2018–2024）</h2>
+    </div>
+    <p style="color:var(--muted);font-size:0.875rem;margin-bottom:24px">
+      理解当前 WM+VLA 领域绕不开的里程碑工作，从世界模型雏形到现代 VLA 体系的演进脉络。
+    </p>
+
+    <!-- Timeline overview -->
+    <div class="subsection">
+      <div class="subsection-title">发展时间线</div>
+      <div class="timeline">
+        <div class="timeline-item gold">
+          <div class="timeline-year">2018</div>
+          <div class="timeline-title">World Models (Ha & Schmidhuber)</div>
+          <div class="timeline-desc">首次提出"世界模型"概念：VAE 感知 + MDN-RNN 记忆 + 控制器，在梦境中训练 Agent</div>
+          <a class="timeline-link" href="https://arxiv.org/abs/1803.10122" target="_blank">↗ 1803.10122</a>
+        </div>
+        <div class="timeline-item gold">
+          <div class="timeline-year">2019</div>
+          <div class="timeline-title">Dream to Control / DreamerV1 (RSSM)</div>
+          <div class="timeline-desc">引入 RSSM（循环状态空间模型），在潜在空间想象中进行 model-based RL，奠定 Dreamer 系列基础</div>
+          <a class="timeline-link" href="https://arxiv.org/abs/1912.01603" target="_blank">↗ 1912.01603</a>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2020</div>
+          <div class="timeline-title">DreamerV2</div>
+          <div class="timeline-desc">引入离散潜在变量（直通梯度），Atari 上首次达人类水平的 model-based RL</div>
+          <a class="timeline-link" href="https://arxiv.org/abs/2010.02193" target="_blank">↗ 2010.02193</a>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2022-04</div>
+          <div class="timeline-title">SayCan (Google)</div>
+          <div class="timeline-desc">用 LLM 规划 + 价值函数评估可执行性，奠定"语言模型用于机器人"的范式</div>
+          <a class="timeline-link" href="https://arxiv.org/abs/2204.01691" target="_blank">↗ 2204.01691</a>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2022-09</div>
+          <div class="timeline-title">RT-1 (Google)</div>
+          <div class="timeline-desc">大规模机器人 Transformer；700 项任务、130k episode；验证数据规模对机器人泛化的决定性作用</div>
+          <a class="timeline-link" href="https://arxiv.org/abs/2212.06817" target="_blank">↗ 2212.06817</a>
+        </div>
+        <div class="timeline-item gold">
+          <div class="timeline-year">2023-01</div>
+          <div class="timeline-title">DreamerV3 (Google DeepMind)</div>
+          <div class="timeline-desc">统一超参数在7类基准（Atari/连续控制/Minecraft/机器人等）全部 SOTA；symlog 变换 + KL 平衡</div>
+          <a class="timeline-link" href="https://arxiv.org/abs/2301.04104" target="_blank">↗ 2301.04104</a>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2023-03</div>
+          <div class="timeline-title">PaLM-E (Google)</div>
+          <div class="timeline-desc">562B 具身多模态大模型，将连续传感器数据注入 LLM；支持机器人规划、VQA、场景理解</div>
+          <a class="timeline-link" href="https://arxiv.org/abs/2303.03378" target="_blank">↗ 2303.03378</a>
+        </div>
+        <div class="timeline-item gold">
+          <div class="timeline-year">2023-07</div>
+          <div class="timeline-title">RT-2 (Google DeepMind) ⭐ VLA 命名起源</div>
+          <div class="timeline-desc">"Vision-Language-Action Models"概念正式提出；VLM 联合微调输出动作 token；展现涌现泛化能力</div>
+          <a class="timeline-link" href="https://arxiv.org/abs/2307.15818" target="_blank">↗ 2307.15818</a>
+        </div>
+        <div class="timeline-item gold">
+          <div class="timeline-year">2024-02</div>
+          <div class="timeline-title">Genie (Google DeepMind)</div>
+          <div class="timeline-desc">从无标注互联网视频自监督训练可交互世界模型；1B 参数；首个从视频学习动作潜变量的生成式世界模型</div>
+          <a class="timeline-link" href="https://arxiv.org/abs/2402.15391" target="_blank">↗ 2402.15391</a>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2024-05</div>
+          <div class="timeline-title">Octo (UC Berkeley)</div>
+          <div class="timeline-desc">通用机器人 Transformer；OpenX 数据集预训练；灵活输入输出；学界常用基线模型</div>
+          <a class="timeline-link" href="https://arxiv.org/abs/2405.12213" target="_blank">↗ 2405.12213</a>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2024-05</div>
+          <div class="timeline-title">DIAMOND</div>
+          <div class="timeline-desc">扩散世界模型用于 Atari 游戏强化学习，超越 DreamerV3；验证生成式世界模型的 RL 训练能力</div>
+          <a class="timeline-link" href="https://arxiv.org/abs/2405.12399" target="_blank">↗ 2405.12399</a>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2024-06</div>
+          <div class="timeline-title">OpenVLA (Stanford / UC Berkeley)</div>
+          <div class="timeline-desc">开源 7B VLA；BridgeData V2 + OXE 预训练；成为后续研究标准基线</div>
+          <a class="timeline-link" href="https://arxiv.org/abs/2406.09246" target="_blank">↗ 2406.09246</a>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2024-06</div>
+          <div class="timeline-title">RDT-1B</div>
+          <div class="timeline-desc">扩散 Transformer 机器人策略；1B 参数；多模态上下文（语言/图像/动作）双手操作新基准</div>
+          <a class="timeline-link" href="https://arxiv.org/abs/2406.15270" target="_blank">↗ 2406.15270</a>
+        </div>
+        <div class="timeline-item gold">
+          <div class="timeline-year">2024-10</div>
+          <div class="timeline-title">π0 / pi-zero (Physical Intelligence)</div>
+          <div class="timeline-desc">通用机器人 VLA；Flow Matching 连续动作；7 平台 68 任务跨平台训练；行业最受关注的通用机器人基础模型</div>
+          <a class="timeline-link" href="https://arxiv.org/abs/2410.24164" target="_blank">↗ 2410.24164</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Classic papers in card form -->
+    <div class="subsection">
+      <div class="subsection-title">2025 年新经典工作</div>
+      <div class="paper-grid">
+        <div class="paper-card classic-star">
+          <div class="date">2025-01</div>
+          <h4>FAST: Efficient Action Tokenization for VLA</h4>
+          <p class="summary">频域动作 tokenizer，将连续动作压缩为紧凑离散 token；解决扩散策略慢、自回归策略精度低的双重困境。Physical Intelligence。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag vla">VLA</span><span class="tag eff">效率</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2501.09747" target="_blank">↗ 2501.09747</a>
+          </div>
+        </div>
+        <div class="paper-card classic-star">
+          <div class="date">2025-01</div>
+          <h4>EnerVerse: Envisioning Embodied Future Space for Robotics</h4>
+          <p class="summary">机器人专用世界模型；多相机一致性生成 + 无限空间扩展；为 VLA 提供高质量数据增强和想象式规划环境。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag wm">WM</span><span class="tag vla">VLA</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2501.01895" target="_blank">↗ 2501.01895</a>
+          </div>
+        </div>
+        <div class="paper-card classic-star">
+          <div class="date">2025-03</div>
+          <h4>GR00T N1 (NVIDIA)</h4>
+          <p class="summary">NVIDIA 开源人形机器人基础模型；双系统架构（快/慢）；Isaac Lab 仿真训练；全身运动控制；物理 AI 方向重要里程碑。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag vla">VLA</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2503.14734" target="_blank">↗ 2503.14734</a>
+          </div>
+        </div>
+        <div class="paper-card classic-star">
+          <div class="date">2025-03</div>
+          <h4>Gemini Robotics (Google DeepMind)</h4>
+          <p class="summary">基于 Gemini 2.0 的机器人基础模型；安全感知；多形态泛化；世界理解 + 灵巧控制；行业顶级工程与研究成果。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag vla">VLA</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2503.20020" target="_blank">↗ 2503.20020</a>
+          </div>
+        </div>
+        <div class="paper-card classic-star">
+          <div class="date">2025-03</div>
+          <h4>V-JEPA 2 (Meta AI)</h4>
+          <p class="summary">自监督视频模型；预测潜在表征；支持理解、预测和规划三类任务；在机器人操作规划基准上超越 GPT-4o。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag wm">WM</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2503.19377" target="_blank">↗ 2503.19377</a>
+          </div>
+        </div>
+        <div class="paper-card classic-star">
+          <div class="date">2025-03</div>
+          <h4>CoT-VLA: Visual Chain-of-Thought for VLA</h4>
+          <p class="summary">视觉链式思维：先预测目标未来图像，再生成动作；混合注意力机制；将 LLM CoT 的推理范式迁移至机器人视觉-动作决策。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag vla">VLA</span><span class="tag fusion">WM</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2503.22020" target="_blank">↗ 2503.22020</a>
+          </div>
+        </div>
+        <div class="paper-card classic-star">
+          <div class="date">2025-04</div>
+          <h4>π0.5 (Physical Intelligence)</h4>
+          <p class="summary">开放世界通用 VLA；高级 VLM 推理 + π0 灵巧控制；Web 数据 + 机器人数据协同训练；在陌生家庭环境中完成长程任务。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag vla">VLA</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2504.16054" target="_blank">↗ 2504.16054</a>
+          </div>
+        </div>
+        <div class="paper-card classic-star">
+          <div class="date">2025-04</div>
+          <h4>DreamVLA: Dreaming with World Knowledge for VLA</h4>
+          <p class="summary">融合世界知识的 VLA；视频扩散世界模型生成未来想象帧作为辅助训练信号，从而让 VLA 掌握物理常识与时序推理。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag fusion">WM+VLA</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2504.05217" target="_blank">↗ 2504.05217</a>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -600,6 +846,81 @@
     </div>
 
     <div class="subsection">
+      <div class="subsection-title">Dreamer 系列演进</div>
+      <div class="paper-grid">
+        <div class="paper-card classic-star">
+          <div class="date">2018-03</div>
+          <h4>World Models (Ha & Schmidhuber)</h4>
+          <p class="summary">开创性工作：VAE 压缩视觉 + MDN-RNN 建模时序动态 + 线性控制器；提出"在梦境中训练 Agent"的核心思想，奠定世界模型研究方向。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag wm">WM</span><span class="tag classic">经典</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/1803.10122" target="_blank">↗ 1803.10122</a>
+          </div>
+        </div>
+        <div class="paper-card classic-star">
+          <div class="date">2019-12</div>
+          <h4>Dream to Control / DreamerV1 (RSSM)</h4>
+          <p class="summary">循环状态空间模型 (RSSM)；在潜在空间想象轨迹进行 model-based RL；DeepMind 出品，为 Dreamer 系列奠基，RSSM 仍是主流世界模型架构骨干。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag wm">WM</span><span class="tag rl">RL</span><span class="tag classic">经典</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/1912.01603" target="_blank">↗ 1912.01603</a>
+          </div>
+        </div>
+        <div class="paper-card classic-star">
+          <div class="date">2023-01</div>
+          <h4>DreamerV3: Mastering Diverse Domains</h4>
+          <p class="summary">统一超参数跨 7 类基准全 SOTA（Atari/连续控制/Minecraft/机器人）；symlog 变换 + KL 平衡；首个从头学 Minecraft 钻石的 Agent。Google DeepMind 重磅工作。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag wm">WM</span><span class="tag rl">RL</span><span class="tag classic">经典</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2301.04104" target="_blank">↗ 2301.04104</a>
+          </div>
+        </div>
+        <div class="paper-card">
+          <div class="date">2024-05</div>
+          <h4>DIAMOND: Diffusion World Model for Atari RL</h4>
+          <p class="summary">基于扩散的视觉世界模型用于 Atari 游戏强化学习；超越 DreamerV3；验证生成式世界模型替代真实环境进行 RL 训练的可行性。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag wm">WM</span><span class="tag rl">RL</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2405.12399" target="_blank">↗ 2405.12399</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">生成式 / 交互式世界模型</div>
+      <div class="paper-grid">
+        <div class="paper-card classic-star">
+          <div class="date">2024-02</div>
+          <h4>Genie: Generative Interactive Environments (Google DeepMind)</h4>
+          <p class="summary">从无标注互联网视频自监督训练可交互世界模型；1B 参数；时空视频 Tokenizer + 潜在动作模型 + 动态模型；首个从视频学习动作潜变量的生成式世界模型，影响深远。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag wm">WM</span><span class="tag classic">经典</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2402.15391" target="_blank">↗ 2402.15391</a>
+          </div>
+        </div>
+        <div class="paper-card">
+          <div class="date">2025-01</div>
+          <h4>EnerVerse: Embodied Future Space for Robotics Manipulation</h4>
+          <p class="summary">机器人专用世界模型；自由视角一致性视频生成；无限空间扩展；为机器人 VLA 提供想象式规划环境与高质量数据增强。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag wm">WM</span><span class="tag vla">VLA</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2501.01895" target="_blank">↗ 2501.01895</a>
+          </div>
+        </div>
+        <div class="paper-card">
+          <div class="date">2025-03</div>
+          <h4>V-JEPA 2: Self-Supervised Video Models (Meta AI)</h4>
+          <p class="summary">自监督视频表征学习；联合嵌入预测架构；支持理解、预测和规划；在机器人操作规划上超越 GPT-4o；为 WM+VLA 预训练提供新路径。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag wm">WM</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2503.19377" target="_blank">↗ 2503.19377</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
       <div class="subsection-title">机器人操作 World Model</div>
       <div class="paper-grid">
         <div class="paper-card hot">
@@ -730,109 +1051,137 @@
   <section id="fusion">
     <div class="section-header">
       <div class="section-icon" style="background:#4c1d95">🔗</div>
-      <h2>WM + VLA 深度融合（2026年最热方向）</h2>
+      <h2>WM + VLA 深度融合（2025–2026 最热方向）</h2>
     </div>
     <p style="color:var(--muted);font-size:0.875rem;margin-bottom:20px">
       核心范式：用真实数据训练世界模型 → 在世界模型中进行 RL 后训练 VLA → 无需大量真实机器人交互
     </p>
-    <div class="paper-grid">
-      <div class="paper-card hot">
-        <div class="date">2026-03-11</div>
-        <h4>World2Act: Latent Action Post-Training via Skill-Compositional World Models</h4>
-        <p class="summary">技能组合世界模型用于 VLA 后训练，自适应处理分布外环境变化，提升策略鲁棒性。</p>
-        <div class="footer">
-          <div class="tags"><span class="tag fusion">WM+VLA</span></div>
-          <a class="arxiv-link" href="https://arxiv.org/abs/2603.10422" target="_blank">↗ 2603.10422</a>
+
+    <div class="subsection">
+      <div class="subsection-title">先驱工作（2022–2024）</div>
+      <div class="paper-grid">
+        <div class="paper-card classic-star">
+          <div class="date">2022-04</div>
+          <h4>SayCan: Grounding Language in Robotic Affordances (Google)</h4>
+          <p class="summary">LLM 生成高层计划 + 价值函数评估可执行性，将语言模型的世界知识与机器人能力接地。奠定"LLM × 机器人"范式基础，VLA+WM 融合的先驱思路。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag fusion">WM+VLA</span><span class="tag classic">经典</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2204.01691" target="_blank">↗ 2204.01691</a>
+          </div>
+        </div>
+        <div class="paper-card classic-star">
+          <div class="date">2025-04</div>
+          <h4>DreamVLA: Dreaming with Comprehensive World Knowledge</h4>
+          <p class="summary">视频扩散世界模型生成未来想象帧作为 VLA 辅助训练信号；让 VLA 掌握物理常识与时序推理；WM 监督式预训练 VLA 的重要范式。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag fusion">WM+VLA</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2504.05217" target="_blank">↗ 2504.05217</a>
+          </div>
         </div>
       </div>
-      <div class="paper-card hot">
-        <div class="date">2026-03-09</div>
-        <h4>AtomVLA: Scalable Post-Training via Predictive Latent World Models</h4>
-        <p class="summary">预测性潜在世界模型可扩展地提升 VLA 多步行为的鲁棒性与指令跟随能力。</p>
-        <div class="footer">
-          <div class="tags"><span class="tag fusion">WM+VLA</span></div>
-          <a class="arxiv-link" href="https://arxiv.org/abs/2603.08519" target="_blank">↗ 2603.08519</a>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">2026 年爆发期</div>
+      <div class="paper-grid">
+        <div class="paper-card hot">
+          <div class="date">2026-03-11</div>
+          <h4>World2Act: Latent Action Post-Training via Skill-Compositional World Models</h4>
+          <p class="summary">技能组合世界模型用于 VLA 后训练，自适应处理分布外环境变化，提升策略鲁棒性。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag fusion">WM+VLA</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.10422" target="_blank">↗ 2603.10422</a>
+          </div>
         </div>
-      </div>
-      <div class="paper-card hot">
-        <div class="date">2026-03-03</div>
-        <h4>Chain of World: World Model Thinking in Latent Motion</h4>
-        <p class="summary">将 CoT 从语言 token 迁移到潜在运动空间，引入时序因果结构，VLA 先"想"再"做"。</p>
-        <div class="footer">
-          <div class="tags"><span class="tag fusion">WM+VLA</span></div>
-          <a class="arxiv-link" href="https://arxiv.org/abs/2603.03195" target="_blank">↗ 2603.03195</a>
+        <div class="paper-card hot">
+          <div class="date">2026-03-09</div>
+          <h4>AtomVLA: Scalable Post-Training via Predictive Latent World Models</h4>
+          <p class="summary">预测性潜在世界模型可扩展地提升 VLA 多步行为的鲁棒性与指令跟随能力。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag fusion">WM+VLA</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.08519" target="_blank">↗ 2603.08519</a>
+          </div>
         </div>
-      </div>
-      <div class="paper-card">
-        <div class="date">2026-03-02</div>
-        <h4>LaST-VLA: Thinking in Latent Spatio-Temporal Space</h4>
-        <p class="summary">用潜在时空表征替代文本 CoT，消除语义-感知鸿沟，用于自动驾驶 VLA。</p>
-        <div class="footer">
-          <div class="tags"><span class="tag fusion">WM+VLA</span><span class="tag ad">自动驾驶</span></div>
-          <a class="arxiv-link" href="https://arxiv.org/abs/2603.01928" target="_blank">↗ 2603.01928</a>
+        <div class="paper-card hot">
+          <div class="date">2026-03-03</div>
+          <h4>Chain of World: World Model Thinking in Latent Motion</h4>
+          <p class="summary">将 CoT 从语言 token 迁移到潜在运动空间，引入时序因果结构，VLA 先"想"再"做"。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag fusion">WM+VLA</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.03195" target="_blank">↗ 2603.03195</a>
+          </div>
         </div>
-      </div>
-      <div class="paper-card">
-        <div class="date">2026-02-15</div>
-        <h4>WoVR: World Models as Reliable Simulators for Post-Training VLA with RL</h4>
-        <p class="summary">世界模型替代真实环境，为 VLA 提供 RL 训练沙箱，大幅降低真实机器人交互需求。</p>
-        <div class="footer">
-          <div class="tags"><span class="tag fusion">WM+VLA</span><span class="tag rl">RL</span></div>
-          <a class="arxiv-link" href="https://arxiv.org/abs/2602.13977" target="_blank">↗ 2602.13977</a>
+        <div class="paper-card">
+          <div class="date">2026-03-02</div>
+          <h4>LaST-VLA: Thinking in Latent Spatio-Temporal Space</h4>
+          <p class="summary">用潜在时空表征替代文本 CoT，消除语义-感知鸿沟，用于自动驾驶 VLA。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag fusion">WM+VLA</span><span class="tag ad">自动驾驶</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2603.01928" target="_blank">↗ 2603.01928</a>
+          </div>
         </div>
-      </div>
-      <div class="paper-card">
-        <div class="date">2026-02-12</div>
-        <h4>VLAW: Iterative Co-Improvement of VLA Policy and World Model</h4>
-        <p class="summary">VLA 策略与世界模型双向迭代协同改进，线上交互数据循环提升两者质量。</p>
-        <div class="footer">
-          <div class="tags"><span class="tag fusion">WM+VLA</span></div>
-          <a class="arxiv-link" href="https://arxiv.org/abs/2602.12063" target="_blank">↗ 2602.12063</a>
+        <div class="paper-card">
+          <div class="date">2026-02-15</div>
+          <h4>WoVR: World Models as Reliable Simulators for Post-Training VLA with RL</h4>
+          <p class="summary">世界模型替代真实环境，为 VLA 提供 RL 训练沙箱，大幅降低真实机器人交互需求。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag fusion">WM+VLA</span><span class="tag rl">RL</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2602.13977" target="_blank">↗ 2602.13977</a>
+          </div>
         </div>
-      </div>
-      <div class="paper-card">
-        <div class="date">2026-02-11</div>
-        <h4>RISE: Self-Improving Robot Policy with Compositional World Model</h4>
-        <p class="summary">组合式世界模型驱动机器人策略自我改进，解决接触丰富动态操作任务的 VLA 脆弱性。</p>
-        <div class="footer">
-          <div class="tags"><span class="tag fusion">WM+VLA</span></div>
-          <a class="arxiv-link" href="https://arxiv.org/abs/2602.11075" target="_blank">↗ 2602.11075</a>
+        <div class="paper-card">
+          <div class="date">2026-02-12</div>
+          <h4>VLAW: Iterative Co-Improvement of VLA Policy and World Model</h4>
+          <p class="summary">VLA 策略与世界模型双向迭代协同改进，线上交互数据循环提升两者质量。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag fusion">WM+VLA</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2602.12063" target="_blank">↗ 2602.12063</a>
+          </div>
         </div>
-      </div>
-      <div class="paper-card">
-        <div class="date">2026-02-11</div>
-        <h4>Scaling World Model for Hierarchical Manipulation Policies</h4>
-        <p class="summary">层级操作策略的世界模型扩展，解决 OOD 场景下 VLA 脆弱性，仅需少量真实数据。</p>
-        <div class="footer">
-          <div class="tags"><span class="tag fusion">WM+VLA</span></div>
-          <a class="arxiv-link" href="https://arxiv.org/abs/2602.10983" target="_blank">↗ 2602.10983</a>
+        <div class="paper-card">
+          <div class="date">2026-02-11</div>
+          <h4>RISE: Self-Improving Robot Policy with Compositional World Model</h4>
+          <p class="summary">组合式世界模型驱动机器人策略自我改进，解决接触丰富动态操作任务的 VLA 脆弱性。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag fusion">WM+VLA</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2602.11075" target="_blank">↗ 2602.11075</a>
+          </div>
         </div>
-      </div>
-      <div class="paper-card">
-        <div class="date">2026-02-10</div>
-        <h4>VLA-JEPA: Enhancing VLA with Latent World Model</h4>
-        <p class="summary">JEPA 风格潜在世界模型预训练，超越像素级变化的动作-感知对齐目标。</p>
-        <div class="footer">
-          <div class="tags"><span class="tag fusion">WM+VLA</span></div>
-          <a class="arxiv-link" href="https://arxiv.org/abs/2602.10098" target="_blank">↗ 2602.10098</a>
+        <div class="paper-card">
+          <div class="date">2026-02-11</div>
+          <h4>Scaling World Model for Hierarchical Manipulation Policies</h4>
+          <p class="summary">层级操作策略的世界模型扩展，解决 OOD 场景下 VLA 脆弱性，仅需少量真实数据。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag fusion">WM+VLA</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2602.10983" target="_blank">↗ 2602.10983</a>
+          </div>
         </div>
-      </div>
-      <div class="paper-card">
-        <div class="date">2026-02-25</div>
-        <h4>World Guidance: World Modeling in Condition Space for Action Generation</h4>
-        <p class="summary">在条件空间中建模未来观测，将世界模型预测作为 VLA 动作生成的引导信号。</p>
-        <div class="footer">
-          <div class="tags"><span class="tag fusion">WM+VLA</span></div>
-          <a class="arxiv-link" href="https://arxiv.org/abs/2602.22010" target="_blank">↗ 2602.22010</a>
+        <div class="paper-card">
+          <div class="date">2026-02-10</div>
+          <h4>VLA-JEPA: Enhancing VLA with Latent World Model</h4>
+          <p class="summary">JEPA 风格潜在世界模型预训练，超越像素级变化的动作-感知对齐目标。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag fusion">WM+VLA</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2602.10098" target="_blank">↗ 2602.10098</a>
+          </div>
         </div>
-      </div>
-      <div class="paper-card">
-        <div class="date">2026-02-12</div>
-        <h4>GigaBrain-0.5M: VLA Learns From World Model-Based RL</h4>
-        <p class="summary">基于世界模型 RL 的 VLA 训练，解决单步 chunk 动作预测的场景理解局限。</p>
-        <div class="footer">
-          <div class="tags"><span class="tag fusion">WM+VLA</span><span class="tag rl">RL</span></div>
-          <a class="arxiv-link" href="https://arxiv.org/abs/2602.12099" target="_blank">↗ 2602.12099</a>
+        <div class="paper-card">
+          <div class="date">2026-02-25</div>
+          <h4>World Guidance: World Modeling in Condition Space for Action Generation</h4>
+          <p class="summary">在条件空间中建模未来观测，将世界模型预测作为 VLA 动作生成的引导信号。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag fusion">WM+VLA</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2602.22010" target="_blank">↗ 2602.22010</a>
+          </div>
+        </div>
+        <div class="paper-card">
+          <div class="date">2026-02-12</div>
+          <h4>GigaBrain-0.5M: VLA Learns From World Model-Based RL</h4>
+          <p class="summary">基于世界模型 RL 的 VLA 训练，解决单步 chunk 动作预测的场景理解局限。</p>
+          <div class="footer">
+            <div class="tags"><span class="tag fusion">WM+VLA</span><span class="tag rl">RL</span></div>
+            <a class="arxiv-link" href="https://arxiv.org/abs/2602.12099" target="_blank">↗ 2602.12099</a>
+          </div>
         </div>
       </div>
     </div>
@@ -847,33 +1196,43 @@
     <div class="trend-grid">
       <div class="trend-card">
         <h4>🔥 WM 成为 VLA 后训练标配</h4>
-        <p>WoVR、VLAW、RISE、AtomVLA 等在2026年初密集爆发，核心范式：用真实数据训世界模型 → WM 中 RL 后训练 VLA → 无需大量真实机器人交互。</p>
-        <p class="examples">代表：WoVR / VLAW / RISE / AtomVLA / World2Act</p>
+        <p>WoVR、VLAW、RISE、AtomVLA 等在2025-2026年密集爆发，核心范式：用真实数据训世界模型 → WM 中 RL 后训练 VLA → 无需大量真实机器人交互。从 DreamerV3 的通用 RL 演进至 WM 专为 VLA 服务。</p>
+        <p class="examples">代表：WoVR / VLAW / RISE / AtomVLA / World2Act / DreamVLA</p>
       </div>
       <div class="trend-card">
         <h4>💭 潜在空间 CoT 替代文本 CoT</h4>
-        <p>将 Chain-of-Thought 从语言 token 迁移到潜在动态/时空表征，减少语义-感知鸿沟，更直接地建模物理因果。</p>
-        <p class="examples">代表：Chain of World / LaST-VLA / DynVLA</p>
+        <p>将 Chain-of-Thought 从语言 token 迁移到潜在动态/时空表征，减少语义-感知鸿沟，更直接地建模物理因果。CoT-VLA 的视觉目标预测是过渡，Chain of World 是终极形态。</p>
+        <p class="examples">代表：Chain of World / LaST-VLA / DynVLA / CoT-VLA</p>
       </div>
       <div class="trend-card">
         <h4>📐 3D / 空间感知注入</h4>
-        <p>VLA 的 2D patch token 缺乏几何结构，GST-VLA 等工作将深度/高斯空间结构显式引入 token，弥补几何缺失。</p>
-        <p class="examples">代表：GST-VLA / FutureVLA</p>
+        <p>VLA 的 2D patch token 缺乏几何结构，GST-VLA 等工作将深度/高斯空间结构显式引入 token，弥补几何缺失，与 NeRF/3DGS 技术趋势交叉融合。</p>
+        <p class="examples">代表：GST-VLA / FutureVLA / PointVLA</p>
       </div>
       <div class="trend-card">
         <h4>🚗 自动驾驶 VLA 热潮</h4>
-        <p>2026年3月出现多篇 AD-VLA，将机器人 VLA 范式迁移到自动驾驶。个性化、场景自适应、WM 结合成为子方向热点。</p>
-        <p class="examples">代表：DynVLA / StyleVLA / EvoDriveVLA / SAMoE-VLA</p>
+        <p>2026年3月出现多篇 AD-VLA，将机器人 VLA 范式迁移到自动驾驶。个性化、场景自适应、WM 结合成为子方向热点。UniAD 到 DynVLA 的演进路径清晰。</p>
+        <p class="examples">代表：DynVLA / StyleVLA / EvoDriveVLA / SAMoE-VLA / LaST-VLA</p>
       </div>
       <div class="trend-card">
         <h4>⚡ 推理效率优化</h4>
-        <p>VLA/WM 的 token 冗余问题引起关注，DepthCache、WorldCache 等工作专注免训练加速，Planning in 8 Tokens 探索极致压缩。</p>
-        <p class="examples">代表：DepthCache / WorldCache / Planning in 8 Tokens</p>
+        <p>VLA/WM 的 token 冗余问题引起关注，DepthCache、WorldCache 等工作专注免训练加速，Planning in 8 Tokens 探索极致压缩。FAST tokenizer 则在训练阶段解决动作表示效率。</p>
+        <p class="examples">代表：DepthCache / WorldCache / Planning in 8 Tokens / FAST</p>
       </div>
       <div class="trend-card">
         <h4>🧠 神经科学 / 符号融合</h4>
-        <p>SaiVLA 的大脑-桥脑-小脑三层架构、NS-VLA 的神经符号设计，体现将结构先验显式引入 VLA 的趋势。</p>
-        <p class="examples">代表：SaiVLA-0 / NS-VLA</p>
+        <p>SaiVLA 的大脑-桥脑-小脑三层架构、NS-VLA 的神经符号设计、GR00T N1 的双系统（快/慢）设计，体现将神经科学结构先验显式引入 VLA 的趋势。</p>
+        <p class="examples">代表：SaiVLA-0 / NS-VLA / GR00T N1 / Gemini Robotics</p>
+      </div>
+      <div class="trend-card">
+        <h4>🌐 通用基础模型竞争</h4>
+        <p>2025年工业界全面入局：Physical Intelligence 的 π0/π0.5、Google DeepMind 的 Gemini Robotics、NVIDIA 的 GR00T N1，形成通用机器人基础模型的"大厂竞赛"格局。</p>
+        <p class="examples">代表：π0 / π0.5 / Gemini Robotics / GR00T N1</p>
+      </div>
+      <div class="trend-card">
+        <h4>🎥 视频数据 × 机器人学习</h4>
+        <p>Genie 证明从互联网视频自监督学习世界模型的可行性，EnerVerse、V-JEPA 2 进一步发展；未来 VLA 的大规模预训练数据来源将从机器人演示扩展到海量互联网视频。</p>
+        <p class="examples">代表：Genie / EnerVerse / V-JEPA 2 / PlayWorld</p>
       </div>
     </div>
 
@@ -892,9 +1251,21 @@
           <tbody>
             <tr>
               <td><span class="tag vla">端到端 VLA</span></td>
-              <td>OpenVLA, UniVLA</td>
+              <td>RT-2, OpenVLA, π0</td>
               <td>预训练 VLM + 动作预测头</td>
               <td>强泛化、语言指令跟随</td>
+            </tr>
+            <tr>
+              <td><span class="tag wm">经典 WM（RSSM）</span></td>
+              <td>DreamerV1/2/3</td>
+              <td>潜在空间状态转移 + 潜在空间 RL</td>
+              <td>样本效率高、无需稠密奖励</td>
+            </tr>
+            <tr>
+              <td><span class="tag wm">生成式 WM</span></td>
+              <td>Genie, DIAMOND, EnerVerse</td>
+              <td>扩散/生成式视频模型 + 动作条件化</td>
+              <td>逼真渲染、可交互仿真</td>
             </tr>
             <tr>
               <td><span class="tag fusion">WM for RL</span></td>
@@ -926,6 +1297,12 @@
               <td>高层语义规划 + 低层运动执行</td>
               <td>长程任务分解与执行</td>
             </tr>
+            <tr>
+              <td><span class="tag eff">通用基础模型</span></td>
+              <td>π0, GR00T N1, Gemini Robotics</td>
+              <td>大规模多形态预训练</td>
+              <td>跨平台泛化、零样本迁移</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -936,7 +1313,7 @@
   <section id="hot">
     <div class="section-header">
       <div class="section-icon" style="background:#7c2d12">🔥</div>
-      <h2>近期热点 TOP 8（2026-03）</h2>
+      <h2>近期热点 TOP 10（2026-03）</h2>
     </div>
     <div class="hot-list">
       <div class="hot-item">
@@ -1003,6 +1380,22 @@
           <a href="https://arxiv.org/abs/2603.11110" target="_blank">↗ 2603.11110</a>
         </div>
       </div>
+      <div class="hot-item">
+        <div class="num">9</div>
+        <div class="info">
+          <h5>Gemini Robotics</h5>
+          <p>Google DeepMind 通用机器人基础模型，Gemini 2.0 加持</p>
+          <a href="https://arxiv.org/abs/2503.20020" target="_blank">↗ 2503.20020</a>
+        </div>
+      </div>
+      <div class="hot-item">
+        <div class="num">10</div>
+        <div class="info">
+          <h5>GR00T N1</h5>
+          <p>NVIDIA 开源人形机器人 VLA 基础模型</p>
+          <a href="https://arxiv.org/abs/2503.14734" target="_blank">↗ 2503.14734</a>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -1010,8 +1403,9 @@
 
 <footer>
   数据来源：ArXiv API (cs.RO / cs.CV / cs.AI) · HuggingFace Trending Papers &nbsp;|&nbsp;
-  整理日期：2026-03-14 &nbsp;|&nbsp;
-  收录论文 40+ 篇
+  整理日期：2026-03-21 &nbsp;|&nbsp;
+  收录论文 75+ 篇 &nbsp;|&nbsp;
+  覆盖范围：2018–2026
 </footer>
 
 </body>
