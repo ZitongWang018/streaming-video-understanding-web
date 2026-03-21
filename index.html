@@ -399,7 +399,7 @@
   <p class="subtitle">具身智能领域论文综述 · 2018年 — 2026年3月</p>
   <div class="meta">
     <span>📅 整理日期：2026-03-21</span>
-    <span>📄 收录论文：75+</span>
+    <span>📄 收录论文：79+</span>
     <span>🔍 来源：ArXiv · HuggingFace</span>
     <span>🕐 覆盖范围：2018–2026</span>
   </div>
@@ -413,6 +413,7 @@
   <a href="#fusion">WM+VLA 融合</a>
   <a href="#trends">趋势分析</a>
   <a href="#hot">近期热点</a>
+  <a href="lingbot.html" style="color:#a78bfa;font-weight:600">🤖 LingBot 专栏</a>
 </nav>
 
 <div class="container">
@@ -1044,6 +1045,61 @@
           </div>
         </div>
       </div>
+    </div>
+  </section>
+
+
+  <!-- ===== LINGBOT ===== -->
+  <section id="lingbot">
+    <div class="section-header">
+      <div class="section-icon" style="background:#4c1d95">🤖</div>
+      <h2>LingBot 系列工作专栏</h2>
+    </div>
+    <p style="color:var(--muted);font-size:0.875rem;margin-bottom:20px">
+      Robbyant 团队构建的垂直整合技术栈：空间感知（Depth）→ 世界仿真（World）→ 因果视频-动作建模（VA）→ 实用 VLA 基础模型（VLA）。四个工作相互依赖，形成完整闭环。
+    </p>
+    <div class="paper-grid" style="margin-bottom:20px">
+      <div class="paper-card classic-star" style="border-color:#7c3aed">
+        <div class="date">2026-01-27 · ⭐961 Stars</div>
+        <h4>LingBot-VLA: A Pragmatic VLA Foundation Model</h4>
+        <p class="summary">实用主义 VLA 基础模型。20,000小时真实双臂机器人数据预训练，9种机器人配置；原生集成 LingBot-Depth（MoRGBD）；Flow Matching 动作生成；训练效率 1.5–2.8× 提升。GM-100 平均 SR 35.4%，超越 π0.5、GR00T N1.6。</p>
+        <div class="footer">
+          <div class="tags"><span class="tag vla">VLA</span><span class="tag eff">效率</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2601.18692" target="_blank">↗ 2601.18692</a>
+        </div>
+      </div>
+      <div class="paper-card classic-star" style="border-color:#0891b2">
+        <div class="date">2026-01-29 · ⭐3.2k Stars</div>
+        <h4>LingBot-World: Advancing Open-source World Models</h4>
+        <p class="summary">开源顶级世界仿真器。基于 Wan2.2 DiT；&lt;1秒延迟 16fps 实时交互；961帧分钟级时序记忆；双控制信号（相机位姿 + 机器人动作）；覆盖写实/科幻/卡通等多样环境。</p>
+        <div class="footer">
+          <div class="tags"><span class="tag wm">WM</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2601.20540" target="_blank">↗ 2601.20540</a>
+        </div>
+      </div>
+      <div class="paper-card classic-star" style="border-color:#059669">
+        <div class="date">2026-01-29 · ⭐836 Stars</div>
+        <h4>LingBot-VA: Causal World Modeling for Robot Control</h4>
+        <p class="summary">因果视频-动作世界模型。双流 MoT 架构将视频帧与动作 token 交织自回归；KV Cache + 异步执行；首个在 RoboTwin 2.0 Easy+Hard 双超90% 的工作（92.9%/91.6%）。</p>
+        <div class="footer">
+          <div class="tags"><span class="tag fusion">WM+VLA</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2601.21998" target="_blank">↗ 2601.21998</a>
+        </div>
+      </div>
+      <div class="paper-card classic-star" style="border-color:#c2410c">
+        <div class="date">2026-01 · ⭐957 Stars</div>
+        <h4>LingBot-Depth: Masked Depth Modeling for Spatial Perception</h4>
+        <p class="summary">机器人深度感知基础模型。掩码深度建模（MDM）自监督预训练；ViT-L + 深度感知注意力；3M RGB-D 数据集训练；度量精确深度图 + 3D 点云；集成于 LingBot-VLA 作为 MoRGBD 感知增强模块。</p>
+        <div class="footer">
+          <div class="tags"><span class="tag vla">感知</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2601.17895" target="_blank">↗ 2601.17895</a>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:8px">
+      <a href="lingbot.html" style="display:inline-block;background:linear-gradient(90deg,#7c3aed,#0891b2);color:white;text-decoration:none;padding:12px 32px;border-radius:24px;font-size:0.9rem;font-weight:700">
+        📖 查看 LingBot 系列完整深度分析 →
+      </a>
     </div>
   </section>
 
