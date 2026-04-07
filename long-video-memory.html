@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Long Video Understanding with Memory 综述 (2019–2026)</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #21253a;
+      --border: #2e3350;
+      --accent: #6c8ef7;
+      --accent2: #a78bfa;
+      --accent3: #34d399;
+      --accent4: #fb923c;
+      --accent5: #f472b6;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --tag-bg: rgba(108,142,247,0.15);
+      --tag-border: rgba(108,142,247,0.4);
+    }
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface2: #f1f5f9;
+      --border: #e2e8f0;
+      --accent: #3b5ee8;
+      --accent2: #7c3aed;
+      --accent3: #059669;
+      --accent4: #ea580c;
+      --accent5: #db2777;
+      --text: #1e293b;
+      --text-muted: #475569;
+      --text-dim: #94a3b8;
+      --tag-bg: rgba(59,94,232,0.08);
+      --tag-border: rgba(59,94,232,0.3);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(15,17,23,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 56px;
+    }
+    [data-theme="light"] nav { background: rgba(248,250,252,0.95); }
+    .nav-logo { font-weight: 700; font-size: 1rem; color: var(--text); display: flex; align-items: center; gap: 8px; }
+    .nav-logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 0; }
+    .nav-links a {
+      color: var(--text-muted); font-size: 0.82rem; padding: 0 0.85rem;
+      height: 56px; display: flex; align-items: center; border-bottom: 2px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--accent); border-bottom-color: var(--accent); text-decoration: none; }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .lang-btn, .theme-btn {
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text-muted); border-radius: 6px;
+      padding: 4px 10px; font-size: 0.78rem; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .lang-btn:hover, .theme-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+    /* ── HERO ── */
+    .hero {
+      text-align: center; padding: 5rem 2rem 3.5rem;
+      background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(108,142,247,0.12) 0%, transparent 70%);
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--tag-bg); border: 1px solid var(--tag-border);
+      border-radius: 100px; padding: 4px 14px;
+      font-size: 0.78rem; color: var(--accent); margin-bottom: 1.4rem;
+    }
+    .hero h1 { font-size: clamp(1.8rem, 5vw, 3rem); font-weight: 800; line-height: 1.2; margin-bottom: 0.6rem; }
+    .hero h1 span { color: var(--accent); }
+    .hero .sub { color: var(--text-muted); font-size: 1rem; max-width: 660px; margin: 0 auto 2rem; }
+    .hero-stats { display: flex; justify-content: center; gap: 2.5rem; flex-wrap: wrap; }
+    .stat { text-align: center; }
+    .stat-n { font-size: 2rem; font-weight: 800; color: var(--accent); }
+    .stat-l { font-size: 0.78rem; color: var(--text-muted); }
+
+    /* ── SECTION LAYOUT ── */
+    .section { max-width: 1100px; margin: 0 auto; padding: 3rem 2rem; }
+    .section-header {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 2rem; padding-bottom: 1rem;
+      border-bottom: 2px solid var(--border);
+    }
+    .section-icon { font-size: 1.4rem; }
+    .section-title { font-size: 1.3rem; font-weight: 700; }
+    .section-title-en { font-size: 0.85rem; color: var(--text-muted); font-weight: 400; }
+
+    /* ── OVERVIEW GRID ── */
+    .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .ov-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.2rem 1.4rem;
+      border-top: 3px solid transparent;
+    }
+    .ov-card.c1 { border-top-color: var(--accent); }
+    .ov-card.c2 { border-top-color: var(--accent2); }
+    .ov-card.c3 { border-top-color: var(--accent3); }
+    .ov-card.c4 { border-top-color: var(--accent4); }
+    .ov-card h3 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .ov-card p { font-size: 0.82rem; color: var(--text-muted); }
+
+    /* ── CHALLENGE CARDS ── */
+    .challenge-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+    .chal-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.2rem;
+    }
+    .chal-card .icon { font-size: 1.6rem; margin-bottom: 0.5rem; }
+    .chal-card h4 { font-size: 0.88rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .chal-card p { font-size: 0.8rem; color: var(--text-muted); }
+
+    /* ── TIMELINE ── */
+    .timeline { position: relative; padding-left: 2rem; }
+    .timeline::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 2px; background: linear-gradient(to bottom, var(--accent), var(--accent2), var(--accent3));
+      border-radius: 2px;
+    }
+    .tl-item { position: relative; margin-bottom: 2rem; }
+    .tl-dot {
+      position: absolute; left: -2.35rem; top: 0.35rem;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--accent); border: 2px solid var(--bg);
+    }
+    .tl-dot.new { background: var(--accent3); box-shadow: 0 0 8px var(--accent3); }
+    .tl-meta { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.3rem; }
+    .tl-meta .year { color: var(--accent); font-weight: 700; }
+    .tl-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1rem 1.2rem;
+      transition: border-color 0.2s;
+    }
+    .tl-card:hover { border-color: var(--accent); }
+    .tl-card h4 { font-size: 0.92rem; font-weight: 700; margin-bottom: 0.35rem; }
+    .tl-card .desc { font-size: 0.82rem; color: var(--text-muted); }
+    .tl-card .tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 0.6rem; }
+    .tag {
+      background: var(--tag-bg); border: 1px solid var(--tag-border);
+      border-radius: 4px; padding: 2px 8px;
+      font-size: 0.72rem; color: var(--accent);
+    }
+    .tag.m { --accent: var(--accent2); --tag-bg: rgba(167,139,250,0.12); --tag-border: rgba(167,139,250,0.3); color: var(--accent2); }
+    .tag.g { --accent: var(--accent3); color: var(--accent3); background: rgba(52,211,153,0.1); border-color: rgba(52,211,153,0.3); }
+    .tag.o { color: var(--accent4); background: rgba(251,146,60,0.1); border-color: rgba(251,146,60,0.3); }
+    .tag.p { color: var(--accent5); background: rgba(244,114,182,0.1); border-color: rgba(244,114,182,0.3); }
+    .arxiv-link { font-size: 0.75rem; color: var(--text-dim); margin-top: 0.4rem; }
+    .arxiv-link a { color: var(--accent3); }
+
+    /* ── PARADIGM TABS ── */
+    .tab-bar { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 1.8rem; overflow-x: auto; }
+    .tab-btn {
+      padding: 0.6rem 1.2rem; font-size: 0.85rem; cursor: pointer;
+      color: var(--text-muted); border-bottom: 2px solid transparent;
+      white-space: nowrap; background: none; border-top: none; border-left: none; border-right: none;
+      transition: all 0.2s;
+    }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    /* ── PAPER CARDS ── */
+    .papers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 1rem; }
+    .paper-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.1rem 1.2rem;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+    .paper-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .paper-card .pc-year { font-size: 0.72rem; color: var(--text-dim); }
+    .paper-card h4 { font-size: 0.88rem; font-weight: 700; margin: 0.25rem 0; line-height: 1.4; }
+    .paper-card .pc-desc { font-size: 0.8rem; color: var(--text-muted); }
+    .paper-card .pc-venue { font-size: 0.72rem; color: var(--accent3); margin-top: 0.5rem; }
+    .paper-card .pc-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 0.5rem; }
+
+    /* ── BENCHMARK TABLE ── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    thead tr { background: var(--surface2); }
+    th { padding: 0.75rem 1rem; text-align: left; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border); }
+    td { padding: 0.65rem 1rem; border-bottom: 1px solid var(--border); color: var(--text); }
+    tr:hover td { background: var(--surface); }
+    .td-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 4px;
+      font-size: 0.72rem;
+    }
+
+    /* ── TREND CARDS ── */
+    .trend-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.2rem; }
+    .trend-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.3rem 1.4rem;
+      border-left: 4px solid transparent;
+    }
+    .trend-card.t1 { border-left-color: var(--accent); }
+    .trend-card.t2 { border-left-color: var(--accent2); }
+    .trend-card.t3 { border-left-color: var(--accent3); }
+    .trend-card.t4 { border-left-color: var(--accent4); }
+    .trend-card.t5 { border-left-color: var(--accent5); }
+    .trend-card .tc-header { display: flex; align-items: center; gap: 8px; margin-bottom: 0.7rem; }
+    .trend-card .tc-icon { font-size: 1.3rem; }
+    .trend-card h3 { font-size: 0.95rem; font-weight: 700; }
+    .trend-card p { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.6rem; }
+    .trend-card .reps { font-size: 0.78rem; color: var(--text-dim); }
+    .trend-card .reps strong { color: var(--text-muted); }
+
+    /* ── COMPARISON TABLE ── */
+    .comp-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .comp-table th { background: var(--surface2); padding: 0.7rem 1rem; text-align: center; border: 1px solid var(--border); }
+    .comp-table td { padding: 0.6rem 1rem; border: 1px solid var(--border); text-align: center; vertical-align: middle; }
+    .comp-table td:first-child { text-align: left; font-weight: 600; }
+    .dot-yes { color: var(--accent3); font-size: 1rem; }
+    .dot-no { color: var(--text-dim); font-size: 1rem; }
+    .dot-part { color: var(--accent4); font-size: 1rem; }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center; padding: 2.5rem 2rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-dim); font-size: 0.8rem;
+    }
+    footer a { color: var(--accent); }
+
+    /* ── LANG HIDE ── */
+    [lang="en"] .zh, [lang="zh"] .en { display: none; }
+
+    @media (max-width: 640px) {
+      nav { padding: 0 1rem; }
+      .nav-links { display: none; }
+      .section { padding: 2rem 1rem; }
+      .hero { padding: 3rem 1rem 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ==================== NAV ==================== -->
+<nav id="top-nav">
+  <div class="nav-logo">🎬 <span>LongVideoMem</span> Survey</div>
+  <div class="nav-links">
+    <a href="#overview" class="zh">概述</a><a href="#overview" class="en">Overview</a>
+    <a href="#timeline" class="zh">发展时间线</a><a href="#timeline" class="en">Timeline</a>
+    <a href="#paradigms" class="zh">技术范式</a><a href="#paradigms" class="en">Paradigms</a>
+    <a href="#benchmarks" class="zh">基准测试</a><a href="#benchmarks" class="en">Benchmarks</a>
+    <a href="#comparison" class="zh">方法对比</a><a href="#comparison" class="en">Comparison</a>
+    <a href="#trends" class="zh">趋势</a><a href="#trends" class="en">Trends</a>
+    <a href="index.html" class="zh">← 返回主页</a><a href="index.html" class="en">← Home</a>
+  </div>
+  <div class="nav-right">
+    <button class="lang-btn" onclick="toggleLang()">EN / 中</button>
+    <button class="theme-btn" onclick="toggleTheme()">☀️</button>
+  </div>
+</nav>
+
+<!-- ==================== HERO ==================== -->
+<div class="hero">
+  <div class="hero-badge">📹 <span class="zh">长视频理解 · 记忆机制</span><span class="en">Long Video Understanding · Memory</span></div>
+  <h1 class="zh">长视频理解与<span>记忆机制</span>综述<br><small style="font-size:0.55em;color:var(--text-muted);font-weight:400;">2019–2026</small></h1>
+  <h1 class="en"><span>Long Video Understanding</span><br>with Memory Survey <small style="font-size:0.55em;color:var(--text-muted);font-weight:400;">2019–2026</small></h1>
+  <p class="sub zh">从稀疏采样到流式记忆，从外部存储到万亿上下文窗口 —— 系统梳理长视频理解技术的演进脉络与前沿趋势。</p>
+  <p class="sub en">From sparse sampling to streaming memory, from external storage to million-token context windows — a systematic survey of long video understanding and memory techniques.</p>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-n">50+</div><div class="stat-l zh">核心论文</div><div class="stat-l en">Key Papers</div></div>
+    <div class="stat"><div class="stat-n">5</div><div class="stat-l zh">技术范式</div><div class="stat-l en">Paradigms</div></div>
+    <div class="stat"><div class="stat-n">12+</div><div class="stat-l zh">主流基准</div><div class="stat-l en">Benchmarks</div></div>
+    <div class="stat"><div class="stat-n">2026</div><div class="stat-l zh">持续更新</div><div class="stat-l en">Updated</div></div>
+  </div>
+</div>
+
+<!-- ==================== OVERVIEW ==================== -->
+<div class="section" id="overview">
+  <div class="section-header">
+    <span class="section-icon">🌐</span>
+    <div>
+      <div class="section-title zh">方向概述</div>
+      <div class="section-title en">Direction Overview</div>
+      <div class="section-title-en zh">Long Video Understanding with Memory — What &amp; Why</div>
+      <div class="section-title-en en">长视频理解与记忆 — 是什么 &amp; 为什么</div>
+    </div>
+  </div>
+
+  <div class="overview-grid">
+    <div class="ov-card c1">
+      <h3 class="zh">🎯 核心问题</h3><h3 class="en">🎯 Core Problem</h3>
+      <p class="zh">视频时长爆炸式增长（电影/直播/监控），而现有多模态大模型受限于上下文窗口（&lt;128K tokens），无法端到端处理超长视频。</p>
+      <p class="en">Video durations are exploding (films, live streams, surveillance), but current multimodal LLMs are constrained by context windows (&lt;128K tokens), making end-to-end processing of ultra-long video infeasible.</p>
+    </div>
+    <div class="ov-card c2">
+      <h3 class="zh">🧠 记忆的意义</h3><h3 class="en">🧠 Role of Memory</h3>
+      <p class="zh">记忆机制让模型能以固定计算代价访问任意时刻的历史信息，是解决长时依赖推理（"两小时前发生了什么"）的关键。</p>
+      <p class="en">Memory mechanisms allow models to access historical information at any moment with fixed compute cost, crucial for long-range temporal reasoning ("what happened two hours ago").</p>
+    </div>
+    <div class="ov-card c3">
+      <h3 class="zh">🔗 与 LLM 的融合</h3><h3 class="en">🔗 LLM Integration</h3>
+      <p class="zh">2023年以来，主流方向从纯视觉模型转向 Video LMM/MLLM：将视频帧编码为 token 注入 LLM，关键挑战是如何在 token 数量 vs. 信息保真度之间取得平衡。</p>
+      <p class="en">Since 2023, the mainstream shifted from pure vision to Video LMM/MLLM: encoding frames as tokens injected into LLMs. The key challenge is balancing token count vs. information fidelity.</p>
+    </div>
+    <div class="ov-card c4">
+      <h3 class="zh">🚀 应用场景</h3><h3 class="en">🚀 Applications</h3>
+      <p class="zh">电影问答、体育分析、医疗视频诊断、会议记录、监控异常检测、具身 Agent 长程规划、视频检索与摘要。</p>
+      <p class="en">Movie QA, sports analytics, medical video diagnosis, meeting transcription, surveillance anomaly detection, embodied agent long-horizon planning, video retrieval and summarization.</p>
+    </div>
+  </div>
+
+  <!-- Core challenges -->
+  <div class="section-header" style="margin-top:2rem;">
+    <span class="section-icon">⚠️</span>
+    <div>
+      <div class="section-title zh">核心挑战</div>
+      <div class="section-title en">Core Challenges</div>
+    </div>
+  </div>
+  <div class="challenge-grid">
+    <div class="chal-card">
+      <div class="icon">💾</div>
+      <h4 class="zh">计算与内存瓶颈</h4><h4 class="en">Compute & Memory Bottleneck</h4>
+      <p class="zh">视频帧数与 token 数呈线性增长，Attention 复杂度 O(n²)，直接处理 1 小时视频需百万级 token。</p>
+      <p class="en">Frame and token counts grow linearly; O(n²) attention complexity. Processing one hour of video requires millions of tokens directly.</p>
+    </div>
+    <div class="chal-card">
+      <div class="icon">⏳</div>
+      <h4 class="zh">长时依赖推理</h4><h4 class="en">Long-Range Temporal Reasoning</h4>
+      <p class="zh">问答需要跨越数小时的跨帧推理（如"主角的动机是什么"），稀疏采样丢失关键帧，密集采样超出窗口。</p>
+      <p class="en">QA requires cross-hour temporal reasoning (e.g., "what motivated the character"). Sparse sampling drops key frames; dense sampling exceeds the window.</p>
+    </div>
+    <div class="chal-card">
+      <div class="icon">🔍</div>
+      <h4 class="zh">时序定位精度</h4><h4 class="en">Temporal Grounding Accuracy</h4>
+      <p class="zh">在小时级视频中精准定位特定事件的时间戳（秒级），需要细粒度的时序感知能力。</p>
+      <p class="en">Precisely localizing specific event timestamps (second-level precision) in hour-long videos requires fine-grained temporal perception.</p>
+    </div>
+    <div class="chal-card">
+      <div class="icon">🗜️</div>
+      <h4 class="zh">信息压缩 vs. 保真</h4><h4 class="en">Compression vs. Fidelity</h4>
+      <p class="zh">激进压缩（如平均池化）会抹去局部细节；过于保守（保留所有 token）则计算不可行。寻找最优压缩策略是核心。</p>
+      <p class="en">Aggressive compression (e.g., average pooling) erases local details; conservative approaches (keep all tokens) are computationally infeasible. Finding optimal compression is the core challenge.</p>
+    </div>
+    <div class="chal-card">
+      <div class="icon">🌊</div>
+      <h4 class="zh">流式 / 在线处理</h4><h4 class="en">Streaming / Online Processing</h4>
+      <p class="zh">直播与监控场景要求模型实时处理视频流，不能等待全部帧到齐，因果约束下的记忆设计需要特殊考量。</p>
+      <p class="en">Live streaming and surveillance require real-time processing without waiting for all frames. Causal memory design under streaming constraints needs special treatment.</p>
+    </div>
+    <div class="chal-card">
+      <div class="icon">🤔</div>
+      <h4 class="zh">多模态对齐</h4><h4 class="en">Multimodal Alignment</h4>
+      <p class="zh">视觉 token 与文本 token 的语义对齐在长视频中更难维持，随时序增长，历史帧的视觉信息与当前查询的相关性逐渐退化。</p>
+      <p class="en">Maintaining semantic alignment between visual and text tokens is harder in long videos; historical frame relevance to current queries degrades over time.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TIMELINE ==================== -->
+<div class="section" id="timeline">
+  <div class="section-header">
+    <span class="section-icon">📅</span>
+    <div>
+      <div class="section-title zh">发展时间线</div>
+      <div class="section-title en">Development Timeline</div>
+      <div class="section-title-en">2019 → 2026</div>
+    </div>
+  </div>
+
+  <div class="timeline">
+
+    <!-- 2019 -->
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-meta"><span class="year">2019</span> · 奠基期 / Foundation Era</div>
+      <div class="tl-card">
+        <h4>VideoBERT (Sun et al., Google)</h4>
+        <p class="desc zh">首次将 BERT 自监督预训练迁移至视频-文本联合学习；将视频离散化为视觉 token，与文字 token 交织训练。奠定了视频-语言预训练范式，长视频研究的远祖。</p>
+        <p class="desc en">First application of BERT-style self-supervised pretraining to joint video-text learning; discretized video into visual tokens interleaved with text. Laid the foundation for video-language pretraining.</p>
+        <div class="tags"><span class="tag">Video-Language Pretraining</span><span class="tag m">Token</span></div>
+        <div class="arxiv-link"><a href="https://arxiv.org/abs/1904.01766" target="_blank">↗ 1904.01766</a></div>
+      </div>
+    </div>
+
+    <!-- 2021 -->
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-meta"><span class="year">2021</span> · 长视频建模启动</div>
+      <div class="tl-card">
+        <h4>Longformer / BigBird for Video (多个工作)</h4>
+        <p class="desc zh">稀疏注意力机制（滑动窗口 + 全局 token）被引入视频理解，将 O(n²) 复杂度降为 O(n)，首次让长序列视频 Transformer 变得可行。</p>
+        <p class="desc en">Sparse attention (sliding window + global tokens) introduced to video understanding, reducing O(n²) to O(n) complexity. Made long-sequence video Transformers feasible for the first time.</p>
+        <div class="tags"><span class="tag">Sparse Attention</span><span class="tag m">Efficiency</span></div>
+      </div>
+    </div>
+
+    <!-- 2022 -->
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-meta"><span class="year">2022</span> · 视频-LLM 元年</div>
+      <div class="tl-card">
+        <h4>Frozen / FrozenBiLM (Alayrac et al., DeepMind)</h4>
+        <p class="desc zh">冻结 LLM 权重，仅通过可学习视觉适配层将视频帧注入语言模型，验证了 LLM 作为视频推理引擎的潜力，奠定"冻结 LLM + 视觉桥接"范式。</p>
+        <p class="desc en">Froze LLM weights, injecting video frames via learnable visual adapters. Validated LLMs as video reasoning engines; established the "frozen LLM + visual bridge" paradigm.</p>
+        <div class="tags"><span class="tag">Video-LLM</span><span class="tag g">Adapter</span></div>
+      </div>
+    </div>
+
+    <!-- 2023-Q1 -->
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-meta"><span class="year">2023-Q1</span> · 对话式视频理解爆发</div>
+      <div class="tl-card">
+        <h4>VideoChat (OpenGVLab) / Video-ChatGPT (MBZUAI)</h4>
+        <p class="desc zh">首批基于对话的视频多模态模型。VideoChat 引入事件记忆（Event Memory），将视频语义压缩为文字摘要输入 LLM；Video-ChatGPT 完成大规模视频指令调优数据集构建。</p>
+        <p class="desc en">First conversational video multimodal models. VideoChat introduced event memory (compressing video semantics into text summaries for LLM). Video-ChatGPT built large-scale video instruction tuning datasets.</p>
+        <div class="tags"><span class="tag">Instruction Tuning</span><span class="tag m">Event Memory</span></div>
+        <div class="arxiv-link"><a href="https://arxiv.org/abs/2305.06355" target="_blank">VideoChat ↗ 2305.06355</a></div>
+      </div>
+    </div>
+
+    <!-- 2023-Q3 -->
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-meta"><span class="year">2023-Q3</span> · 长视频稀疏记忆先驱</div>
+      <div class="tl-card">
+        <h4>MovieChat (CVPR 2024) ⭐ 长视频记忆命名起点</h4>
+        <p class="desc zh">以 Atkinson-Shiffrin 认知记忆模型（短时记忆 + 长时记忆）为框架，设计 Dense Token → Sparse Memory 的两阶段压缩，首次支持 10K+ 帧长视频理解，配套发布 MovieChat-1K 基准。</p>
+        <p class="desc en">Framed on Atkinson-Shiffrin memory model (short-term + long-term), designed Dense Token → Sparse Memory two-stage compression. First to support 10K+ frame long video understanding. Released MovieChat-1K benchmark.</p>
+        <div class="tags"><span class="tag">Sparse Memory</span><span class="tag m">Cognitive Memory</span><span class="tag g">10K Frames</span></div>
+        <div class="arxiv-link"><a href="https://arxiv.org/abs/2307.16449" target="_blank">↗ 2307.16449</a></div>
+      </div>
+    </div>
+
+    <!-- 2023-Q4 -->
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-meta"><span class="year">2023-Q4</span> · 时序理解深化</div>
+      <div class="tl-card">
+        <h4>TimeChat (ICLR 2024) &amp; LLaMA-VID</h4>
+        <p class="desc zh">TimeChat 引入时间感知帧编码器（Timestamp-aware），每帧附加绝对时间戳 token，使模型具备时序定位能力。LLaMA-VID 将每帧压缩至 2 个 token（上下文 + 内容），使百分钟视频成为可能。</p>
+        <p class="desc en">TimeChat introduced timestamp-aware frame encoding, appending absolute timestamp tokens to each frame for temporal grounding. LLaMA-VID compressed each frame to 2 tokens (context + content), enabling hour-long video processing.</p>
+        <div class="tags"><span class="tag">Temporal Grounding</span><span class="tag m">Token Compression</span></div>
+        <div class="arxiv-link"><a href="https://arxiv.org/abs/2312.02051" target="_blank">TimeChat ↗ 2312.02051</a> · <a href="https://arxiv.org/abs/2311.17043" target="_blank">LLaMA-VID ↗ 2311.17043</a></div>
+      </div>
+    </div>
+
+    <!-- 2024-Q1 -->
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-meta"><span class="year">2024-Q1</span> · 记忆增强 Agent 涌现</div>
+      <div class="tl-card">
+        <h4>VideoAgent (ECCV 2024) · VideoAgent-Long (EMNLP 2024)</h4>
+        <p class="desc zh">VideoAgent 构建结构化记忆（时序事件描述 + 对象追踪状态），迭代召回相关片段回答问题，开创"基于外部记忆的视频 Agent"范式。VideoAgent-Long 专注小时级长视频，用 GPT-4V 逐步构建语义记忆库。</p>
+        <p class="desc en">VideoAgent built structured memory (temporal event descriptions + object tracking states), iteratively retrieving relevant clips to answer questions. Pioneered the "external-memory video agent" paradigm. VideoAgent-Long targeted hour-long videos using GPT-4V to progressively build a semantic memory store.</p>
+        <div class="tags"><span class="tag">Memory Agent</span><span class="tag m">Structured Memory</span><span class="tag o">Iterative Retrieval</span></div>
+        <div class="arxiv-link"><a href="https://arxiv.org/abs/2403.11481" target="_blank">VideoAgent ↗ 2403.11481</a> · <a href="https://arxiv.org/abs/2403.10517" target="_blank">VideoAgent-Long ↗ 2403.10517</a></div>
+      </div>
+    </div>
+
+    <!-- 2024-Q2 -->
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-meta"><span class="year">2024-Q2</span> · 大厂长上下文窗口竞赛</div>
+      <div class="tl-card">
+        <h4>Gemini 1.5 Pro (Google) — 1M Token Context ⭐</h4>
+        <p class="desc zh">Gemini 1.5 Pro 以 100 万 token 超长上下文窗口实现端到端长视频理解，无需外部记忆模块即可处理 1 小时以上视频。引发"暴力扩展上下文 vs. 精细记忆设计"的学术争论，在 Video-MME 基准上全面领先 GPT-4o。</p>
+        <p class="desc en">Gemini 1.5 Pro's 1M-token context window enabled end-to-end long video understanding without external memory, processing 1+ hour videos. Sparked debate on "brute-force context scaling vs. fine-grained memory design." Outperformed GPT-4o on Video-MME benchmark.</p>
+        <div class="tags"><span class="tag">Long Context</span><span class="tag g">1M Tokens</span><span class="tag o">Industry</span></div>
+      </div>
+    </div>
+
+    <!-- 2024-Q2 b -->
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-meta"><span class="year">2024-Q2</span> · 记忆增强 LMM 双雄</div>
+      <div class="tl-card">
+        <h4>MA-LMM (CVPR 2024) &amp; MovieChat+ </h4>
+        <p class="desc zh">MA-LMM 设计可插拔长期记忆库（Long-term Memory Bank），在线压缩历史视觉 token，支持视频描述/预测/问答多任务，是记忆增强视频 LMM 的标准基线。MovieChat+ 改进为问题感知稀疏记忆（Question-aware），提升检索相关性。</p>
+        <p class="desc en">MA-LMM designed a plug-in long-term memory bank, compressing historical visual tokens online across video captioning, prediction, and QA tasks. MovieChat+ improved to question-aware sparse memory for better retrieval relevance.</p>
+        <div class="tags"><span class="tag">Memory Bank</span><span class="tag m">Online Compression</span></div>
+        <div class="arxiv-link"><a href="https://arxiv.org/abs/2404.05726" target="_blank">MA-LMM ↗ 2404.05726</a> · <a href="https://arxiv.org/abs/2404.17176" target="_blank">MovieChat+ ↗ 2404.17176</a></div>
+      </div>
+    </div>
+
+    <!-- 2024-Q3 -->
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-meta"><span class="year">2024-Q3</span> · 层次事件记忆</div>
+      <div class="tl-card">
+        <h4>HEM-LLM: Hierarchical Event-Based Memory (2024)</h4>
+        <p class="desc zh">设计层次化事件记忆机制，将视频切分为多粒度事件（片段→事件→故事弧），每层独立压缩后跨层级检索，缓解平坦记忆结构的信息稀释问题。</p>
+        <p class="desc en">Designed hierarchical event-based memory, segmenting videos at multiple granularities (clips → events → story arcs), compressing each level independently and enabling cross-level retrieval to alleviate flat-memory information dilution.</p>
+        <div class="tags"><span class="tag">Hierarchical Memory</span><span class="tag m">Event Segmentation</span></div>
+        <div class="arxiv-link"><a href="https://arxiv.org/abs/2409.06299" target="_blank">↗ 2409.06299</a></div>
+      </div>
+    </div>
+
+    <!-- 2024-Q4 -->
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-meta"><span class="year">2024-Q4</span> · 流式记忆 &amp; 大规模训练</div>
+      <div class="tl-card">
+        <h4>LLaVA-Video (ByteDance / NeurIPS 2024) &amp; VideoStreaming</h4>
+        <p class="desc zh">LLaVA-Video 通过大规模合成视频指令数据（1.6M 视频-文本对）显著提升长视频理解，成为开源视频 LMM 的新基线。VideoStreaming 提出固定 token 预算下的流式压缩，常数计算量处理任意长度视频。</p>
+        <p class="desc en">LLaVA-Video significantly improved long video understanding via large-scale synthetic instruction data (1.6M video-text pairs), becoming the new open-source Video LMM baseline. VideoStreaming proposed streaming compression with fixed token budget, processing arbitrary-length video with constant compute.</p>
+        <div class="tags"><span class="tag">Streaming</span><span class="tag m">Synthetic Data</span><span class="tag g">Open Source</span></div>
+        <div class="arxiv-link"><a href="https://arxiv.org/abs/2411.10442" target="_blank">LLaVA-Video ↗ 2411.10442</a></div>
+      </div>
+    </div>
+
+    <!-- 2024-Q4b -->
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-meta"><span class="year">2024-Q4</span> · 可学习记忆</div>
+      <div class="tl-card">
+        <h4>ReWind (CVPR 2025) — Instructed Learnable Memory</h4>
+        <p class="desc zh">两阶段框架：阶段一维护动态记忆（按问题指令更新），阶段二在记忆 + 关键帧上进行推理。引入"Instructed Learnable Memory"——记忆内容由用户查询驱动动态调整，而非固定压缩规则。</p>
+        <p class="desc en">Two-stage framework: Stage 1 maintains dynamic memory (updated by query instruction); Stage 2 reasons over memory + key frames. Introduced "Instructed Learnable Memory" — memory content is dynamically adjusted by user queries rather than fixed compression rules.</p>
+        <div class="tags"><span class="tag">Learnable Memory</span><span class="tag m">Query-Driven</span><span class="tag g">CVPR 2025</span></div>
+        <div class="arxiv-link"><a href="https://arxiv.org/abs/2411.15556" target="_blank">↗ 2411.15556</a></div>
+      </div>
+    </div>
+
+    <!-- 2024-Q4c -->
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-meta"><span class="year">2024-Q4</span> · 循环记忆桥接</div>
+      <div class="tl-card">
+        <h4>VideoLLaMB (ICCV 2025) — Recurrent Memory Bridges</h4>
+        <p class="desc zh">引入循环记忆桥接（Recurrent Memory Bridges）和时序记忆 token（Temporal Memory Tokens），在保持流式处理的同时维持跨片段的语义连贯性，以极低的 token 开销支持长程推理。</p>
+        <p class="desc en">Introduced Recurrent Memory Bridges and Temporal Memory Tokens, maintaining semantic coherence across segments during streaming processing, supporting long-range reasoning with very low token overhead.</p>
+        <div class="tags"><span class="tag">Recurrent Memory</span><span class="tag m">Streaming</span><span class="tag g">ICCV 2025</span></div>
+      </div>
+    </div>
+
+    <!-- 2024-Q4d -->
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-meta"><span class="year">2024-Q4</span> · 超长视频自适应记忆</div>
+      <div class="tl-card">
+        <h4>VideoMem (2024) — Adaptive Memory for Ultra-Long Video</h4>
+        <p class="desc zh">专攻超长视频（小时级以上），引入自适应记忆更新策略，根据语义重要性动态决定哪些帧应进入长期记忆，哪些可丢弃，有效解决超长时序的信息保留问题。</p>
+        <p class="desc en">Specialized for ultra-long video (hour+), introduced adaptive memory update strategy that dynamically decides which frames enter long-term memory based on semantic importance, effectively solving ultra-long temporal information retention.</p>
+        <div class="tags"><span class="tag">Adaptive Memory</span><span class="tag m">Ultra-Long</span></div>
+        <div class="arxiv-link"><a href="https://arxiv.org/abs/2512.04540" target="_blank">↗ 2512.04540</a></div>
+      </div>
+    </div>
+
+    <!-- 2025-Q1 -->
+    <div class="tl-item">
+      <div class="tl-dot new"></div>
+      <div class="tl-meta"><span class="year">2025-Q1</span> · 🆕 RAG-Video &amp; 图记忆</div>
+      <div class="tl-card">
+        <h4>Vgent (NeurIPS 2025, KAUST × Meta AI) &amp; Graph-based Memory</h4>
+        <p class="desc zh">Vgent 将检索增强生成（RAG）引入视频 Agent，构建基于图结构的视频知识库，通过多跳检索回答复杂跨段问题。图节点=场景/对象，边=时序/因果关系，突破了线性时序记忆的局限。</p>
+        <p class="desc en">Vgent brought Retrieval-Augmented Generation (RAG) to video agents, constructing a graph-structured video knowledge base with multi-hop retrieval for complex cross-segment questions. Graph nodes = scenes/objects; edges = temporal/causal relations. Overcame limitations of linear temporal memory.</p>
+        <div class="tags"><span class="tag">RAG</span><span class="tag m">Graph Memory</span><span class="tag g">Multi-hop</span></div>
+      </div>
+    </div>
+
+    <!-- 2025-Q1b -->
+    <div class="tl-item">
+      <div class="tl-dot new"></div>
+      <div class="tl-meta"><span class="year">2025-Q1</span> · 🆕 固定记忆窗口加速</div>
+      <div class="tl-card">
+        <h4>Long-VMNet (2025) — Fixed Memory for Acceleration</h4>
+        <p class="desc zh">提出固定记忆窗口（Fixed Memory Window）加速长视频理解，相比动态记忆方案显著降低延迟，在多个基准上以极小精度损失换取大幅推理加速。</p>
+        <p class="desc en">Proposed Fixed Memory Window to accelerate long video understanding, significantly reducing latency compared to dynamic memory approaches while achieving large speedups with minimal accuracy loss on multiple benchmarks.</p>
+        <div class="tags"><span class="tag">Fixed Memory</span><span class="tag m">Efficiency</span></div>
+        <div class="arxiv-link"><a href="https://arxiv.org/abs/2503.13707" target="_blank">↗ 2503.13707</a></div>
+      </div>
+    </div>
+
+    <!-- 2025-Q2 -->
+    <div class="tl-item">
+      <div class="tl-dot new"></div>
+      <div class="tl-meta"><span class="year">2025-Q2</span> · 🆕 事件中心情景记忆</div>
+      <div class="tl-card">
+        <h4>Video-EM (2025) — Event-Centric Episodic Memory</h4>
+        <p class="desc zh">以"事件"为基本单元构建情景记忆（Episodic Memory），克服传统基于帧/片段的碎片化检索问题，强化叙事主线的完整性，在长视频问答中实现更连贯的时序证据链。</p>
+        <p class="desc en">Built episodic memory with "events" as the fundamental unit, overcoming fragmented retrieval in frame/clip-based approaches, reinforcing narrative completeness and achieving more coherent temporal evidence chains in long video QA.</p>
+        <div class="tags"><span class="tag">Episodic Memory</span><span class="tag m">Event-Centric</span></div>
+        <div class="arxiv-link"><a href="https://arxiv.org/abs/2508.09486" target="_blank">↗ 2508.09486</a></div>
+      </div>
+    </div>
+
+    <!-- 2025-Q3 -->
+    <div class="tl-item">
+      <div class="tl-dot new"></div>
+      <div class="tl-meta"><span class="year">2025-Q3</span> · 🆕 深度回溯记忆</div>
+      <div class="tl-card">
+        <h4>VideoLucy (2025) — Deep Memory Backtracking</h4>
+        <p class="desc zh">受人类回忆"由粗到精"过程启发，设计深度记忆回溯框架：先粗粒度定位大致时段，再细粒度回溯精确片段，避免全量扫描的计算浪费，同时保证关键细节不丢失。</p>
+        <p class="desc en">Inspired by human coarse-to-fine recall, designed a deep memory backtracking framework: coarse-grained temporal localization followed by fine-grained segment backtracking, avoiding full-scan compute waste while retaining critical details.</p>
+        <div class="tags"><span class="tag">Deep Backtracking</span><span class="tag m">Coarse-to-Fine</span></div>
+        <div class="arxiv-link"><a href="https://arxiv.org/abs/2510.12422" target="_blank">↗ 2510.12422</a></div>
+      </div>
+    </div>
+
+    <!-- 2025-Q4 -->
+    <div class="tl-item">
+      <div class="tl-dot new"></div>
+      <div class="tl-meta"><span class="year">2025-Q4</span> · 🆕 流式 Token 压缩</div>
+      <div class="tl-card">
+        <h4>StreamingTOM (2025) — Streaming Token Compression</h4>
+        <p class="desc zh">无需训练的两阶段插件式框架，同时解决 LLM 前（视觉 token 冗余）和 LLM 后（KV Cache 膨胀）两个瓶颈；因果时序缩减 + 语义 token 合并；预测延迟稳定、精度与 SOTA 持平。</p>
+        <p class="desc en">Training-free, plug-and-play two-stage framework addressing both pre-LLM (visual token redundancy) and post-LLM (KV Cache inflation) bottlenecks. Causal temporal reduction + semantic token merging; predictable latency with state-of-the-art accuracy.</p>
+        <div class="tags"><span class="tag">Token Compression</span><span class="tag m">Training-Free</span><span class="tag g">Streaming</span></div>
+        <div class="arxiv-link"><a href="https://arxiv.org/abs/2510.18269" target="_blank">↗ 2510.18269</a></div>
+      </div>
+    </div>
+
+  </div><!-- /timeline -->
+</div>
+
+<!-- ==================== PARADIGMS ==================== -->
+<div class="section" id="paradigms">
+  <div class="section-header">
+    <span class="section-icon">🔬</span>
+    <div>
+      <div class="section-title zh">五大技术范式</div>
+      <div class="section-title en">Five Technical Paradigms</div>
+      <div class="section-title-en zh">Long Video Understanding with Memory — Taxonomy</div>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab(event,'p1')">
+      <span class="zh">① 稀疏采样</span><span class="en">① Sparse Sampling</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab(event,'p2')">
+      <span class="zh">② 记忆增强</span><span class="en">② Memory-Augmented</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab(event,'p3')">
+      <span class="zh">③ 长上下文扩展</span><span class="en">③ Long Context</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab(event,'p4')">
+      <span class="zh">④ 检索增强（RAG）</span><span class="en">④ RAG</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab(event,'p5')">
+      <span class="zh">⑤ Agent 式理解</span><span class="en">⑤ Agent-based</span>
+    </button>
+  </div>
+
+  <!-- P1: Sparse Sampling -->
+  <div class="tab-pane active" id="p1">
+    <div class="ov-card c1" style="margin-bottom:1.2rem;">
+      <h3 class="zh">📸 稀疏采样范式 (Sparse Sampling)</h3><h3 class="en">📸 Sparse Sampling Paradigm</h3>
+      <p class="zh">核心思路：从长视频中均匀或自适应地抽取 N 帧（通常 8–64），将所有帧 token 拼接送入模型。优点是实现简单；缺点是面对小时级视频时采样率极低，高密度事件段信息丢失严重。</p>
+      <p class="en">Core idea: uniformly or adaptively sample N frames (typically 8–64) from the long video, concatenating all frame tokens as model input. Simple to implement; suffers from extreme undersampling on hour-long video, causing severe information loss in dense event segments.</p>
+    </div>
+    <div class="papers-grid">
+      <div class="paper-card">
+        <div class="pc-year">2022</div>
+        <h4>CLIP-ViP</h4>
+        <p class="pc-desc zh">视频-文本对比学习，均匀采样16帧，奠定基础采样基线。</p>
+        <p class="pc-desc en">Video-text contrastive learning with 16-frame uniform sampling; established the basic sampling baseline.</p>
+        <div class="pc-tags"><span class="tag">Sampling</span><span class="tag m">CLIP</span></div>
+      </div>
+      <div class="paper-card">
+        <div class="pc-year">2023</div>
+        <h4>Video-LLaMA</h4>
+        <p class="pc-desc zh">将 BLIP-2 的图像理解扩展至视频，帧级 Q-Former 提取视觉特征后注入 LLaMA。</p>
+        <p class="pc-desc en">Extended BLIP-2 image understanding to video with a frame-level Q-Former injecting features into LLaMA.</p>
+        <div class="pc-tags"><span class="tag">Video-LLM</span><span class="tag m">Q-Former</span></div>
+      </div>
+      <div class="paper-card">
+        <div class="pc-year">2023</div>
+        <h4>LLaMA-VID</h4>
+        <p class="pc-desc zh">极端压缩：每帧仅保留 2 token（上下文+内容），首次使百分钟级视频处理成为可能。</p>
+        <p class="pc-desc en">Extreme compression: 2 tokens per frame (context + content). First to make hour-length video processing feasible.</p>
+        <div class="pc-venue">arxiv 2311.17043</div>
+        <div class="pc-tags"><span class="tag">2-token/frame</span><span class="tag m">Compression</span></div>
+      </div>
+      <div class="paper-card">
+        <div class="pc-year">2024</div>
+        <h4>Video Token Merging (NeurIPS 2024)</h4>
+        <p class="pc-desc zh">探索多种视频 token 合并策略（均匀/区域集中/时序），在长视频分类上以低算力匹配高算力模型。</p>
+        <p class="pc-desc en">Explored video token merging strategies (uniform/region-concentrated/temporal) for long video classification, matching high-compute models at low cost.</p>
+        <div class="pc-venue">NeurIPS 2024</div>
+        <div class="pc-tags"><span class="tag">Token Merging</span></div>
+      </div>
+      <div class="paper-card">
+        <div class="pc-year">2024</div>
+        <h4>LLaVA-Video (ByteDance)</h4>
+        <p class="pc-desc zh">1.6M 合成视频指令数据 + 高质量采样策略，成为开源视频 LMM 的新 SOTA 基线。</p>
+        <p class="pc-desc en">1.6M synthetic video instruction data + high-quality sampling; new open-source Video LMM SOTA baseline.</p>
+        <div class="pc-venue">arxiv 2411.10442</div>
+        <div class="pc-tags"><span class="tag">Instruction Tuning</span><span class="tag g">SOTA</span></div>
+      </div>
+      <div class="paper-card">
+        <div class="pc-year">2025</div>
+        <h4>DYTO (ICCV 2025)</h4>
+        <p class="pc-desc zh">动态 token 合并：层次帧选择 + 二部图 token 合并，零样本自适应压缩，平衡关键帧保留与冗余消除。</p>
+        <p class="pc-desc en">Dynamic token merging: hierarchical frame selection + bipartite token merging; zero-shot adaptive compression balancing key frame retention and redundancy removal.</p>
+        <div class="pc-venue">ICCV 2025</div>
+        <div class="pc-tags"><span class="tag">Dynamic Merging</span><span class="tag m">Zero-Shot</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- P2: Memory-Augmented -->
+  <div class="tab-pane" id="p2">
+    <div class="ov-card c2" style="margin-bottom:1.2rem;">
+      <h3 class="zh">🧠 记忆增强范式 (Memory-Augmented)</h3><h3 class="en">🧠 Memory-Augmented Paradigm</h3>
+      <p class="zh">核心思路：将"已处理"的视频帧信息压缩存入外部/内部记忆库，推理时按需检索或直接读取。分为短时缓冲（近 K 帧精细 token）+ 长期压缩存储（历史帧蒸馏后的稀疏表示）。受人类认知记忆模型启发。</p>
+      <p class="en">Core idea: compress processed frame information into external/internal memory banks; retrieve or read on demand during inference. Consists of short-term buffer (recent K frames' fine-grained tokens) + long-term compressed storage (distilled sparse representations). Inspired by human cognitive memory models.</p>
+    </div>
+    <div class="papers-grid">
+      <div class="paper-card">
+        <div class="pc-year">2023</div>
+        <h4>MovieChat (CVPR 2024)</h4>
+        <p class="pc-desc zh">Atkinson-Shiffrin 模型：短时 token + 长期稀疏记忆，10K 帧突破。</p>
+        <p class="pc-desc en">Atkinson-Shiffrin model: short-term tokens + long-term sparse memory; 10K frame breakthrough.</p>
+        <div class="pc-venue">CVPR 2024</div>
+        <div class="pc-tags"><span class="tag">Short+Long Memory</span></div>
+      </div>
+      <div class="paper-card">
+        <div class="pc-year">2024</div>
+        <h4>MA-LMM (CVPR 2024)</h4>
+        <p class="pc-desc zh">即插即用记忆库，在线 token 压缩，支持多任务；标准基线。</p>
+        <p class="pc-desc en">Plug-in memory bank with online token compression supporting multi-task; standard baseline.</p>
+        <div class="pc-venue">CVPR 2024</div>
+        <div class="pc-tags"><span class="tag">Memory Bank</span><span class="tag g">Multi-task</span></div>
+      </div>
+      <div class="paper-card">
+        <div class="pc-year">2024</div>
+        <h4>MovieChat+ </h4>
+        <p class="pc-desc zh">问题感知稀疏记忆，检索相关性大幅提升。</p>
+        <p class="pc-desc en">Question-aware sparse memory with significantly improved retrieval relevance.</p>
+        <div class="pc-venue">arxiv 2404.17176</div>
+        <div class="pc-tags"><span class="tag">Query-Aware</span></div>
+      </div>
+      <div class="paper-card">
+        <div class="pc-year">2024</div>
+        <h4>HEM-LLM</h4>
+        <p class="pc-desc zh">层次化事件记忆，多粒度分层压缩，跨级检索。</p>
+        <p class="pc-desc en">Hierarchical event memory with multi-granularity layered compression and cross-level retrieval.</p>
+        <div class="pc-venue">arxiv 2409.06299</div>
+        <div class="pc-tags"><span class="tag">Hierarchical</span><span class="tag m">Event</span></div>
+      </div>
+      <div class="paper-card">
+        <div class="pc-year">2024</div>
+        <h4>ReWind (CVPR 2025)</h4>
+        <p class="pc-desc zh">指令驱动可学习记忆，两阶段（建记忆→推理）框架，时序保真。</p>
+        <p class="pc-desc en">Instruction-driven learnable memory in a two-stage (build memory → reason) framework with temporal fidelity.</p>
+        <div class="pc-venue">CVPR 2025</div>
+        <div class="pc-tags"><span class="tag">Learnable</span><span class="tag g">Instruction-Driven</span></div>
+      </div>
+      <div class="paper-card">
+        <div class="pc-year">2024</div>
+        <h4>VideoLLaMB (ICCV 2025)</h4>
+        <p class="pc-desc zh">循环记忆桥接 + 时序记忆 token，流式高效，长程连贯。</p>
+        <p class="pc-desc en">Recurrent memory bridges + temporal memory tokens; streaming-efficient with long-range coherence.</p>
+        <div class="pc-venue">ICCV 2025</div>
+        <div class="pc-tags"><span class="tag">Recurrent</span><span class="tag m">Streaming</span></div>
+      </div>
+      <div class="paper-card">
+        <div class="pc-year">2024</div>
+        <h4>VideoMem</h4>
+        <p class="pc-desc zh">超长视频自适应记忆，语义重要性动态决策，小时级以上视频。</p>
+        <p class="pc-desc en">Adaptive memory for ultra-long video; semantic importance-based dynamic decision-making for hour+ video.</p>
+        <div class="pc-venue">arxiv 2512.04540</div>
+        <div class="pc-tags"><span class="tag">Adaptive</span><span class="tag g">Ultra-Long</span></div>
+      </div>
+      <div class="paper-card">
+        <div class="pc-year">2025</div>
+        <h4>Video-EM</h4>
+        <p class="pc-desc zh">事件中心情景记忆，叙事完整性强化，跨段推理连贯。</p>
+        <p class="pc-desc en">Event-centric episodic memory reinforcing narrative completeness and cross-segment reasoning coherence.</p>
+        <div class="pc-venue">arxiv 2508.09486</div>
+        <div class="pc-tags"><span class="tag">Episodic</span><span class="tag m">Narrative</span></div>
+      </div>
+      <div class="paper-card">
+        <div class="pc-year">2025</div>
+        <h4>VideoLucy</h4>
+        <p class="pc-desc zh">深度记忆回溯，由粗到精，仿人类回忆过程。</p>
+        <p class="pc-desc en">Deep memory backtracking; coarse-to-fine, mimicking human recollection process.</p>
+        <div class="pc-venue">arxiv 2510.12422</div>
+        <div class="pc-tags"><span class="tag">Backtracking</span><span class="tag o">Coarse-to-Fine</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- P3: Long Context -->
+  <div class="tab-pane" id="p3">
+    <div class="ov-card c3" style="margin-bottom:1.2rem;">
+      <h3 class="zh">📏 长上下文扩展范式 (Long Context Scaling)</h3><h3 class="en">📏 Long Context Scaling Paradigm</h3>
+      <p class="zh">核心思路：通过扩展模型原生上下文窗口（RoPE 外推/YaRN/位置插值等），让模型直接接受百万级 token 的视频序列，无需外部记忆模块。代表：Gemini 1.5（1M）、GPT-4o（128K）。优点是架构简洁，端到端推理；缺点是推理计算量随上下文平方增长，成本极高。</p>
+      <p class="en">Core idea: extend native context window (RoPE extrapolation/YaRN/position interpolation) to accept million-token video sequences directly, without external memory. Examples: Gemini 1.5 (1M), GPT-4o (128K). Advantages: simple architecture, end-to-end; drawbacks: inference cost scales quadratically with context.</p>
+    </div>
+    <div class="papers-grid">
+      <div class="paper-card">
+        <div class="pc-year">2024</div>
+        <h4>Gemini 1.5 Pro (Google)</h4>
+        <p class="pc-desc zh">1M token 上下文，原生处理整部电影；Video-MME 基准全面领先 GPT-4o。</p>
+        <p class="pc-desc en">1M token context, natively processes entire movies. Outperformed GPT-4o on Video-MME benchmark across all categories.</p>
+        <div class="pc-venue">2024 Technical Report</div>
+        <div class="pc-tags"><span class="tag g">1M Context</span><span class="tag o">Industry</span></div>
+      </div>
+      <div class="paper-card">
+        <div class="pc-year">2024</div>
+        <h4>GPT-4o (OpenAI)</h4>
+        <p class="pc-desc zh">128K 上下文，多模态原生支持，视频理解能力强但上下文仍有限。</p>
+        <p class="pc-desc en">128K context, native multimodal support; strong video understanding but context still limited.</p>
+        <div class="pc-tags"><span class="tag">128K Context</span><span class="tag o">Industry</span></div>
+      </div>
+      <div class="paper-card">
+        <div class="pc-year">2024</div>
+        <h4>LongVA (EECS, Berkeley)</h4>
+        <p class="pc-desc zh">长上下文 LLM（224K）用于高分辨率长视频，无需专项记忆模块。</p>
+        <p class="pc-desc en">Long-context LLM (224K) for high-resolution long video, requiring no dedicated memory module.</p>
+        <div class="pc-tags"><span class="tag">224K Context</span><span class="tag m">High-Res</span></div>
+      </div>
+      <div class="paper-card">
+        <div class="pc-year">2025</div>
+        <h4>Long-VMNet</h4>
+        <p class="pc-desc zh">固定记忆窗口加速方案，用小计算量近似长上下文效果。</p>
+        <p class="pc-desc en">Fixed memory window acceleration approximating long-context performance at reduced compute.</p>
+        <div class="pc-venue">arxiv 2503.13707</div>
+        <div class="pc-tags"><span class="tag">Fixed Window</span><span class="tag g">Acceleration</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- P4: RAG -->
+  <div class="tab-pane" id="p4">
+    <div class="ov-card c4" style="margin-bottom:1.2rem;">
+      <h3 class="zh">🔎 检索增强范式 (RAG for Video)</h3><h3 class="en">🔎 Retrieval-Augmented Generation for Video</h3>
+      <p class="zh">核心思路：将长视频预处理为索引（文本描述/视觉向量），问答时动态检索相关片段再交给 LLM 推理，避免全量处理。优点是可扩展性强、支持超长视频；缺点是检索错误会级联影响推理质量。</p>
+      <p class="en">Core idea: preprocess long video into an index (text descriptions/visual vectors), dynamically retrieve relevant clips during QA then hand to LLM for reasoning. Highly scalable, supports ultra-long video; retrieval errors can cascade and degrade reasoning quality.</p>
+    </div>
+    <div class="papers-grid">
+      <div class="paper-card">
+        <div class="pc-year">2024</div>
+        <h4>VideoAgent (ECCV 2024)</h4>
+        <p class="pc-desc zh">结构化事件记忆 + 对象状态追踪，迭代检索-推理循环。</p>
+        <p class="pc-desc en">Structured event memory + object tracking states; iterative retrieve-reason loop.</p>
+        <div class="pc-venue">ECCV 2024</div>
+        <div class="pc-tags"><span class="tag">Structured Memory</span><span class="tag m">Iterative</span></div>
+      </div>
+      <div class="paper-card">
+        <div class="pc-year">2024</div>
+        <h4>VideoAgent-Long</h4>
+        <p class="pc-desc zh">GPT-4V 辅助构建语义记忆库，专攻小时级长视频问答。</p>
+        <p class="pc-desc en">GPT-4V-assisted semantic memory store construction for hour-long video QA.</p>
+        <div class="pc-venue">arxiv 2403.10517</div>
+        <div class="pc-tags"><span class="tag">Hour-Long</span><span class="tag o">GPT-4V</span></div>
+      </div>
+      <div class="paper-card">
+        <div class="pc-year">2024</div>
+        <h4>EgoVideo-RAG</h4>
+        <p class="pc-desc zh">专为自我中心视频设计的 RAG，动作/对象检索融合，EgoSchema 基准提升。</p>
+        <p class="pc-desc en">RAG designed for egocentric video, fusing action/object retrieval; improved EgoSchema benchmark results.</p>
+        <div class="pc-tags"><span class="tag">Egocentric</span><span class="tag m">Fusion Retrieval</span></div>
+      </div>
+      <div class="paper-card">
+        <div class="pc-year">2025</div>
+        <h4>Vgent (NeurIPS 2025)</h4>
+        <p class="pc-desc zh">图结构知识库 + 多跳检索，突破线性时序记忆局限，复杂推理大幅提升。</p>
+        <p class="pc-desc en">Graph-structured knowledge base + multi-hop retrieval; breaks linear temporal memory limitations with major complex reasoning gains.</p>
+        <div class="pc-tags"><span class="tag g">Graph RAG</span><span class="tag">Multi-hop</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- P5: Agent -->
+  <div class="tab-pane" id="p5">
+    <div class="ov-card c1" style="margin-bottom:1.2rem;border-top-color:var(--accent5);">
+      <h3 class="zh">🤖 Agent 式理解范式 (Agentic Video Understanding)</h3><h3 class="en">🤖 Agentic Video Understanding Paradigm</h3>
+      <p class="zh">核心思路：将视频理解包装为多步 Agent 循环（计划→工具调用→记忆更新→回答），支持自适应采样、多工具协作（OCR/ASR/对象检测/字幕生成）。最适合需要多步推理的复杂问答。</p>
+      <p class="en">Core idea: wrap video understanding as a multi-step agent loop (plan → tool call → memory update → answer), supporting adaptive sampling and multi-tool collaboration (OCR/ASR/object detection/captioning). Best for complex QA requiring multi-step reasoning.</p>
+    </div>
+    <div class="papers-grid">
+      <div class="paper-card">
+        <div class="pc-year">2024</div>
+        <h4>VideoAgent (ECCV 2024)</h4>
+        <p class="pc-desc zh">记忆增强 Agent，结构化记忆库，LLM 驱动推理循环。</p>
+        <p class="pc-desc en">Memory-augmented agent with structured memory store; LLM-driven reasoning loop.</p>
+        <div class="pc-venue">ECCV 2024</div>
+        <div class="pc-tags"><span class="tag">Memory Agent</span></div>
+      </div>
+      <div class="paper-card">
+        <div class="pc-year">2025</div>
+        <h4>LVAgent (ICCV 2025)</h4>
+        <p class="pc-desc zh">多轮动态协作 MLLM，多 Agent 互补理解，长视频复杂推理新 SOTA。</p>
+        <p class="pc-desc en">Multi-round dynamic collaboration of MLLMs; complementary multi-agent understanding; new SOTA for complex long video reasoning.</p>
+        <div class="pc-venue">ICCV 2025</div>
+        <div class="pc-tags"><span class="tag g">Multi-Agent</span><span class="tag">Dynamic</span></div>
+      </div>
+      <div class="paper-card">
+        <div class="pc-year">2025</div>
+        <h4>MARC (RL Token Compression)</h4>
+        <p class="pc-desc zh">强化学习驱动 token 压缩 Agent，动态决策哪些 token 保留，性能与效率双优。</p>
+        <p class="pc-desc en">RL-driven token compression agent that dynamically decides which tokens to retain; achieves both performance and efficiency.</p>
+        <div class="pc-tags"><span class="tag">RL Agent</span><span class="tag m">Token Compression</span></div>
+      </div>
+      <div class="paper-card">
+        <div class="pc-year">2025</div>
+        <h4>Vgent (NeurIPS 2025)</h4>
+        <p class="pc-desc zh">图增强视频 Agent，知识图谱 + RAG，复杂因果推理。</p>
+        <p class="pc-desc en">Graph-augmented video agent; knowledge graph + RAG for complex causal reasoning.</p>
+        <div class="pc-tags"><span class="tag">Graph Agent</span><span class="tag o">Knowledge Graph</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== BENCHMARKS ==================== -->
+<div class="section" id="benchmarks">
+  <div class="section-header">
+    <span class="section-icon">📊</span>
+    <div>
+      <div class="section-title zh">主流基准测试</div>
+      <div class="section-title en">Major Benchmarks</div>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Benchmark</th>
+          <th class="zh">视频时长</th><th class="en">Video Duration</th>
+          <th class="zh">规模</th><th class="en">Scale</th>
+          <th class="zh">任务类型</th><th class="en">Task Type</th>
+          <th class="zh">发布时间</th><th class="en">Year</th>
+          <th class="zh">特点</th><th class="en">Highlights</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><a href="https://egoschema.github.io/" target="_blank">EgoSchema</a></td>
+          <td>3 min avg</td>
+          <td>5,000 QA</td>
+          <td><span class="td-badge" style="background:rgba(108,142,247,0.15);color:#6c8ef7">Video QA</span></td>
+          <td>2023</td>
+          <td class="zh">自我中心视频，多项选择，长时推理</td><td class="en">Egocentric, multiple-choice, long-range reasoning</td>
+        </tr>
+        <tr>
+          <td><a href="https://video-mme.github.io/" target="_blank">Video-MME</a></td>
+          <td>11s–1h</td>
+          <td>900 videos, 2700 QA</td>
+          <td><span class="td-badge" style="background:rgba(52,211,153,0.1);color:#34d399">Comprehensive</span></td>
+          <td>2024</td>
+          <td class="zh">首个全面视频 MLLM 评估基准，短/中/长三档，Gemini 1.5 Pro 登顶</td><td class="en">First comprehensive Video MLLM benchmark; short/medium/long tiers; Gemini 1.5 Pro topped leaderboard</td>
+        </tr>
+        <tr>
+          <td><a href="https://arxiv.org/abs/2407.15754" target="_blank">LongVideoBench</a></td>
+          <td>15s–60min</td>
+          <td>6,678 QA (17 cats)</td>
+          <td><span class="td-badge" style="background:rgba(167,139,250,0.12);color:#a78bfa">Interleaved</span></td>
+          <td>2024</td>
+          <td class="zh">视频-语言交织输入，17类问题，最全面长视频 QA 基准之一</td><td class="en">Video-language interleaved input; 17 QA categories; one of the most comprehensive long video benchmarks</td>
+        </tr>
+        <tr>
+          <td><a href="https://lvbench.github.io/" target="_blank">LVBench</a></td>
+          <td>1h+</td>
+          <td>超长视频集</td>
+          <td><span class="td-badge" style="background:rgba(251,146,60,0.1);color:#fb923c">Extreme Long</span></td>
+          <td>2024</td>
+          <td class="zh">专为超长视频设计，平均时长 1 小时以上，当前模型在此表现仍差</td><td class="en">Designed for extreme long video (avg 1h+); current models still struggle significantly</td>
+        </tr>
+        <tr>
+          <td>MovieChat-1K</td>
+          <td>电影级 / Movie-length</td>
+          <td>1K videos, 2K grounding</td>
+          <td><span class="td-badge" style="background:rgba(108,142,247,0.15);color:#6c8ef7">Grounding</span></td>
+          <td>2024</td>
+          <td class="zh">配套 MovieChat 发布，包含时序定位标注，首个10K帧级评测集</td><td class="en">Released with MovieChat; includes temporal grounding annotations; first 10K-frame scale evaluation set</td>
+        </tr>
+        <tr>
+          <td>ActivityNet-QA</td>
+          <td>3 min avg</td>
+          <td>58,000 QA</td>
+          <td><span class="td-badge" style="background:rgba(52,211,153,0.1);color:#34d399">Open-Ended QA</span></td>
+          <td>2019</td>
+          <td class="zh">开放式问答，覆盖日常活动，长视频理解早期经典基准</td><td class="en">Open-ended QA on daily activities; classic early long video benchmark</td>
+        </tr>
+        <tr>
+          <td>How2QA / How2R</td>
+          <td>90s avg</td>
+          <td>22K QA</td>
+          <td><span class="td-badge" style="background:rgba(167,139,250,0.12);color:#a78bfa">Retrieval+QA</span></td>
+          <td>2020</td>
+          <td class="zh">多语言教育视频，检索+问答双任务，测试跨段推理</td><td class="en">Multilingual educational videos; dual retrieval+QA tasks; tests cross-segment reasoning</td>
+        </tr>
+        <tr>
+          <td>Ego4D-NLQ</td>
+          <td>小时级 / Hour-long</td>
+          <td>15K 查询</td>
+          <td><span class="td-badge" style="background:rgba(251,146,60,0.1);color:#fb923c">Temporal NLQ</span></td>
+          <td>2022</td>
+          <td class="zh">自我中心视频自然语言查询时序定位，Meta+UC Berkeley 联合构建</td><td class="en">Egocentric video natural language query temporal localization; jointly built by Meta+UC Berkeley</td>
+        </tr>
+        <tr>
+          <td>MLVUBench</td>
+          <td>3–120 min</td>
+          <td>2,593 QA</td>
+          <td><span class="td-badge" style="background:rgba(108,142,247,0.15);color:#6c8ef7">Multi-task</span></td>
+          <td>2024</td>
+          <td class="zh">多维度长视频评测（叙事/推理/识别），Needle-in-a-Haystack 专项</td><td class="en">Multi-dimensional long video evaluation (narrative/reasoning/recognition); Needle-in-a-Haystack special test</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ==================== COMPARISON ==================== -->
+<div class="section" id="comparison">
+  <div class="section-header">
+    <span class="section-icon">⚖️</span>
+    <div>
+      <div class="section-title zh">主要方法能力对比</div>
+      <div class="section-title en">Method Capability Comparison</div>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th class="zh">方法 / Method</th><th class="en">Method</th>
+          <th class="zh">记忆类型</th><th class="en">Memory Type</th>
+          <th class="zh">小时级</th><th class="en">Hour+</th>
+          <th class="zh">流式</th><th class="en">Streaming</th>
+          <th class="zh">问题感知</th><th class="en">Query-Aware</th>
+          <th class="zh">时序定位</th><th class="en">Temporal Grounding</th>
+          <th class="zh">多步推理</th><th class="en">Multi-step</th>
+          <th class="zh">无需训练</th><th class="en">Training-Free</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>MovieChat (CVPR 2024)</td>
+          <td class="zh">短+长期稀疏</td><td class="en">Short+Long Sparse</td>
+          <td><span class="dot-yes">✓</span></td>
+          <td><span class="dot-no">✗</span></td>
+          <td><span class="dot-no">✗</span></td>
+          <td><span class="dot-part">△</span></td>
+          <td><span class="dot-no">✗</span></td>
+          <td><span class="dot-no">✗</span></td>
+        </tr>
+        <tr>
+          <td>MA-LMM (CVPR 2024)</td>
+          <td class="zh">在线记忆库</td><td class="en">Online Memory Bank</td>
+          <td><span class="dot-yes">✓</span></td>
+          <td><span class="dot-part">△</span></td>
+          <td><span class="dot-no">✗</span></td>
+          <td><span class="dot-part">△</span></td>
+          <td><span class="dot-no">✗</span></td>
+          <td><span class="dot-no">✗</span></td>
+        </tr>
+        <tr>
+          <td>ReWind (CVPR 2025)</td>
+          <td class="zh">指令驱动可学习</td><td class="en">Instruction-Learnable</td>
+          <td><span class="dot-yes">✓</span></td>
+          <td><span class="dot-no">✗</span></td>
+          <td><span class="dot-yes">✓</span></td>
+          <td><span class="dot-yes">✓</span></td>
+          <td><span class="dot-no">✗</span></td>
+          <td><span class="dot-no">✗</span></td>
+        </tr>
+        <tr>
+          <td>VideoLLaMB (ICCV 2025)</td>
+          <td class="zh">循环记忆桥接</td><td class="en">Recurrent Memory Bridge</td>
+          <td><span class="dot-yes">✓</span></td>
+          <td><span class="dot-yes">✓</span></td>
+          <td><span class="dot-no">✗</span></td>
+          <td><span class="dot-part">△</span></td>
+          <td><span class="dot-no">✗</span></td>
+          <td><span class="dot-no">✗</span></td>
+        </tr>
+        <tr>
+          <td>VideoAgent (ECCV 2024)</td>
+          <td class="zh">结构化检索记忆</td><td class="en">Structured Retrieval</td>
+          <td><span class="dot-yes">✓</span></td>
+          <td><span class="dot-no">✗</span></td>
+          <td><span class="dot-yes">✓</span></td>
+          <td><span class="dot-yes">✓</span></td>
+          <td><span class="dot-yes">✓</span></td>
+          <td><span class="dot-no">✗</span></td>
+        </tr>
+        <tr>
+          <td>Gemini 1.5 Pro</td>
+          <td class="zh">1M 上下文窗口</td><td class="en">1M Context Window</td>
+          <td><span class="dot-yes">✓</span></td>
+          <td><span class="dot-no">✗</span></td>
+          <td><span class="dot-yes">✓</span></td>
+          <td><span class="dot-yes">✓</span></td>
+          <td><span class="dot-yes">✓</span></td>
+          <td><span class="dot-no">✗</span></td>
+        </tr>
+        <tr>
+          <td>StreamingTOM (2025)</td>
+          <td class="zh">流式 Token 压缩</td><td class="en">Streaming Token Compress</td>
+          <td><span class="dot-yes">✓</span></td>
+          <td><span class="dot-yes">✓</span></td>
+          <td><span class="dot-no">✗</span></td>
+          <td><span class="dot-part">△</span></td>
+          <td><span class="dot-no">✗</span></td>
+          <td><span class="dot-yes">✓</span></td>
+        </tr>
+        <tr>
+          <td>VideoMem (2024)</td>
+          <td class="zh">自适应记忆</td><td class="en">Adaptive Memory</td>
+          <td><span class="dot-yes">✓</span></td>
+          <td><span class="dot-part">△</span></td>
+          <td><span class="dot-yes">✓</span></td>
+          <td><span class="dot-yes">✓</span></td>
+          <td><span class="dot-no">✗</span></td>
+          <td><span class="dot-no">✗</span></td>
+        </tr>
+        <tr>
+          <td>Vgent (NeurIPS 2025)</td>
+          <td class="zh">图结构记忆 + RAG</td><td class="en">Graph Memory + RAG</td>
+          <td><span class="dot-yes">✓</span></td>
+          <td><span class="dot-no">✗</span></td>
+          <td><span class="dot-yes">✓</span></td>
+          <td><span class="dot-yes">✓</span></td>
+          <td><span class="dot-yes">✓</span></td>
+          <td><span class="dot-no">✗</span></td>
+        </tr>
+        <tr>
+          <td>LVAgent (ICCV 2025)</td>
+          <td class="zh">多 Agent 协作</td><td class="en">Multi-Agent Collab.</td>
+          <td><span class="dot-yes">✓</span></td>
+          <td><span class="dot-no">✗</span></td>
+          <td><span class="dot-yes">✓</span></td>
+          <td><span class="dot-yes">✓</span></td>
+          <td><span class="dot-yes">✓</span></td>
+          <td><span class="dot-no">✗</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:0.75rem;color:var(--text-dim);margin-top:0.5rem;">✓ 支持 / Supported &nbsp;·&nbsp; △ 部分支持 / Partial &nbsp;·&nbsp; ✗ 不支持 / Not Supported</p>
+  </div>
+</div>
+
+<!-- ==================== TRENDS ==================== -->
+<div class="section" id="trends">
+  <div class="section-header">
+    <span class="section-icon">🚀</span>
+    <div>
+      <div class="section-title zh">六大演进趋势</div>
+      <div class="section-title en">Six Key Trends</div>
+      <div class="section-title-en">2023 → 2026 发展方向</div>
+    </div>
+  </div>
+
+  <div class="trend-grid">
+    <div class="trend-card t1">
+      <div class="tc-header"><span class="tc-icon">🧠</span><h3 class="zh">记忆从静态→动态→可学习</h3><h3 class="en">Memory: Static → Dynamic → Learnable</h3></div>
+      <p class="zh">早期方案（MovieChat/MA-LMM）采用固定压缩规则（FIFO、平均池化）；2024年后转向问题感知、指令驱动的动态记忆（ReWind、MovieChat+）；趋势终点是完全端到端可学习的记忆读写机制，记忆内容由模型自主决策。</p>
+      <p class="en">Early approaches (MovieChat/MA-LMM) used fixed compression rules (FIFO, average pooling); post-2024 shifted to query-aware, instruction-driven dynamic memory (ReWind, MovieChat+); the end goal is fully end-to-end learnable memory read/write, where memory content is autonomously decided by the model.</p>
+      <div class="reps"><strong class="zh">代表 /</strong><strong class="en">Reps:</strong> MovieChat → MA-LMM → ReWind → VideoMem</div>
+    </div>
+
+    <div class="trend-card t2">
+      <div class="tc-header"><span class="tc-icon">⚡</span><h3 class="zh">Token 压缩效率化</h3><h3 class="en">Token Compression Efficiency</h3></div>
+      <p class="zh">随着视频 LMM 进入工业落地，推理成本成为瓶颈。从简单均匀采样→基于注意力的 token 合并→训练无关的流式压缩（StreamingTOM）→RL 驱动的动态压缩（MARC）。目标：在固定 token 预算下最大化信息密度。</p>
+      <p class="en">As Video LMMs enter production, inference cost is the bottleneck. Evolution: simple uniform sampling → attention-based token merging → training-free streaming compression (StreamingTOM) → RL-driven dynamic compression (MARC). Goal: maximize information density under fixed token budget.</p>
+      <div class="reps"><strong class="zh">代表 /</strong><strong class="en">Reps:</strong> LLaMA-VID → Video Token Merging → StreamingTOM → MARC → Long-VMNet</div>
+    </div>
+
+    <div class="trend-card t3">
+      <div class="tc-header"><span class="tc-icon">🌐</span><h3 class="zh">上下文窗口 vs. 结构化记忆</h3><h3 class="en">Context Window vs. Structured Memory</h3></div>
+      <p class="zh">Gemini 1.5 Pro 的 1M 上下文引发"是否需要专用记忆模块"的争论。学界认为：长上下文适合短时高密度推理，结构化记忆适合超长视频（数小时）的高效检索与低成本部署。两者将长期共存，分别占据不同应用场景。</p>
+      <p class="en">Gemini 1.5's 1M context sparked debate on "whether dedicated memory modules are needed." Academic consensus: long context suits short high-density reasoning; structured memory suits ultra-long video (hours) for efficient retrieval and low-cost deployment. Both will coexist for different use cases.</p>
+      <div class="reps"><strong class="zh">代表 /</strong><strong class="en">Reps:</strong> Gemini 1.5 vs. VideoMem vs. VideoAgent</div>
+    </div>
+
+    <div class="trend-card t4">
+      <div class="tc-header"><span class="tc-icon">🕸️</span><h3 class="zh">平坦记忆→层次/图结构记忆</h3><h3 class="en">Flat → Hierarchical / Graph Memory</h3></div>
+      <p class="zh">线性时序记忆难以表达复杂的因果、空间和实体关系。HEM-LLM 引入层次化事件记忆；Vgent 引入图结构记忆，支持多跳推理。预计未来视频知识图谱（Video KG）将成为长视频理解的基础设施。</p>
+      <p class="en">Linear temporal memory fails to capture complex causal, spatial, and entity relations. HEM-LLM introduced hierarchical event memory; Vgent introduced graph memory supporting multi-hop reasoning. Video Knowledge Graphs (KGs) are expected to become long video understanding infrastructure.</p>
+      <div class="reps"><strong class="zh">代表 /</strong><strong class="en">Reps:</strong> HEM-LLM → Video-EM → Vgent → VideoLucy</div>
+    </div>
+
+    <div class="trend-card t5">
+      <div class="tc-header"><span class="tc-icon">🤖</span><h3 class="zh">单模型→多 Agent 协作</h3><h3 class="en">Single Model → Multi-Agent Collaboration</h3></div>
+      <p class="zh">单一 MLLM 的能力上限难以覆盖长视频所有任务（OCR/ASR/对象追踪/时序推理）。LVAgent、VideoAgent 等工作转向多 Agent 分工协作，每个 Agent 专精子任务，通过共享记忆库和协调机制融合输出，显著提升复杂长视频问答性能。</p>
+      <p class="en">A single MLLM cannot cover all long video tasks (OCR/ASR/object tracking/temporal reasoning). LVAgent, VideoAgent et al. shifted to multi-agent division of labor, each specializing in subtasks, fusing outputs via shared memory and coordination, significantly improving complex long video QA.</p>
+      <div class="reps"><strong class="zh">代表 /</strong><strong class="en">Reps:</strong> VideoAgent → LVAgent → Vgent</div>
+    </div>
+
+    <div class="trend-card" style="border-left-color:#6ee7b7;">
+      <div class="tc-header"><span class="tc-icon">📡</span><h3 class="zh">离线→实时流式处理</h3><h3 class="en">Offline → Real-Time Streaming</h3></div>
+      <p class="zh">早期工作均为离线处理（等待全部帧）。直播/监控场景需要实时感知与记忆更新。VideoStreaming、StreamingTOM、VideoLLaMB 等引入因果约束下的流式记忆更新，在实时推理效率上取得突破。体现了长视频理解从"学术玩具"走向"工业落地"的核心挑战。</p>
+      <p class="en">Early work was all offline (wait for all frames). Live streaming/surveillance requires real-time perception and memory updates. VideoStreaming, StreamingTOM, VideoLLaMB et al. introduced causal-constrained streaming memory updates, achieving breakthroughs in real-time inference. Reflects the core challenge of moving from "academic toy" to "industrial deployment."</p>
+      <div class="reps"><strong class="zh">代表 /</strong><strong class="en">Reps:</strong> VideoStreaming → VideoLLaMB → StreamingTOM</div>
+    </div>
+  </div>
+
+  <!-- Future Directions -->
+  <div class="section-header" style="margin-top:3rem;">
+    <span class="section-icon">🔭</span>
+    <div>
+      <div class="section-title zh">开放挑战与未来方向</div>
+      <div class="section-title en">Open Challenges & Future Directions</div>
+    </div>
+  </div>
+  <div class="overview-grid">
+    <div class="ov-card" style="border-top-color:var(--accent);">
+      <h3 class="zh">🎬 小时级视频推理</h3><h3 class="en">🎬 Hour-long Video Reasoning</h3>
+      <p class="zh">LVBench 显示当前最优模型在 1 小时以上视频上准确率仍不足 50%，核心瓶颈是超长时序依赖建模与关键帧定位。</p>
+      <p class="en">LVBench shows current best models achieve &lt;50% accuracy on 1h+ videos. Core bottleneck: ultra-long temporal dependency modeling and key frame localization.</p>
+    </div>
+    <div class="ov-card" style="border-top-color:var(--accent2);">
+      <h3 class="zh">💡 记忆可解释性</h3><h3 class="en">💡 Memory Interpretability</h3>
+      <p class="zh">"模型记住了什么"目前几乎无法解释。可解释性记忆（类似注意力可视化）是提升用户信任和模型 Debug 的关键研究方向。</p>
+      <p class="en">"What did the model remember" is currently nearly uninterpretable. Interpretable memory (analogous to attention visualization) is key for user trust and model debugging.</p>
+    </div>
+    <div class="ov-card" style="border-top-color:var(--accent3);">
+      <h3 class="zh">🌐 多语言 × 长视频</h3><h3 class="en">🌐 Multilingual × Long Video</h3>
+      <p class="zh">绝大多数基准与模型以英文为主。多语言（特别是低资源语言）长视频理解数据极度匮乏，是重要的未探索空白。</p>
+      <p class="en">Most benchmarks and models are English-centric. Multilingual (especially low-resource) long video understanding data is severely lacking — an important unexplored gap.</p>
+    </div>
+    <div class="ov-card" style="border-top-color:var(--accent4);">
+      <h3 class="zh">🔗 与具身 AI 融合</h3><h3 class="en">🔗 Integration with Embodied AI</h3>
+      <p class="zh">具身 Agent 需要长时序视频记忆来完成多步任务（"一小时前我把工具放在哪里"）。长视频记忆与 VLA/WM 的深度融合是下一个重大方向。</p>
+      <p class="en">Embodied agents need long-temporal video memory for multi-step tasks ("where did I put the tool an hour ago"). Deep integration of long video memory with VLA/WM is the next major direction.</p>
+    </div>
+    <div class="ov-card" style="border-top-color:var(--accent5);">
+      <h3 class="zh">⚡ 实时低延迟部署</h3><h3 class="en">⚡ Real-time Low-latency Deployment</h3>
+      <p class="zh">监控/直播场景需要端到端延迟 &lt;200ms 的流式推理，而目前最好的模型仍需秒级甚至分钟级推理时间，工业落地差距巨大。</p>
+      <p class="en">Surveillance/live-streaming requires &lt;200ms end-to-end latency for streaming inference, but current best models still need seconds to minutes — a huge gap for industrial deployment.</p>
+    </div>
+    <div class="ov-card" style="border-top-color:#6ee7b7;">
+      <h3 class="zh">🏆 统一评测体系</h3><h3 class="en">🏆 Unified Evaluation Framework</h3>
+      <p class="zh">目前各基准测试场景割裂（EgoSchema/Video-MME/LVBench），缺少统一的跨任务、跨时长、跨场景的长视频理解综合评测体系。</p>
+      <p class="en">Current benchmarks are fragmented (EgoSchema/Video-MME/LVBench). A unified cross-task, cross-duration, cross-domain long video understanding evaluation framework is urgently needed.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== FOOTER ==================== -->
+<footer>
+  <p class="zh">长视频理解 × 记忆机制综述 (2019–2026) · 构建于 <a href="index.html">World Model & VLA Survey</a> 仓库</p>
+  <p class="en">Long Video Understanding with Memory Survey (2019–2026) · Built in the <a href="index.html">World Model & VLA Survey</a> repository</p>
+  <p style="margin-top:0.5rem;color:var(--text-dim)">
+    <a href="index.html">← World Model & VLA</a> &nbsp;|&nbsp;
+    <a href="lingbot.html">LingBot Stack →</a>
+  </p>
+</footer>
+
+<script>
+// ── Lang toggle ──
+let curLang = 'zh';
+document.documentElement.setAttribute('lang', curLang);
+function toggleLang() {
+  curLang = curLang === 'zh' ? 'en' : 'zh';
+  document.documentElement.setAttribute('lang', curLang);
+}
+
+// ── Theme toggle ──
+let curTheme = 'dark';
+function toggleTheme() {
+  curTheme = curTheme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', curTheme === 'light' ? 'light' : '');
+  document.querySelector('.theme-btn').textContent = curTheme === 'dark' ? '☀️' : '🌙';
+}
+
+// ── Tab switch ──
+function switchTab(e, id) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  e.currentTarget.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+
+// ── Nav active link ──
+const sections = ['overview','timeline','paradigms','benchmarks','comparison','trends'];
+const navLinks = document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll', () => {
+  const sy = window.scrollY + 80;
+  let cur = '';
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.offsetTop <= sy) cur = id;
+  });
+  navLinks.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + cur);
+  });
+}, { passive: true });
+</script>
+</body>
+</html>

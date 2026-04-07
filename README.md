@@ -30,9 +30,11 @@ The survey includes:
 
 ## 🌐 View Online
 
-The survey is hosted as an interactive HTML page via GitHub Pages:
+The surveys are hosted as interactive HTML pages via GitHub Pages:
 
-**🔗 https://song2yu.github.io/world-model-vla/**
+**🔗 World Model & VLA:** https://song2yu.github.io/world-model-vla/
+
+**🔗 Long Video Understanding with Memory:** https://song2yu.github.io/world-model-vla/long-video-memory.html
 
 No installation required — just open the link in any browser.
 
@@ -42,7 +44,9 @@ No installation required — just open the link in any browser.
 
 ```
 world-model-vla/
-└── index.html          # Full interactive survey page (self-contained)
+├── index.html                # World Model & VLA Survey (self-contained)
+├── lingbot.html              # LingBot Tech Stack Survey
+└── long-video-memory.html    # 🆕 Long Video Understanding with Memory Survey (2019–2026)
 ```
 
 The entire survey is a **single self-contained HTML file** — all styles, scripts, and content are bundled together, making it easy to share and view offline.
