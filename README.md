@@ -36,6 +36,8 @@ The surveys are hosted as interactive HTML pages via GitHub Pages:
 
 **🔗 Long Video Understanding with Memory:** https://song2yu.github.io/world-model-vla/long-video-memory.html
 
+**🔗 生成基模团队面试题全集:** https://song2yu.github.io/world-model-vla/genai_interview.html
+
 No installation required — just open the link in any browser.
 
 ---
@@ -46,7 +48,8 @@ No installation required — just open the link in any browser.
 world-model-vla/
 ├── index.html                # World Model & VLA Survey (self-contained)
 ├── lingbot.html              # LingBot Tech Stack Survey
-└── long-video-memory.html    # 🆕 Long Video Understanding with Memory Survey (2019–2026)
+├── long-video-memory.html    # Long Video Understanding with Memory Survey (2019–2026)
+└── genai_interview.html      # 🆕 生成基模团队面试题全集（Transformer/预训练/RLHF/推理优化/生成模型）
 ```
 
 The entire survey is a **single self-contained HTML file** — all styles, scripts, and content are bundled together, making it easy to share and view offline.
