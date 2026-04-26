@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>生成基模团队面试题全集</title>
+  <title>生成基模团队面试题全集 v2</title>
   <style>
     :root {
       --bg: #0f1117;
@@ -177,10 +177,10 @@
 
 <header>
   <h1>🚀 生成基模团队面试题全集</h1>
-  <p>涵盖 Transformer · 训练范式 · 推理优化 · 生成模型 · 多模态 · 系统设计 · 代码题</p>
+  <p>涵盖 Transformer · 训练范式 · 推理优化 · 视觉生成 · 多模态 · 系统设计 · 强化学习 · 代码题</p>
   <div class="stats">
-    <div class="stat"><div class="n">80+</div><div class="label">面试题</div></div>
-    <div class="stat"><div class="n">8</div><div class="label">核心模块</div></div>
+    <div class="stat"><div class="n">130+</div><div class="label">面试题</div></div>
+    <div class="stat"><div class="n">9</div><div class="label">核心模块</div></div>
     <div class="stat"><div class="n">2025</div><div class="label">最新版本</div></div>
   </div>
 </header>
@@ -194,6 +194,7 @@
   <a href="#s6">多模态</a>
   <a href="#s7">系统设计</a>
   <a href="#s8">代码题</a>
+  <a href="#s9">强化学习</a>
 </nav>
 
 <main>
@@ -846,6 +847,193 @@
   </div></div>
 </div>
 
+
+<!-- Q28 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">28</div>
+    <div>
+      <div class="q-text">DDIM 相比 DDPM 做了哪些改进？其采样过程是确定性的吗？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p>DDPM 的马尔科夫链定义了展开后验概率 q(x₁:T|x₀)，采样是随机的。DDIM 将前向过程重定义为一类<em>非马尔科夫零方差</em>过程：</p>
+    <div class="formula">x_{t-1} = √ᾱ_{t-1}·( (xₜ − √(1−ᾱₜ)·ε_θ(xₜ,t)) / √ᾱₜ ) + √(1−ᾱ_{t-1})·ε_θ(xₜ,t)</div>
+    <p>当 η=0 时采样过程完全<strong>确定性</strong>，同一初始噪声 x_T 永远得到相同输出。</p>
+    <p><strong>优势：</strong></p>
+    <ul>
+      <li>采样步数可从 1000 降至 20~50 步，速度提升 20-50×</li>
+      <li>确定性采样利于图像编辑（interpolation）：在 latent 空间线性插值即可得到语义过渡</li>
+      <li>共享训练好的 DDPM 权重，无需重训练</li>
+    </ul>
+  </div></div>
+</div>
+
+<!-- Q29 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">29</div>
+    <div>
+      <div class="q-text">Classifier-Free Guidance (CFG) 的原理与作用？为什么提高 CFG Scale 会导致图像过饱和？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p><strong>CFG 公式：</strong></p>
+    <div class="formula">ε_guided = ε_uncond + w · (ε_cond − ε_uncond)</div>
+    <p>w 为 Guidance Scale，等价于在<em>条件方向</em>上拉长梯度。</p>
+    <p><strong>训练方式：</strong>随机以 10%~20% 概率丢弃 condition（设为空字符串），训练同一个 U-Net 同时学有条件/无条件两种路径。</p>
+    <p><strong>过饱和原因：</strong>w 过大时，梯度方向被过度放大，模型强行生成与 condition 最相关且概率最高的像素，导致颜色饱和、细节丢失、artifact 增加。</p>
+    <div class="tip">💡 实践经验：写实图/写实特写 CFG=7~9；艺术插画/海报 CFG=4~6；超过 15 一般就会出现饱和。</div>
+  </div></div>
+</div>
+
+<!-- Q30 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">30</div>
+    <div>
+      <div class="q-text">扩散模型的噪声调度策略（Noise Schedule）有哪些？各自对生成质量有什么影响？</div>
+      <div class="q-tags"><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <table>
+      <tr><th>调度</th><th>公式/特点</th><th>适用场景</th></tr>
+      <tr><td><strong>Linear</strong> (DDPM)</td><td>β_t 线性从 1e-4 到 0.02</td><td>基础实验</td></tr>
+      <tr><td><strong>Cosine</strong> (improved DDPM)</td><td>ᾱ_t = cos²(πt/2T)，低 t 整流冠写效果更轻对称</td><td>高分辨率图像</td></tr>
+      <tr><td><strong>EDM</strong> (逸收编方)</td><td>用 σ 直接描述噪声级别，去掉 T 离散概念</td><td>SD3/FLUX</td></tr>
+      <tr><td><strong>Linear Flow</strong></td><td>Flow Matching 的线性路径，最简单直接</td><td>Wan、Sora 类</td></tr>
+    </table>
+    <p>调度影响信噪比分布：<em>Cosine 调度在中间时间步保留更多信号</em>，对高分辨率细节生成更友好；过早进入纯噪声会浪费训练容量。</p>
+  </div></div>
+</div>
+
+<!-- Q31 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">31</div>
+    <div>
+      <div class="q-text">图像生成的主流评价指标：FID、IS、CLIP Score 的计算方式与局限性？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <table>
+      <tr><th>指标</th><th>计算方式</th><th>局限性</th></tr>
+      <tr><td><strong>FID</strong>（Fréchet Inception Distance）</td><td>InceptionV3 提取真实/生成集的特征，计算两模态高斯分布的 Fréchet 距离</td><td>依赖 ImageNet 特征空间，对文本-图对齐不敏感</td></tr>
+      <tr><td><strong>IS</strong>（Inception Score）</td><td>E[KL(p(y|x) || p(y))]，高 IS 要求类别明确且多样</td><td>不衡量图文对齐；弹模式时 IS 也可能很高</td></tr>
+      <tr><td><strong>CLIP Score</strong></td><td>CLIP 图像-文本余弦相似度</td><td>对细小细节/属性绑定较弱</td></tr>
+      <tr><td><strong>DINO/LPIPS</strong></td><td>真实性/感知相似度</td><td>需要参考图像</td></tr>
+    </table>
+    <div class="tip">💡 实际评估常用 FID + CLIP Score + 人工评审三者结合。</div>
+  </div></div>
+</div>
+
+<!-- Q32 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">32</div>
+    <div>
+      <div class="q-text">控制生成（ControlNet）的架构设计是什么？训练时为何只训练副本？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p>ControlNet 为平行复制原始 U-Net 的<em>编码器半部</em>（副本），功能：</p>
+    <ol>
+      <li>原始 U-Net 权重<strong>冻结</strong>，保留预训练涌现能力</li>
+      <li>副本编码器接受额外条件（边缘图/深度图/骨架），通过<strong>Zero Convolution（初始化为 0 的 1×1 卷积）</strong>将特征逐层加进解码器</li>
+      <li>Zero Conv 保证训练初期不引入噪声，梯度平稳</li>
+    </ol>
+    <p><strong>为何只训练副本？</strong></p>
+    <ul>
+      <li>可训练参数量仅为全模型的 50%，显存减少</li>
+      <li>冻结原始 U-Net 防止灾失性遗忘，不危害已有文本生成能力</li>
+      <li>支持多个 ControlNet 叠加使用</li>
+    </ul>
+  </div></div>
+</div>
+
+<!-- Q33 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">33</div>
+    <div>
+      <div class="q-text">LoRA 应用于扩散模型微调时（DreamBooth + LoRA）的流程和注意事项？</div>
+      <div class="q-tags"><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p><strong>DreamBooth 目标：</strong>用 3~20 张特定主题图片，让扩散模型学会生成该主题内容。</p>
+    <p><strong>+ LoRA 流程：</strong></p>
+    <ol>
+      <li>准备 3~20 张目标图像 + 认罪图像（prior preservation loss 防止过拟合）</li>
+      <li>在 U-Net 的 Attention 层插入 LoRA，秩 &lt;rank=4~32&gt;</li>
+      <li>训练 loss = diffusion MSE loss + λ · prior loss</li>
+      <li>训练 200~500 steps，lr 约 1e-4</li>
+    </ol>
+    <p><strong>常见问题：</strong></p>
+    <ul>
+      <li><em>语言漂移</em>：过多训练后模型只会生成特定主题而失去泛化 → 加大 prior loss 权重</li>
+      <li><em>过拟合</em>：图像并不多时应及时停止 → 评估 validation loss</li>
+      <li><em>LoRA Rank 选择</em>：写实水平用 r=8；风格过渡用 r=16~32</li>
+    </ul>
+  </div></div>
+</div>
+
+<!-- Q34 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">34</div>
+    <div>
+      <div class="q-text">视频生成的 VAE 设计：为什么要在时间维度也进行压缩？如何保证隐空间连贯性？</div>
+      <div class="q-tags"><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p>图像 VAE：仅在空间维压缩（H×W ÷ 8）；视频 VAE 额外在时间维压缩（T ÷ 4），进一步降低扩散过程的计算量：</p>
+    <div class="formula">原始视频 T×H×W → Latent (T/4)×(H/8)×(W/8)</div>
+    <p><strong>时序连贯性保证方法：</strong></p>
+    <ul>
+      <li><em>3D卷积</em>：在 Encoder/Decoder 里使用 3D Conv 捕捉时空联合特征</li>
+      <li><em>Temporal Attention</em>：在 latent 序列上做时间轴注意力，支持跨帧建模</li>
+      <li><em>帧间光流监督</em>：加入光流一致性损失，强制相邻帧 latent 运动可推）</li>
+    </ul>
+  </div></div>
+</div>
+
+<!-- Q35 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">35</div>
+    <div>
+      <div class="q-text">IP-Adapter 和图片提示（Image Prompt）技术的实现原理？</div>
+      <div class="q-tags"><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p>IP-Adapter 实现图片内容作为提示，控制生成图的风格/内容：</p>
+    <ol>
+      <li>CLIP 图像编码器提取图片特征（使用 patch-level embedding，非仅 CLS token）</li>
+      <li>新增一个平行的跨注意力子层（Decoupled Cross-Attention）：
+        <div class="formula">Attn = Attn_text + λ · Attn_image</div>
+        文本 Cross-Attention 和图片 Cross-Attention 分开进行，控制权重 λ 平衡内容/文本影响力</li>
+      <li>冻结原始 U-Net，只训练新增 Attention 层和图像投影</li>
+    </ol>
+    <div class="tip">💡 IP-Adapter-FaceID 进一步用人脸识别模型提取身份 embedding，实现人脸一致性生成。</div>
+  </div></div>
+</div>
+
 </section>
 
 <!-- ═══════════════════════════════════
@@ -1251,11 +1439,275 @@
 
 </section>
 
+
+<!-- ═══════════════════════════════════
+     SECTION 9 — 强化学习基础
+════════════════════════════════════ -->
+<section id="s9">
+<div class="section-title"><span class="section-icon">🎮</span>九、强化学习基础</div>
+
+<!-- RL1 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">RL1</div>
+    <div>
+      <div class="q-text">马尔科夫决策过程（MDP）的五元组定义是什么？贝尔曼方程如何推导？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p><strong>MDP 五元组：</strong>(S, A, P, R, γ)</p>
+    <ul>
+      <li><strong>S</strong>：状态空间</li>
+      <li><strong>A</strong>：动作空间</li>
+      <li><strong>P(s'|s,a)</strong>：状态转移概率</li>
+      <li><strong>R(s,a)</strong>：奖励函数</li>
+      <li><strong>γ ∈ [0,1)</strong>：折扣因子</li>
+    </ul>
+    <p><strong>贝尔曼方程（状态价值函数）：</strong></p>
+    <div class="formula">V_π(s) = Σ_a π(a|s) · [R(s,a) + γ · Σ_s' P(s'|s,a) · V_π(s')]</div>
+    <p><strong>贝尔曼最优方程：</strong></p>
+    <div class="formula">V*(s) = max_a [R(s,a) + γ · Σ_s' P(s'|s,a) · V*(s')]</div>
+    <div class="tip">💡 γ 越接近 1，模型越重视长期收益；γ=0 只看当前奖励（贪心）。</div>
+  </div></div>
+</div>
+
+<!-- RL2 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">RL2</div>
+    <div>
+      <div class="q-text">Model-Free RL 中 Q-Learning 与 SARSA 的区别？为何 Q-Learning 是 off-policy 的？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p><strong>Q-Learning（off-policy）：</strong></p>
+    <div class="formula">Q(s,a) ← Q(s,a) + α·[r + γ·max_{a'} Q(s',a') − Q(s,a)]</div>
+    <p>TD 目标用 max Q(s',·)，与行为策略无关，直接估计最优策略价值 → <strong>off-policy</strong>。</p>
+    <p><strong>SARSA（on-policy）：</strong></p>
+    <div class="formula">Q(s,a) ← Q(s,a) + α·[r + γ·Q(s',a') − Q(s,a)]</div>
+    <p>TD 目标用实际执行的下一动作 a'（由当前策略决定）→ <strong>on-policy</strong>，更保守，学习的是执行策略的价值。</p>
+    <table>
+      <tr><th></th><th>Q-Learning</th><th>SARSA</th></tr>
+      <tr><td>策略类型</td><td>off-policy（学最优）</td><td>on-policy（学当前策略）</td></tr>
+      <tr><td>悬崖行走</td><td>走悬崖边缘（最优但危险）</td><td>走安全路线</td></tr>
+      <tr><td>收敛性</td><td>收敛到 Q*</td><td>收敛到 Q_π</td></tr>
+    </table>
+  </div></div>
+</div>
+
+<!-- RL3 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">RL3</div>
+    <div>
+      <div class="q-text">策略梯度（Policy Gradient）定理的推导？REINFORCE 算法的核心公式？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p>目标：最大化期望回报 J(θ) = E_τ[R(τ)]。</p>
+    <p><strong>策略梯度定理：</strong></p>
+    <div class="formula">∇_θ J(θ) = E_τ[ Σ_t ∇_θ log π_θ(a_t|s_t) · Q^π(s_t, a_t) ]</div>
+    <p><strong>REINFORCE（Monte Carlo 策略梯度）：</strong>用完整轨迹的折扣回报 G_t 估计 Q 值：</p>
+    <div class="formula">∇_θ J(θ) ≈ Σ_t ∇_θ log π_θ(a_t|s_t) · G_t</div>
+    <p><strong>Baseline 减方差：</strong>引入基线 b（通常为状态价值 V(s_t)），减少梯度方差：</p>
+    <div class="formula">∇_θ J(θ) ≈ Σ_t ∇_θ log π_θ(a_t|s_t) · (G_t − b(s_t))</div>
+    <div class="warn">⚠️ REINFORCE 方差大，样本效率低，实际更多用 Actor-Critic 架构。</div>
+  </div></div>
+</div>
+
+<!-- RL4 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">RL4</div>
+    <div>
+      <div class="q-text">Actor-Critic 框架的原理？A2C 和 A3C 有何区别？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p>Actor-Critic 同时维护：</p>
+    <ul>
+      <li><strong>Actor（策略网络 π_θ）</strong>：负责选动作</li>
+      <li><strong>Critic（价值网络 V_φ）</strong>：负责评估当前策略的价值，提供 TD 误差作为梯度信号</li>
+    </ul>
+    <p><strong>优势函数（Advantage）：</strong></p>
+    <div class="formula">A(s,a) = r + γ·V(s') − V(s)（TD 误差即单步优势估计）</div>
+    <p>Actor 更新：∇_θ log π_θ(a|s) · A(s,a)</p>
+    <table>
+      <tr><th></th><th>A2C（Advantage Actor-Critic）</th><th>A3C（Asynchronous A3C）</th></tr>
+      <tr><td>执行方式</td><td>同步，等所有并行 worker</td><td>异步，各 worker 独立更新全局网络</td></tr>
+      <tr><td>硬件需求</td><td>单机多线程/GPU</td><td>多 CPU 核心</td></tr>
+      <tr><td>稳定性</td><td>更稳定</td><td>异步噪声大但探索多</td></tr>
+    </table>
+  </div></div>
+</div>
+
+<!-- RL5 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">RL5</div>
+    <div>
+      <div class="q-text">PPO（Proximal Policy Optimization）的核心机制？Clip 函数的作用？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p>PPO 限制每次策略更新的幅度，防止过大更新破坏策略：</p>
+    <p><strong>重要性权重：</strong> r_t(θ) = π_θ(a_t|s_t) / π_θ_old(a_t|s_t)</p>
+    <p><strong>Clip 目标函数：</strong></p>
+    <div class="formula">L_CLIP(θ) = E_t[ min( r_t·A_t, clip(r_t, 1-ε, 1+ε)·A_t ) ]</div>
+    <p>ε 通常取 0.1~0.2。当 r_t > 1+ε（新策略比旧策略提升过多）时，clip 截断不再获益；当 A_t < 0 时，若 r_t < 1-ε 也被截断，防止过度惩罚。</p>
+    <p><strong>完整 PPO 损失：</strong></p>
+    <div class="formula">L = L_CLIP − c₁·L_VF + c₂·S[π_θ]</div>
+    <p>其中 L_VF 是 Critic 均方误差，S 是熵正则防止策略过早收敛。</p>
+    <div class="tip">💡 PPO 在 RLHF 中被广泛使用，因为其稳定性好，超参相对较少。</div>
+  </div></div>
+</div>
+
+<!-- RL6 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">RL6</div>
+    <div>
+      <div class="q-text">DQN（Deep Q-Network）解决了哪些经典 Q-Learning 的问题？Experience Replay 和 Target Network 的作用？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p>经典 Q-Learning 用表格存 Q 值，无法处理高维状态。DQN 用神经网络近似 Q 函数，并引入两大技巧：</p>
+    <p><strong>1. Experience Replay（经验回放）：</strong></p>
+    <ul>
+      <li>维护 Replay Buffer 存储历史转换 (s, a, r, s')</li>
+      <li>每次随机采样 mini-batch 训练，打破样本时序相关性</li>
+      <li>提高样本利用率，稳定训练</li>
+    </ul>
+    <p><strong>2. Target Network（目标网络）：</strong></p>
+    <ul>
+      <li>用独立的旧网络 θ⁻ 计算 TD 目标：y = r + γ·max_a' Q(s',a'; θ⁻)</li>
+      <li>每隔 C 步将主网络参数复制给目标网络</li>
+      <li>防止"追逐移动目标"导致训练发散</li>
+    </ul>
+    <div class="formula">L(θ) = E[(r + γ·max_{a'}Q(s',a';θ⁻) − Q(s,a;θ))²]</div>
+  </div></div>
+</div>
+
+<!-- RL7 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">RL7</div>
+    <div>
+      <div class="q-text">探索与利用的权衡（Exploration vs Exploitation）？常用探索策略有哪些？</div>
+      <div class="q-tags"><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p>核心矛盾：<em>利用</em>当前已知最优动作 vs <em>探索</em>未知动作以发现更好策略。</p>
+    <table>
+      <tr><th>策略</th><th>原理</th><th>适用场景</th></tr>
+      <tr><td><strong>ε-greedy</strong></td><td>以概率 ε 随机探索，1-ε 贪心利用；ε 随训练衰减</td><td>离散动作（DQN）</td></tr>
+      <tr><td><strong>UCB</strong>（上置信界）</td><td>选择 Q(a) + c·√(ln t / N(a)) 最大的动作，未探索动作 bonus 高</td><td>Bandit 问题</td></tr>
+      <tr><td><strong>Boltzmann/Softmax</strong></td><td>按 exp(Q/τ) 概率采样，温度 τ 控制随机度</td><td>连续/概率动作</td></tr>
+      <tr><td><strong>内在奖励</strong></td><td>好奇心驱动（预测误差/新颖性）作为额外奖励</td><td>稀疏奖励环境</td></tr>
+    </table>
+  </div></div>
+</div>
+
+<!-- RL8 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">RL8</div>
+    <div>
+      <div class="q-text">GAE（Generalized Advantage Estimation）的原理？为何能在偏差和方差之间取得平衡？</div>
+      <div class="q-tags"><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p>GAE 是多步 TD 优势的指数加权平均：</p>
+    <div class="formula">A^GAE(γ,λ)_t = Σ_{l=0}^∞ (γλ)^l · δ_{t+l}</div>
+    <p>其中 δ_t = r_t + γ·V(s_{t+1}) − V(s_t) 为单步 TD 误差。</p>
+    <table>
+      <tr><th>λ 取值</th><th>等价形式</th><th>偏差/方差</th></tr>
+      <tr><td>λ=0</td><td>A = δ_t（纯 1-step TD）</td><td>低方差，高偏差</td></tr>
+      <tr><td>λ=1</td><td>A = G_t − V(s_t)（Monte Carlo）</td><td>无偏差，高方差</td></tr>
+      <tr><td>λ∈(0,1)</td><td>折中</td><td>平衡偏差-方差</td></tr>
+    </table>
+    <div class="tip">💡 PPO 通常配合 GAE（λ=0.95, γ=0.99）使用，是目前最稳定的策略梯度实践。</div>
+  </div></div>
+</div>
+
+<!-- RL9 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">RL9</div>
+    <div>
+      <div class="q-text">RLHF 中 RL 的奖励稀疏问题如何解决？KL 散度惩罚的作用是什么？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p>LLM RLHF 中，奖励来自 RM 模型（只在序列末尾给分），属于典型稀疏奖励。</p>
+    <p><strong>解决方案：</strong></p>
+    <ul>
+      <li><em>逐 token 分配奖励</em>：将终态奖励均匀或按重要性分摊到每个 token</li>
+      <li><em>KL 散度惩罚</em>：每步加 −β·KL(π_θ(·|s) || π_ref(·|s))，防止策略偏离 SFT 基准太远</li>
+    </ul>
+    <p><strong>KL 惩罚的三重作用：</strong></p>
+    <ul>
+      <li>防止 reward hacking（模型发现漏洞刷 RM 高分但输出质量差）</li>
+      <li>保持语言流畅度（SFT 模型已有好的语言生成能力）</li>
+      <li>稳定训练（避免策略更新过大）</li>
+    </ul>
+    <div class="formula">R_total = r_θ(x,y) − β·KL(π_θ(y|x) || π_ref(y|x))</div>
+  </div></div>
+</div>
+
+<!-- RL10 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">RL10</div>
+    <div>
+      <div class="q-text">GRPO（Group Relative Policy Optimization）与 PPO 的区别？DeepSeek-R1 为何选择 GRPO？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p>GRPO 去掉了 PPO 中的 <strong>Critic 网络</strong>，改用<em>组内相对奖励</em>估计优势：</p>
+    <ol>
+      <li>对同一 prompt 采样 G 条回答 {y₁,...,y_G}</li>
+      <li>用奖励模型打分 {r₁,...,r_G}</li>
+      <li>组内归一化：A_i = (r_i − mean(r)) / std(r)</li>
+      <li>用 A_i 代替 PPO 中 Critic 估计的优势</li>
+    </ol>
+    <table>
+      <tr><th></th><th>PPO</th><th>GRPO</th></tr>
+      <tr><td>Critic 网络</td><td>需要（同 Actor 大小）</td><td>不需要</td></tr>
+      <tr><td>显存需求</td><td>高（同时加载 4 个模型）</td><td>低（2 个模型）</td></tr>
+      <tr><td>优势估计</td><td>GAE + Critic</td><td>组内相对排名</td></tr>
+    </table>
+    <p><strong>DeepSeek-R1 选择 GRPO 的原因：</strong>训练超大模型时省去 Critic 可节省约 50% 显存，同时对数学/代码等有客观验证标准的任务，组内相对奖励信号足够稳定。</p>
+  </div></div>
+</div>
+
+</section>
+
 </main>
 
 <footer>
   <p>生成基模团队面试题全集 · 整理自互联网技术博客及论文 · 2025年</p>
-  <p style="margin-top:6px">Transformer · 预训练 · RLHF · 推理优化 · Diffusion · 多模态 · 系统设计</p>
+  <p style="margin-top:6px">Transformer · 预训练 · RLHF · 推理优化 · 视觉生成 · 多模态 · 系统设计 · 强化学习基础</p>
 </footer>
 
 <script>
