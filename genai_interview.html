@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>生成基模团队面试题全集</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --card: #1a1d27;
+      --border: #2e3248;
+      --accent: #6c63ff;
+      --accent2: #00d4aa;
+      --text: #e2e8f0;
+      --muted: #8892a4;
+      --tag-bg: #252840;
+      --code-bg: #12141e;
+      --answer-bg: #151825;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      line-height: 1.7;
+    }
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #1a1d27 0%, #0f1117 60%, #1a1330 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 48px 24px 36px;
+      text-align: center;
+    }
+    header h1 { font-size: 2.2rem; font-weight: 800; background: linear-gradient(90deg,#6c63ff,#00d4aa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    header p { color: var(--muted); margin-top: 8px; font-size: .95rem; }
+    .stats { display: flex; justify-content: center; gap: 32px; margin-top: 20px; flex-wrap: wrap; }
+    .stat { text-align: center; }
+    .stat .n { font-size: 1.8rem; font-weight: 700; color: var(--accent); }
+    .stat .label { font-size: .78rem; color: var(--muted); }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(15,17,23,.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 16px;
+      display: flex; gap: 4px; overflow-x: auto;
+    }
+    nav a {
+      display: inline-block; padding: 12px 14px;
+      color: var(--muted); font-size: .85rem; text-decoration: none;
+      white-space: nowrap; border-bottom: 2px solid transparent;
+      transition: color .2s, border-color .2s;
+    }
+    nav a:hover, nav a.active { color: var(--accent2); border-bottom-color: var(--accent2); }
+
+    /* ── Main layout ── */
+    main { max-width: 900px; margin: 0 auto; padding: 32px 16px 80px; }
+
+    /* ── Section ── */
+    section { margin-bottom: 60px; }
+    .section-title {
+      font-size: 1.35rem; font-weight: 700;
+      border-left: 4px solid var(--accent);
+      padding-left: 14px; margin-bottom: 24px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-icon { font-size: 1.4rem; }
+
+    /* ── Card ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 16px;
+      overflow: hidden;
+      transition: border-color .2s;
+    }
+    .card:hover { border-color: var(--accent); }
+    .card-header {
+      padding: 16px 20px;
+      cursor: pointer;
+      display: flex; align-items: flex-start; gap: 14px;
+    }
+    .q-num {
+      min-width: 32px; height: 32px;
+      background: var(--tag-bg); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .8rem; font-weight: 700; color: var(--accent);
+      margin-top: 2px;
+    }
+    .q-text { font-size: 1rem; font-weight: 600; flex: 1; }
+    .q-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+    .tag {
+      font-size: .72rem; padding: 2px 8px;
+      border-radius: 99px; background: var(--tag-bg); color: var(--muted);
+    }
+    .tag.code { background: #1a2530; color: #56b6c2; }
+    .tag.hot { background: #2a1a1a; color: #e06c75; }
+    .tag.hard { background: #1a1a2a; color: #c678dd; }
+    .chevron {
+      font-size: 1.1rem; color: var(--muted);
+      transition: transform .25s;
+      margin-left: auto; margin-top: 6px;
+    }
+    .card.open .chevron { transform: rotate(180deg); }
+
+    /* ── Answer ── */
+    .answer {
+      max-height: 0; overflow: hidden;
+      transition: max-height .35s ease;
+      background: var(--answer-bg);
+      border-top: 0px solid var(--border);
+    }
+    .card.open .answer {
+      max-height: 3000px;
+      border-top: 1px solid var(--border);
+    }
+    .answer-inner { padding: 20px 24px; }
+    .answer-inner p { margin-bottom: 10px; color: #c5cdd8; }
+    .answer-inner ul, .answer-inner ol { padding-left: 22px; margin-bottom: 10px; color: #c5cdd8; }
+    .answer-inner li { margin-bottom: 6px; }
+    .answer-inner strong { color: var(--accent2); }
+    .answer-inner em { color: #e5c07b; font-style: normal; }
+    code {
+      background: var(--code-bg); border-radius: 5px;
+      padding: 2px 6px; font-size: .88em; font-family: 'Fira Code', Consolas, monospace;
+      color: #98c379;
+    }
+    pre {
+      background: var(--code-bg);
+      border: 1px solid #2e3248; border-radius: 10px;
+      padding: 16px; overflow-x: auto; margin: 12px 0;
+    }
+    pre code { background: none; padding: 0; }
+    .formula {
+      background: var(--code-bg); border-left: 3px solid var(--accent);
+      padding: 12px 16px; margin: 10px 0; border-radius: 0 8px 8px 0;
+      font-family: 'Fira Code', Consolas, monospace; font-size: .92em; color: #e5c07b;
+    }
+    .tip {
+      background: #1a2a1a; border-left: 3px solid #00d4aa;
+      padding: 10px 14px; margin: 10px 0; border-radius: 0 8px 8px 0; font-size: .9em;
+      color: #90c9b5;
+    }
+    .warn {
+      background: #2a1a10; border-left: 3px solid #e5a04b;
+      padding: 10px 14px; margin: 10px 0; border-radius: 0 8px 8px 0; font-size: .9em;
+      color: #e5a04b;
+    }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: .9em; }
+    th { background: var(--tag-bg); color: var(--accent2); padding: 8px 12px; text-align: left; }
+    td { border-top: 1px solid var(--border); padding: 7px 12px; }
+    tr:hover td { background: rgba(108,99,255,.05); }
+
+    /* ── Code-only badge ── */
+    .code-only {
+      display: flex; align-items: center; gap: 10px; padding: 14px 20px;
+      background: #12141e; border-top: 1px solid var(--border);
+    }
+    .code-badge {
+      font-size: .78rem; background: #1a3040; color: #56b6c2;
+      padding: 3px 10px; border-radius: 99px;
+    }
+
+    /* ── Footer ── */
+    footer { text-align: center; color: var(--muted); font-size: .8rem; padding: 32px; border-top: 1px solid var(--border); }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🚀 生成基模团队面试题全集</h1>
+  <p>涵盖 Transformer · 训练范式 · 推理优化 · 生成模型 · 多模态 · 系统设计 · 代码题</p>
+  <div class="stats">
+    <div class="stat"><div class="n">80+</div><div class="label">面试题</div></div>
+    <div class="stat"><div class="n">8</div><div class="label">核心模块</div></div>
+    <div class="stat"><div class="n">2025</div><div class="label">最新版本</div></div>
+  </div>
+</header>
+
+<nav>
+  <a href="#s1">Transformer</a>
+  <a href="#s2">预训练</a>
+  <a href="#s3">后训练对齐</a>
+  <a href="#s4">推理优化</a>
+  <a href="#s5">生成模型</a>
+  <a href="#s6">多模态</a>
+  <a href="#s7">系统设计</a>
+  <a href="#s8">代码题</a>
+</nav>
+
+<main>
+
+<!-- ═══════════════════════════════════
+     SECTION 1 — Transformer 架构
+════════════════════════════════════ -->
+<section id="s1">
+<div class="section-title"><span class="section-icon">🧠</span>一、Transformer 架构原理</div>
+
+<!-- Q1 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">1</div>
+    <div>
+      <div class="q-text">请描述 Transformer 的整体架构，Encoder 和 Decoder 有何区别？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p>Transformer 由 <strong>Encoder 栈</strong>（原始论文 6 层）和 <strong>Decoder 栈</strong>（6 层）组成。</p>
+    <p><strong>Encoder 每层包含：</strong></p>
+    <ul>
+      <li>多头自注意力（Multi-Head Self-Attention）</li>
+      <li>前馈神经网络（FFN，两层线性 + ReLU/GeLU）</li>
+      <li>残差连接 + Layer Normalization</li>
+    </ul>
+    <p><strong>Decoder 每层多一个 Cross-Attention 子层</strong>，额外关注 Encoder 输出；自注意力使用 <em>Causal Mask</em>（下三角掩码）防止"偷看未来"。</p>
+    <p><strong>现代主流变体：</strong>GPT/LLaMA 是 Decoder-Only（去掉 Encoder 和 Cross-Attention）；T5/BART 保留完整 Encoder-Decoder。</p>
+    <div class="tip">💡 面试要点：Decoder-Only 更适合生成任务（逐 token 自回归），Encoder 更适合理解/分类。</div>
+  </div></div>
+</div>
+
+<!-- Q2 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">2</div>
+    <div>
+      <div class="q-text">自注意力（Self-Attention）的计算公式是什么？为什么要除以 √d_k？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <div class="formula">Attention(Q, K, V) = softmax( QKᵀ / √d_k ) · V</div>
+    <p><strong>为什么除以 √d_k？</strong></p>
+    <p>QK 点积结果的方差约为 d_k（若 Q、K 各分量均值 0、方差 1），随 d_k 增大，点积绝对值变大，softmax 进入极度饱和区（梯度消失）。除以 √d_k 将方差归一化为 1，使 softmax 在可训练区间工作。</p>
+    <div class="tip">💡 推导：若 q_i, k_i ~ N(0,1)，则 q·k = Σq_i·k_i，方差 = d_k，标准差 = √d_k。</div>
+  </div></div>
+</div>
+
+<!-- Q3 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">3</div>
+    <div>
+      <div class="q-text">多头注意力（Multi-Head Attention）的作用？为什么不用单头？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p>多头注意力将 d_model 维度划分为 h 个子空间，每个 head 独立计算注意力后拼接：</p>
+    <div class="formula">MultiHead(Q,K,V) = Concat(head_1,...,head_h) · W_O<br>head_i = Attention(QW_i^Q, KW_i^K, VW_i^V)</div>
+    <p><strong>优点：</strong></p>
+    <ul>
+      <li><strong>多空间建模</strong>：不同 head 捕获不同类型的依赖（语法/语义/位置）</li>
+      <li><strong>打破对称性</strong>：单头 attention 矩阵可能退化为近对称，泛化差</li>
+      <li><strong>计算量相当</strong>：每个 head 的 d_k = d_model/h，总计算量与单头相同</li>
+    </ul>
+  </div></div>
+</div>
+
+<!-- Q4 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">4</div>
+    <div>
+      <div class="q-text">Transformer 的位置编码方案有哪些？RoPE 的原理是什么？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <table>
+      <tr><th>方案</th><th>原理</th><th>代表模型</th></tr>
+      <tr><td>绝对正弦位置编码</td><td>sin/cos 固定公式叠加到 Embedding</td><td>原版 Transformer</td></tr>
+      <tr><td>可学习绝对位置编码</td><td>Embedding 表可训练</td><td>BERT、GPT-2</td></tr>
+      <tr><td>相对位置编码（ALiBi）</td><td>在 attention score 上加线性偏置</td><td>BLOOM</td></tr>
+      <tr><td><strong>RoPE</strong></td><td>旋转矩阵编码相对位置，作用于 Q/K</td><td><strong>LLaMA、GPT-NeoX</strong></td></tr>
+    </table>
+    <p><strong>RoPE 原理：</strong>对位置 m 的 query 向量分量 (x_{2i}, x_{2i+1}) 进行旋转变换：</p>
+    <div class="formula">
+      [x_{2i}·cos(mθ_i) − x_{2i+1}·sin(mθ_i),<br>
+       x_{2i}·sin(mθ_i) + x_{2i+1}·cos(mθ_i)]<br>
+      θ_i = 10000^(−2i/d)
+    </div>
+    <p>两个位置 m、n 的内积只与相对位置 m−n 有关，天然建模相对位置，且可外推到更长上下文（配合 YaRN/NTK 插值）。</p>
+  </div></div>
+</div>
+
+<!-- Q5 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">5</div>
+    <div>
+      <div class="q-text">Pre-LayerNorm 与 Post-LayerNorm 的区别？为何现代 LLM 普遍用 Pre-LN？</div>
+      <div class="q-tags"><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p><strong>Post-LN（原始 Transformer）：</strong>残差后才 normalize，梯度在深层容易爆炸，训练不稳定。</p>
+    <p><strong>Pre-LN（GPT-2/LLaMA）：</strong>每个子层输入先 normalize，梯度路径稳定，可直接训练深层模型，无需 warm-up 也能收敛。</p>
+    <p><strong>RMSNorm（进一步简化）：</strong>去掉均值项，只做方差归一化，更快，LLaMA 使用。</p>
+    <div class="formula">RMSNorm(x) = x / RMS(x) · γ，其中 RMS(x) = √(1/n Σx_i²)</div>
+  </div></div>
+</div>
+
+<!-- Q6 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">6</div>
+    <div>
+      <div class="q-text">Transformer 的时间复杂度是多少？有哪些降低注意力复杂度的方法？</div>
+      <div class="q-tags"><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p>标准自注意力时间复杂度为 <strong>O(n²·d)</strong>，n 为序列长度，空间也是 O(n²)（存储 Attention 矩阵）。</p>
+    <table>
+      <tr><th>方法</th><th>复杂度</th><th>思路</th></tr>
+      <tr><td>Sparse Attention</td><td>O(n√n)</td><td>只关注局部+全局少数 token</td></tr>
+      <tr><td>Linear Attention</td><td>O(n·d)</td><td>核函数近似，不存完整矩阵</td></tr>
+      <tr><td>FlashAttention</td><td>O(n²·d) 计算，O(n) IO</td><td>分块计算，减少 HBM 访问</td></tr>
+      <tr><td>GQA（Group Query Attn）</td><td>-</td><td>多个 Q head 共享 K/V head，减显存</td></tr>
+      <tr><td>MLA（Multi-head Latent）</td><td>-</td><td>低秩压缩 KV，DeepSeek 使用</td></tr>
+    </table>
+  </div></div>
+</div>
+
+<!-- Q7 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">7</div>
+    <div>
+      <div class="q-text">MoE（混合专家）模型的原理？训练和推理各有什么挑战？</div>
+      <div class="q-tags"><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p>MoE 在 FFN 层用多个"专家网络"替代单一 FFN，通过 <strong>Router（门控网络）</strong>为每个 token 选 Top-K 个专家激活：</p>
+    <div class="formula">output = Σ g_i(x) · Expert_i(x)，g = TopK(Softmax(Wx))</div>
+    <p><strong>优点：</strong>参数量大但计算量可控（每 token 只激活部分专家），如 Mixtral-8×7B 有 47B 参数但每 token 激活 12B。</p>
+    <p><strong>训练挑战：</strong></p>
+    <ul>
+      <li><em>负载不均衡</em>：部分专家被频繁选择（热门专家），需加辅助损失均衡负载</li>
+      <li><em>通信开销</em>：分布式训练中专家分散在不同设备，all-to-all 通信昂贵</li>
+    </ul>
+    <p><strong>推理挑战：</strong>需要将所有专家权重加载到显存或频繁 IO。DeepSeek-V3 使用 <em>Expert Parallelism</em> 缓解。</p>
+  </div></div>
+</div>
+
+</section>
+
+<!-- ═══════════════════════════════════
+     SECTION 2 — 预训练
+════════════════════════════════════ -->
+<section id="s2">
+<div class="section-title"><span class="section-icon">📚</span>二、预训练原理与技术</div>
+
+<!-- Q8 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">8</div>
+    <div>
+      <div class="q-text">语言模型预训练的目标函数是什么？Causal LM 与 Masked LM 有何区别？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p><strong>Causal LM（自回归，GPT 系列）：</strong>给定前 t−1 个 token，预测第 t 个 token。损失为交叉熵：</p>
+    <div class="formula">L = −Σ log P(x_t | x_1,...,x_{t-1})</div>
+    <p><strong>Masked LM（BERT）：</strong>随机 mask 15% token，预测被 mask 的词；双向注意力，不能直接做生成。</p>
+    <table>
+      <tr><th></th><th>Causal LM</th><th>Masked LM</th></tr>
+      <tr><td>注意力方向</td><td>单向（左到右）</td><td>双向</td></tr>
+      <tr><td>适合任务</td><td>文本生成、对话</td><td>理解、分类、NER</td></tr>
+      <tr><td>代表模型</td><td>GPT、LLaMA、Qwen</td><td>BERT、RoBERTa</td></tr>
+    </table>
+  </div></div>
+</div>
+
+<!-- Q9 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">9</div>
+    <div>
+      <div class="q-text">预训练的 Scaling Law 是什么？如何指导训练计算量分配？</div>
+      <div class="q-tags"><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p><strong>OpenAI Scaling Law（Kaplan et al.）：</strong>模型 Loss 与模型参数量 N、数据量 D、计算量 C 之间满足幂律关系。</p>
+    <p><strong>Chinchilla Scaling Law（Hoffmann et al.）：</strong>在固定计算预算 C 下，最优分配是 <em>N ≈ D</em>（参数量约等于 token 数），即 1B 参数需约 20B tokens。</p>
+    <div class="formula">最优 N = √(C/6)，最优 D = √(6C)</div>
+    <p>实践指导：不要一味扩大模型，同等算力下同比增加数据和参数更优。LLaMA 系列有意"欠训练参数"但"过训练数据"，以获得更强推理效率比。</p>
+  </div></div>
+</div>
+
+<!-- Q10 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">10</div>
+    <div>
+      <div class="q-text">预训练的数据工程：如何进行数据清洗、去重和质量筛选？</div>
+      <div class="q-tags"><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p><strong>主要流程：</strong></p>
+    <ol>
+      <li><strong>语言检测</strong>：fastText 识别语种，过滤低质量混合语言</li>
+      <li><strong>规则过滤</strong>：去除广告、乱码、重复符号；过滤极短/极长文档</li>
+      <li><strong>MinHash 去重</strong>：局部敏感哈希（LSH）+Jaccard 相似度，去除近重复文档（n-gram 级别）</li>
+      <li><strong>质量打分</strong>：用小型分类器（如 fastText 训练）筛选高质量内容（Wikipedia 风格）</li>
+      <li><strong>毒性过滤</strong>：基于关键词词典或分类器去除有害内容</li>
+    </ol>
+    <div class="tip">💡 CC-Net、Dolma、RedPajama 均开源了完整数据清洗管道。</div>
+  </div></div>
+</div>
+
+<!-- Q11 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">11</div>
+    <div>
+      <div class="q-text">什么是 Tokenizer？BPE、WordPiece、SentencePiece 各有何特点？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <table>
+      <tr><th>算法</th><th>核心思路</th><th>代表模型</th></tr>
+      <tr><td><strong>BPE</strong>（Byte Pair Encoding）</td><td>迭代合并最高频字节对，自底向上构建词表</td><td>GPT-2、Qwen、Llama</td></tr>
+      <tr><td><strong>WordPiece</strong></td><td>类 BPE，但合并标准是最大化语言模型似然</td><td>BERT</td></tr>
+      <tr><td><strong>SentencePiece + Unigram</strong></td><td>基于 Unigram 语言模型的统计分词，与语言无关</td><td>T5、mBART</td></tr>
+    </table>
+    <p><strong>中文特点：</strong>字粒度 tokenize 词表小但序列长；子词方案更灵活，现代模型通常混合 Byte-level BPE，将任意字节都能编码（无 UNK）。</p>
+  </div></div>
+</div>
+
+<!-- Q12 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">12</div>
+    <div>
+      <div class="q-text">大模型分布式训练的并行策略有哪些？各自解决什么瓶颈？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <table>
+      <tr><th>策略</th><th>解决问题</th><th>通信量</th></tr>
+      <tr><td><strong>数据并行（DP）</strong></td><td>吞吐量不够，单卡能放下整个模型</td><td>梯度 AllReduce</td></tr>
+      <tr><td><strong>张量并行（TP）</strong></td><td>单层参数太大单卡放不下（如 FFN、Attn 分列并行）</td><td>每层 AllReduce</td></tr>
+      <tr><td><strong>流水线并行（PP）</strong></td><td>层数太多，按层切分到不同设备</td><td>micro-batch P2P</td></tr>
+      <tr><td><strong>序列并行（SP）</strong></td><td>超长序列，Attention 的 N² 显存</td><td>按序列切分</td></tr>
+      <tr><td><strong>ZeRO（DeepSpeed）</strong></td><td>优化器状态/梯度/参数显存</td><td>Stage 1/2/3 可选</td></tr>
+    </table>
+    <p>实际大规模训练（如 GPT-4）通常是 DP × TP × PP 三维混合并行。</p>
+  </div></div>
+</div>
+
+</section>
+
+<!-- ═══════════════════════════════════
+     SECTION 3 — 后训练与对齐
+════════════════════════════════════ -->
+<section id="s3">
+<div class="section-title"><span class="section-icon">🎯</span>三、后训练与对齐技术</div>
+
+<!-- Q13 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">13</div>
+    <div>
+      <div class="q-text">SFT（有监督微调）的流程是什么？数据格式有何要求？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p><strong>SFT 流程：</strong>在预训练基座上，用<em>指令-回答对</em>继续训练，教模型"遵从指令"。</p>
+    <ol>
+      <li>构建高质量指令数据：&lt;System&gt;&lt;Human&gt;&lt;Assistant&gt; 三元组格式</li>
+      <li>只对 <strong>Assistant 回答部分计算 loss</strong>，System/Human 部分 mask 掉</li>
+      <li>通常训练 1~3 个 epoch，学习率 1e-5 ~ 2e-5，防止过拟合</li>
+    </ol>
+    <p><strong>数据质量 > 数量：</strong>InstructGPT 仅用 1.3 万条高质量人工标注，效果远超低质量百万条数据。</p>
+    <div class="warn">⚠️ 注意：SFT 容易导致灾难性遗忘，通常加入少量预训练数据混合训练。</div>
+  </div></div>
+</div>
+
+<!-- Q14 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">14</div>
+    <div>
+      <div class="q-text">RLHF 的完整流程？奖励模型如何训练？PPO 在其中的作用？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p><strong>三阶段流程：</strong></p>
+    <ol>
+      <li><strong>SFT</strong>：基座 → 指令微调模型</li>
+      <li><strong>RM（奖励模型）训练</strong>：收集同一 prompt 下多个回答的人类偏好排序，用 BradleyTerry 模型训练：
+        <div class="formula">L_RM = −log σ(r(y_w) − r(y_l))</div>
+        y_w 为人类更偏好的回答，y_l 为较差回答
+      </li>
+      <li><strong>PPO 强化学习优化</strong>：用 RM 打分作为 reward，用 PPO 更新策略模型，同时加 KL 散度惩罚防止偏离 SFT 模型：
+        <div class="formula">R = r_θ(x,y) − β·KL(π_θ || π_ref)</div>
+      </li>
+    </ol>
+    <div class="tip">💡 PPO 的 clip 机制防止策略更新过大：L_CLIP = min(r_t·A_t, clip(r_t, 1-ε, 1+ε)·A_t)</div>
+  </div></div>
+</div>
+
+<!-- Q15 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">15</div>
+    <div>
+      <div class="q-text">DPO（Direct Preference Optimization）与 RLHF 有何区别？优缺点是什么？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p>DPO 绕过了显式奖励模型和 PPO，直接用偏好数据优化策略模型：</p>
+    <div class="formula">L_DPO = −log σ( β·log(π_θ(y_w|x)/π_ref(y_w|x)) − β·log(π_θ(y_l|x)/π_ref(y_l|x)) )</div>
+    <table>
+      <tr><th></th><th>RLHF+PPO</th><th>DPO</th></tr>
+      <tr><td>是否需要 RM</td><td>是</td><td>否</td></tr>
+      <tr><td>训练稳定性</td><td>较难，超参多</td><td>简单，类 SFT</td></tr>
+      <tr><td>效果</td><td>灵活性更高</td><td>略逊但工程简单</td></tr>
+      <tr><td>计算成本</td><td>高（4 个模型同时在线）</td><td>低（2 个模型）</td></tr>
+    </table>
+    <div class="tip">💡 2024 趋势：GRPO（DeepSeek-R1 使用）去掉 Critic 模型，进一步简化。</div>
+  </div></div>
+</div>
+
+<!-- Q16 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">16</div>
+    <div>
+      <div class="q-text">LoRA 的原理是什么？QLoRA 有何改进？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p><strong>LoRA（Low-Rank Adaptation）：</strong>冻结原始权重 W₀，在其旁边并联两个低秩矩阵 A（d×r）和 B（r×d）：</p>
+    <div class="formula">W = W₀ + ΔW = W₀ + B·A，其中 r ≪ d</div>
+    <p>推理时合并 ΔW，无额外延迟。训练参数量仅为原始的 0.1%~1%。</p>
+    <p><strong>QLoRA：</strong>将基础模型用 <em>NF4（4-bit Normal Float）</em>量化存储，LoRA 权重用 BF16 训练，通过<em>双重量化</em>和<em>分页优化器</em>实现在单卡 48GB 上微调 65B 模型。</p>
+    <table>
+      <tr><th></th><th>LoRA</th><th>QLoRA</th></tr>
+      <tr><td>基础模型精度</td><td>FP16/BF16</td><td>NF4 量化</td></tr>
+      <tr><td>显存需求</td><td>~2×基础</td><td>比 LoRA 少 50%+</td></tr>
+      <tr><td>精度损失</td><td>极小</td><td>略有损失</td></tr>
+    </table>
+  </div></div>
+</div>
+
+<!-- Q17 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">17</div>
+    <div>
+      <div class="q-text">Chain-of-Thought（CoT）原理？如何让模型具备推理能力？</div>
+      <div class="q-tags"><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p>CoT 通过在 prompt 中提供<em>逐步推理示例</em>，引导模型输出中间推理步骤，显著提升复杂推理任务（数学、逻辑）的准确率。</p>
+    <ul>
+      <li><strong>Few-shot CoT</strong>：在 prompt 中给几个"问题+思维链+答案"示例</li>
+      <li><strong>Zero-shot CoT</strong>：直接在 prompt 后加"Let's think step by step"</li>
+      <li><strong>Self-Consistency</strong>：对同一问题采样多条推理路径，多数票选结果</li>
+      <li><strong>训练时蒸馏</strong>：用 CoT 数据做 SFT，让模型内化推理能力（o1 / R1 路线）</li>
+    </ul>
+    <div class="tip">💡 DeepSeek-R1 通过 GRPO 强化学习，让模型在无示例情况下自发涌现长思维链。</div>
+  </div></div>
+</div>
+
+</section>
+
+<!-- ═══════════════════════════════════
+     SECTION 4 — 推理优化
+════════════════════════════════════ -->
+<section id="s4">
+<div class="section-title"><span class="section-icon">⚡</span>四、推理加速与优化</div>
+
+<!-- Q18 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">18</div>
+    <div>
+      <div class="q-text">KV Cache 的原理？为什么能加速自回归推理？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p>自回归推理中，每步生成新 token 时，旧 token 的 Key 和 Value 计算结果不变，KV Cache 缓存这些结果，避免重复计算。</p>
+    <p><strong>无 KV Cache：</strong>生成第 t 个 token 需对前 t 个 token 重新计算 attention，总复杂度 O(n²)。</p>
+    <p><strong>有 KV Cache：</strong>每步只计算新 token 的 Q，用缓存的 K/V，每步 O(n)，总复杂度 O(n²) → 每步 O(n)。</p>
+    <p><strong>显存代价：</strong>KV Cache 大小 = 2 × layers × n_heads × d_head × seq_len × precision，长序列时可能超过模型本身显存。</p>
+    <div class="tip">💡 优化：MQA（Multi-Query Attention）让所有 Q head 共享同一套 KV，大幅减少 KV Cache。</div>
+  </div></div>
+</div>
+
+<!-- Q19 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">19</div>
+    <div>
+      <div class="q-text">FlashAttention 的核心思想？解决了什么问题？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p><strong>问题：</strong>标准 Attention 需要将 n×n 的注意力矩阵写入 HBM（GPU 高带宽内存），IO 成为瓶颈。</p>
+    <p><strong>FlashAttention 思想：分块计算 + Online Softmax</strong></p>
+    <ol>
+      <li>将 Q/K/V 按行分块，每块加载到 SRAM（片上缓存）</li>
+      <li>用 Online Softmax 算法（Milakov & Gimelshein）逐块更新 softmax，无需存完整矩阵</li>
+      <li>计算完整 Attention 但 <strong>只写回最终输出 O</strong>，中间矩阵不写 HBM</li>
+    </ol>
+    <p><strong>效果：</strong>计算量不变（仍 O(n²)），但 IO 降到 O(n)，实测 2~4× 加速，显存从 O(n²) 降到 O(n)。</p>
+  </div></div>
+</div>
+
+<!-- Q20 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">20</div>
+    <div>
+      <div class="q-text">vLLM 的 PagedAttention 原理？如何提升推理服务吞吐量？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p><strong>问题：</strong>传统 LLM 服务为每个请求预分配最大长度的 KV Cache，造成大量显存碎片和浪费（利用率 <20%）。</p>
+    <p><strong>PagedAttention：</strong>借鉴操作系统虚拟内存分页思想：</p>
+    <ul>
+      <li>KV Cache 按固定大小 Block（如 16 tokens）分配</li>
+      <li>通过 Block Table 映射逻辑块→物理块（类似页表）</li>
+      <li>Block 支持多请求<strong>写时复制（CoW）共享</strong>（prefix sharing）</li>
+    </ul>
+    <p><strong>效果：</strong>显存碎片几乎为 0，支持 Continuous Batching（不同长度请求动态合并），吞吐量提升 2~24×。</p>
+  </div></div>
+</div>
+
+<!-- Q21 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">21</div>
+    <div>
+      <div class="q-text">模型量化（INT8/INT4）的原理？PTQ 与 QAT 的区别？</div>
+      <div class="q-tags"><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p><strong>量化原理：</strong>将浮点权重/激活映射到低精度整数：</p>
+    <div class="formula">x_q = round( x / scale ) + zero_point<br>scale = (x_max − x_min) / (2^b − 1)</div>
+    <table>
+      <tr><th></th><th>INT8</th><th>INT4</th></tr>
+      <tr><td>显存压缩</td><td>~4×（vs FP32）</td><td>~8×</td></tr>
+      <tr><td>精度损失</td><td>极小</td><td>中等，需仔细校准</td></tr>
+      <tr><td>硬件支持</td><td>广泛</td><td>需 A100/H100 Tensor Core</td></tr>
+    </table>
+    <p><strong>PTQ（Post-Training Quantization）：</strong>训练后直接量化，不需重新训练，速度快但精度可能有损。代表：GPTQ、AWQ。</p>
+    <p><strong>QAT（Quantization-Aware Training）：</strong>训练时模拟量化误差，精度更高，但需要训练成本。</p>
+    <div class="tip">💡 AWQ 的思路：权重中少量"显著权重"保持高精度，其余量化 → 比 GPTQ 更好保留模型能力。</div>
+  </div></div>
+</div>
+
+<!-- Q22 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">22</div>
+    <div>
+      <div class="q-text">投机解码（Speculative Decoding）的原理是什么？</div>
+      <div class="q-tags"><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p>用小模型（草稿模型）快速生成 k 个候选 token，再用大模型并行验证，接受/拒绝每个 token：</p>
+    <ol>
+      <li>小模型（草稿模型）自回归生成 k 个 token（快）</li>
+      <li>大模型对 k+1 个位置并行 forward（一次）</li>
+      <li>按接受率公式（rejection sampling）决定接受哪些 token</li>
+      <li>拒绝的位置重采样，从该位置继续</li>
+    </ol>
+    <p><strong>效果：</strong>大模型的期望加速比取决于小模型与大模型的对齐程度，通常 2~3×，且不改变输出分布（与大模型完全一致）。</p>
+  </div></div>
+</div>
+
+</section>
+
+<!-- ═══════════════════════════════════
+     SECTION 5 — 生成模型
+════════════════════════════════════ -->
+<section id="s5">
+<div class="section-title"><span class="section-icon">🎨</span>五、生成模型（扩散/VAE/GAN）</div>
+
+<!-- Q23 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">23</div>
+    <div>
+      <div class="q-text">扩散模型（Diffusion Model）的前向和反向过程是什么？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p><strong>前向过程（加噪）：</strong>逐步向数据 x₀ 添加高斯噪声，经 T 步后趋近标准高斯分布：</p>
+    <div class="formula">q(x_t | x_{t-1}) = N(x_t; √(1-β_t)·x_{t-1}, β_t·I)</div>
+    <p>任意时刻可直接采样：</p>
+    <div class="formula">x_t = √ᾱ_t·x₀ + √(1-ᾱ_t)·ε，ε~N(0,I)，ᾱ_t = Π β_s</div>
+    <p><strong>反向过程（去噪）：</strong>学习神经网络 ε_θ(x_t, t) 预测噪声，逐步去噪恢复 x₀：</p>
+    <div class="formula">L = E[||ε − ε_θ(x_t, t)||²]（简化训练目标）</div>
+    <div class="tip">💡 DDPM（Ho et al. 2020）是奠基性工作；DDIM 通过确定性采样大幅减少采样步数（1000→50步）。</div>
+  </div></div>
+</div>
+
+<!-- Q24 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">24</div>
+    <div>
+      <div class="q-text">Stable Diffusion 的架构？Latent Diffusion Model（LDM）的核心思想？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p><strong>LDM 核心思想：</strong>在 VAE 的隐空间（Latent Space）而非像素空间做扩散，大幅减少计算量。</p>
+    <p><strong>SD 主要组件：</strong></p>
+    <ul>
+      <li><strong>VAE Encoder/Decoder</strong>：图像 → 4×64×64 latent（压缩因子 8）</li>
+      <li><strong>U-Net（去噪网络）</strong>：在 latent 空间预测噪声，backbone 含 ResBlock + Cross-Attention</li>
+      <li><strong>CLIP Text Encoder</strong>：文本提示 → 条件向量，通过 Cross-Attention 注入 U-Net</li>
+      <li><strong>Scheduler</strong>：控制去噪步数和采样策略（DDIM、DPM-Solver）</li>
+    </ul>
+    <div class="tip">💡 Classifier-Free Guidance（CFG）：训练时随机丢弃条件（无条件/有条件各半），推理时加权：ε = ε_uncond + w·(ε_cond − ε_uncond)，w 越大图像越符合 prompt。</div>
+  </div></div>
+</div>
+
+<!-- Q25 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">25</div>
+    <div>
+      <div class="q-text">VAE 的原理？ELBO 损失由哪两部分组成？</div>
+      <div class="q-tags"><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p>VAE 用 Encoder 将输入 x 编码为隐变量 z 的概率分布（均值 μ 和方差 σ²），再用 Decoder 从 z 重建 x，通过<em>重参数化技巧</em>实现可微分采样。</p>
+    <p><strong>ELBO 损失：</strong></p>
+    <div class="formula">L = E_{q(z|x)}[log p(x|z)] − KL(q(z|x) || p(z))</div>
+    <ul>
+      <li><strong>重建项</strong>：−E[log p(x|z)]，使 Decoder 重建准确</li>
+      <li><strong>KL 散度项</strong>：使编码分布接近先验 N(0,I)，保证隐空间结构性</li>
+    </ul>
+    <p><strong>重参数化技巧：</strong>z = μ + σ·ε（ε ~ N(0,I)），使梯度可以流过采样步骤。</p>
+  </div></div>
+</div>
+
+<!-- Q26 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">26</div>
+    <div>
+      <div class="q-text">GAN 的原理？训练不稳定的原因及改进方法？</div>
+      <div class="q-tags"><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p>GAN 包含 <strong>生成器 G</strong> 和 <strong>判别器 D</strong>，博弈训练：</p>
+    <div class="formula">min_G max_D E[log D(x)] + E[log(1−D(G(z)))]</div>
+    <p><strong>训练不稳定原因：</strong></p>
+    <ul>
+      <li><em>模式崩溃</em>：G 只生成少数样本以骗过 D</li>
+      <li><em>梯度消失</em>：D 太强时，G 的梯度接近 0</li>
+      <li><em>非收敛振荡</em>：G/D 交替更新可能循环震荡</li>
+    </ul>
+    <p><strong>改进：</strong></p>
+    <ul>
+      <li><strong>WGAN</strong>：用 Wasserstein 距离替代 JS 散度，Lipschitz 约束（梯度裁剪/梯度惩罚）</li>
+      <li><strong>StyleGAN</strong>：映射网络 + AdaIN，控制不同层次的风格</li>
+      <li><strong>渐进式训练</strong>：从低分辨率逐渐增大，稳定训练</li>
+    </ul>
+  </div></div>
+</div>
+
+<!-- Q27 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">27</div>
+    <div>
+      <div class="q-text">Flow Matching 与扩散模型的关系？有何优势？</div>
+      <div class="q-tags"><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p>Flow Matching 直接学习从噪声到数据的<strong>确定性速度场</strong>（ODE），而非 SDE（扩散模型）：</p>
+    <div class="formula">dx/dt = v_θ(x, t)，t: 0→1</div>
+    <p>训练目标：让模型预测的速度场与简单插值路径（如线性路径）的速度一致：</p>
+    <div class="formula">L = E[||v_θ(x_t, t) − (x₁ − x₀)||²]，x_t = (1-t)x₀ + t·x₁</div>
+    <p><strong>优势：</strong></p>
+    <ul>
+      <li>训练目标更简单直接，无需复杂噪声调度</li>
+      <li>可用更少步数（8~16 步）生成高质量图像</li>
+      <li>Stable Diffusion 3、FLUX、字节 Wan 等均使用</li>
+    </ul>
+  </div></div>
+</div>
+
+</section>
+
+<!-- ═══════════════════════════════════
+     SECTION 6 — 多模态
+════════════════════════════════════ -->
+<section id="s6">
+<div class="section-title"><span class="section-icon">👁️</span>六、多模态模型</div>
+
+<!-- Q28 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">28</div>
+    <div>
+      <div class="q-text">CLIP 的训练方式？为什么能做零样本图像分类？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p><strong>训练：</strong>收集 4 亿图文对，用<em>对比学习</em>训练图像编码器和文本编码器：最大化正样本对（配对图文）的余弦相似度，最小化负样本对的相似度。</p>
+    <div class="formula">L = −1/N Σ log exp(sim(I_i, T_i)/τ) / Σ_j exp(sim(I_i, T_j)/τ)</div>
+    <p><strong>零样本分类：</strong>将类别名称格式化为 "a photo of a {class}"，用文本编码器生成所有类别 embedding，对输入图像计算最近邻，即可在未见过类别上分类。</p>
+    <p><strong>局限：</strong>对细粒度视觉理解（计数、空间关系）弱；对 OCR 文字识别差。</p>
+  </div></div>
+</div>
+
+<!-- Q29 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">29</div>
+    <div>
+      <div class="q-text">视觉语言模型（VLM）如 LLaVA 的架构设计？图像特征如何对齐到语言空间？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p><strong>LLaVA 架构：</strong></p>
+    <ol>
+      <li><strong>视觉编码器</strong>：CLIP ViT 提取图像 patch 特征（如 256 tokens）</li>
+      <li><strong>投影层（MLP/Linear）</strong>：将视觉特征映射到 LLM 的 token embedding 维度（模态对齐）</li>
+      <li><strong>LLM（Vicuna/LLaMA）</strong>：将图像 token 与文本 token 拼接后统一处理</li>
+    </ol>
+    <p><strong>训练策略（两阶段）：</strong></p>
+    <ul>
+      <li>阶段一：冻结视觉编码器和 LLM，仅训练投影层（图文特征对齐）</li>
+      <li>阶段二：释放 LLM 进行 SFT，用图文对话数据微调</li>
+    </ul>
+    <div class="tip">💡 LLaVA-1.5 用 MLP 替代 Linear 连接层，并加入 ShareGPT4V 高质量数据，大幅提升性能。</div>
+  </div></div>
+</div>
+
+<!-- Q30 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">30</div>
+    <div>
+      <div class="q-text">DiT（Diffusion Transformer）与 U-Net 扩散模型有何区别？</div>
+      <div class="q-tags"><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p>DiT（Peebles & Xie, 2022）用 <strong>Transformer 替代 U-Net</strong> 作为扩散模型的去噪网络：</p>
+    <ul>
+      <li>图像分块（patchify）为序列，类似 ViT</li>
+      <li>时间步 t 和条件通过 <em>Adaptive LayerNorm（adaLN-Zero）</em> 注入每层</li>
+      <li>无 U-Net 的跳连接，结构更简洁</li>
+    </ul>
+    <p><strong>优势：</strong>Transformer 的 Scaling Law 更好（计算量→质量），SD3、Flux、Sora 均采用 DiT 架构。</p>
+    <p><strong>3D DiT（视频生成）：</strong>对时间+空间维度的 patch 建模，处理时序一致性，用于 Sora/OpenSora 等视频生成。</p>
+  </div></div>
+</div>
+
+<!-- Q31 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">31</div>
+    <div>
+      <div class="q-text">文生视频模型（如 Sora）的技术挑战有哪些？时序一致性如何保证？</div>
+      <div class="q-tags"><span class="tag">原理</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p><strong>主要挑战：</strong></p>
+    <ul>
+      <li><em>时序一致性</em>：同一物体在不同帧的外观/运动连贯</li>
+      <li><em>物理合理性</em>：液体、碰撞等物理现象是否真实</li>
+      <li><em>长视频</em>：注意力复杂度 O(T×H×W × …)，计算量极大</li>
+      <li><em>训练数据</em>：高质量带文字描述的视频数据稀缺</li>
+    </ul>
+    <p><strong>时序一致性技术：</strong></p>
+    <ul>
+      <li>3D 时空注意力（Temporal + Spatial Attention 交错）</li>
+      <li>视频 VAE 在时序维度压缩（4×空间 + 4×时间）</li>
+      <li>运动先验：用光流监督或动作条件（ControlNet-like）</li>
+    </ul>
+  </div></div>
+</div>
+
+</section>
+
+<!-- ═══════════════════════════════════
+     SECTION 7 — 系统设计
+════════════════════════════════════ -->
+<section id="s7">
+<div class="section-title"><span class="section-icon">🏗️</span>七、系统设计与工程</div>
+
+<!-- Q32 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">32</div>
+    <div>
+      <div class="q-text">如何设计一个高并发 LLM 推理服务系统？考虑哪些维度？</div>
+      <div class="q-tags"><span class="tag hard">难题</span><span class="tag">设计</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p><strong>关键设计点：</strong></p>
+    <ul>
+      <li><strong>批处理</strong>：Continuous Batching（请求动态合并），不等最长序列完成</li>
+      <li><strong>KV Cache 管理</strong>：PagedAttention 消除碎片，Prefix Caching 共享公共前缀</li>
+      <li><strong>模型并行</strong>：TP（Tensor Parallel）拆分 Attention/FFN 到多卡</li>
+      <li><strong>调度策略</strong>：优先级队列（SLA）、抢占式调度（preemption）</li>
+      <li><strong>流式输出</strong>：SSE 或 WebSocket 逐 token 推流</li>
+      <li><strong>负载均衡</strong>：多副本路由，基于 KV Cache 命中率的亲和路由</li>
+    </ul>
+    <div class="tip">💡 目标指标：TTFT（首 token 延迟）、TPOT（每 token 时间）、吞吐量（tokens/s）。</div>
+  </div></div>
+</div>
+
+<!-- Q33 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">33</div>
+    <div>
+      <div class="q-text">RAG（检索增强生成）的架构设计？如何评估和优化检索质量？</div>
+      <div class="q-tags"><span class="tag hot">高频</span><span class="tag">设计</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <p><strong>基础 RAG 流程：</strong>Query → Retriever（向量检索/BM25）→ 召回 Top-K 文档 → LLM 生成答案</p>
+    <p><strong>优化方向：</strong></p>
+    <ul>
+      <li><em>检索端</em>：混合检索（Dense+Sparse），HyDE（用 LLM 生成假设文档做检索），Query 改写</li>
+      <li><em>索引端</em>：分层切块（Hierarchical Chunking），元数据过滤，Summary 索引</li>
+      <li><em>生成端</em>：Rerank（Cross-Encoder 精排），Long Context 压缩，引用标注</li>
+    </ul>
+    <p><strong>评估指标：</strong>RAGAS 框架（Faithfulness 忠实度、Answer Relevancy 答案相关性、Context Precision 上下文精度）。</p>
+  </div></div>
+</div>
+
+<!-- Q34 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">34</div>
+    <div>
+      <div class="q-text">如何评估大语言模型的能力？有哪些权威 Benchmark？</div>
+      <div class="q-tags"><span class="tag">设计</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <table>
+      <tr><th>Benchmark</th><th>考察能力</th></tr>
+      <tr><td>MMLU</td><td>多学科知识理解（57 个学科）</td></tr>
+      <tr><td>GSM8K / MATH</td><td>数学推理（小学/竞赛级）</td></tr>
+      <tr><td>HumanEval / LiveCodeBench</td><td>代码生成</td></tr>
+      <tr><td>MT-Bench / AlpacaEval</td><td>指令遵循和对话质量</td></tr>
+      <tr><td>HELM / BIG-bench</td><td>综合能力评估</td></tr>
+      <tr><td>SimpleQA</td><td>事实性（OpenAI 提出）</td></tr>
+    </table>
+    <div class="warn">⚠️ 注意 Benchmark 污染：测试集数据可能出现在预训练语料中，需用动态/私有测试集补充评估。</div>
+  </div></div>
+</div>
+
+<!-- Q35 -->
+<div class="card" onclick="toggle(this)">
+  <div class="card-header">
+    <div class="q-num">35</div>
+    <div>
+      <div class="q-text">Agent 系统的设计：Tool Use、Memory、Planning 如何实现？</div>
+      <div class="q-tags"><span class="tag">设计</span></div>
+    </div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="answer"><div class="answer-inner">
+    <ul>
+      <li><strong>Tool Use</strong>：通过 Function Calling 让 LLM 输出结构化 JSON 调用工具（搜索、代码执行、数据库）；工具结果注入上下文后继续生成</li>
+      <li><strong>Memory</strong>：短期（上下文窗口内）+ 长期（外部向量库/KG）；遗忘机制：摘要压缩旧对话</li>
+      <li><strong>Planning</strong>：ReAct（推理+行动循环）、Tree-of-Thought（多路径探索）、Self-Refine（自我批评迭代）</li>
+      <li><strong>多 Agent</strong>：AutoGen/CrewAI 等框架，不同角色 Agent 协作（规划者+执行者+评审）</li>
+    </ul>
+    <div class="tip">💡 关键挑战：幻觉（Agent 对工具结果的误判）、长任务中的错误累积、安全沙箱。</div>
+  </div></div>
+</div>
+
+</section>
+
+<!-- ═══════════════════════════════════
+     SECTION 8 — 代码题
+════════════════════════════════════ -->
+<section id="s8">
+<div class="section-title"><span class="section-icon">💻</span>八、代码题（只给出题目，需自行实现）</div>
+
+<!-- C1 -->
+<div class="card">
+  <div class="card-header">
+    <div class="q-num">C1</div>
+    <div>
+      <div class="q-text">手写 Scaled Dot-Product Attention</div>
+      <div class="q-tags"><span class="tag code">代码</span><span class="tag hot">高频</span></div>
+    </div>
+  </div>
+  <div class="code-only">
+    <span class="code-badge">📝 手写题</span>
+    <span style="color:#8892a4;font-size:.88rem;">用 PyTorch 实现 <code>scaled_dot_product_attention(Q, K, V, mask=None)</code>，包含 softmax 和可选的 causal mask</span>
+  </div>
+</div>
+
+<!-- C2 -->
+<div class="card">
+  <div class="card-header">
+    <div class="q-num">C2</div>
+    <div>
+      <div class="q-text">实现多头注意力 MultiHeadAttention 模块</div>
+      <div class="q-tags"><span class="tag code">代码</span><span class="tag hot">高频</span></div>
+    </div>
+  </div>
+  <div class="code-only">
+    <span class="code-badge">📝 手写题</span>
+    <span style="color:#8892a4;font-size:.88rem;">用 PyTorch nn.Module 实现，参数包含 d_model、num_heads，支持 Q/K/V 线性变换、split heads、concat 和输出投影</span>
+  </div>
+</div>
+
+<!-- C3 -->
+<div class="card">
+  <div class="card-header">
+    <div class="q-num">C3</div>
+    <div>
+      <div class="q-text">实现 RoPE 位置编码</div>
+      <div class="q-tags"><span class="tag code">代码</span></div>
+    </div>
+  </div>
+  <div class="code-only">
+    <span class="code-badge">📝 手写题</span>
+    <span style="color:#8892a4;font-size:.88rem;">给定 Q/K 向量（shape: [B, seq_len, n_heads, head_dim]），实现 RoPE 旋转变换，输出应用了位置编码后的 Q/K</span>
+  </div>
+</div>
+
+<!-- C4 -->
+<div class="card">
+  <div class="card-header">
+    <div class="q-num">C4</div>
+    <div>
+      <div class="q-text">实现 BPE Tokenizer 的训练和编码过程</div>
+      <div class="q-tags"><span class="tag code">代码</span></div>
+    </div>
+  </div>
+  <div class="code-only">
+    <span class="code-badge">📝 手写题</span>
+    <span style="color:#8892a4;font-size:.88rem;">给定语料，实现 BPE 训练（迭代找最高频字节对并合并），以及 encode(text) 和 decode(ids) 函数</span>
+  </div>
+</div>
+
+<!-- C5 -->
+<div class="card">
+  <div class="card-header">
+    <div class="q-num">C5</div>
+    <div>
+      <div class="q-text">实现 Top-p（Nucleus Sampling）采样</div>
+      <div class="q-tags"><span class="tag code">代码</span></div>
+    </div>
+  </div>
+  <div class="code-only">
+    <span class="code-badge">📝 手写题</span>
+    <span style="color:#8892a4;font-size:.88rem;">输入 logits（[vocab_size]），实现 Top-p 采样：对概率排序、累积到阈值 p 后将剩余概率设为 -inf，再用 softmax + 多项式采样</span>
+  </div>
+</div>
+
+<!-- C6 -->
+<div class="card">
+  <div class="card-header">
+    <div class="q-num">C6</div>
+    <div>
+      <div class="q-text">实现 LoRA 微调层（LoRALinear）</div>
+      <div class="q-tags"><span class="tag code">代码</span></div>
+    </div>
+  </div>
+  <div class="code-only">
+    <span class="code-badge">📝 手写题</span>
+    <span style="color:#8892a4;font-size:.88rem;">继承 nn.Module，冻结原始 weight，添加 A（in_features×r）和 B（r×out_features）低秩矩阵，前向传播为 x@W.T + x@A@B * scale</span>
+  </div>
+</div>
+
+<!-- C7 -->
+<div class="card">
+  <div class="card-header">
+    <div class="q-num">C7</div>
+    <div>
+      <div class="q-text">实现简单的 KV Cache 推理循环</div>
+      <div class="q-tags"><span class="tag code">代码</span></div>
+    </div>
+  </div>
+  <div class="code-only">
+    <span class="code-badge">📝 手写题</span>
+    <span style="color:#8892a4;font-size:.88rem;">给定 Transformer decoder，实现带 KV Cache 的 generate 函数：每步只传入新 token，拼接缓存的 K/V，直到生成 EOS 或达到最大长度</span>
+  </div>
+</div>
+
+<!-- C8 -->
+<div class="card">
+  <div class="card-header">
+    <div class="q-num">C8</div>
+    <div>
+      <div class="q-text">实现 DDPM 的前向加噪和 Loss 计算</div>
+      <div class="q-tags"><span class="tag code">代码</span></div>
+    </div>
+  </div>
+  <div class="code-only">
+    <span class="code-badge">📝 手写题</span>
+    <span style="color:#8892a4;font-size:.88rem;">给定 x0 和时间步 t，实现 q_sample(x0, t) 函数（按 sqrt_alphas_cumprod 和 sqrt_one_minus 混合噪声），并计算 MSE Loss with noise_pred 和真实 noise</span>
+  </div>
+</div>
+
+<!-- C9 -->
+<div class="card">
+  <div class="card-header">
+    <div class="q-num">C9</div>
+    <div>
+      <div class="q-text">实现 DPO 损失函数</div>
+      <div class="q-tags"><span class="tag code">代码</span></div>
+    </div>
+  </div>
+  <div class="code-only">
+    <span class="code-badge">📝 手写题</span>
+    <span style="color:#8892a4;font-size:.88rem;">输入 policy_logprob_chosen, policy_logprob_rejected, ref_logprob_chosen, ref_logprob_rejected 和 beta，实现 DPO loss = -log_sigmoid(beta * (log_ratio_w - log_ratio_l))</span>
+  </div>
+</div>
+
+<!-- C10 -->
+<div class="card">
+  <div class="card-header">
+    <div class="q-num">C10</div>
+    <div>
+      <div class="q-text">用 Python 实现 MinHash 文档去重</div>
+      <div class="q-tags"><span class="tag code">代码</span></div>
+    </div>
+  </div>
+  <div class="code-only">
+    <span class="code-badge">📝 手写题</span>
+    <span style="color:#8892a4;font-size:.88rem;">给定一批文本，实现基于 n-gram 的 MinHash 签名生成（k=200 个哈希函数），再用 LSH 分桶，返回 Jaccard 相似度 &gt;0.8 的重复文档对</span>
+  </div>
+</div>
+
+<!-- C11 -->
+<div class="card">
+  <div class="card-header">
+    <div class="q-num">C11</div>
+    <div>
+      <div class="q-text">实现 Beam Search 解码算法</div>
+      <div class="q-tags"><span class="tag code">代码</span></div>
+    </div>
+  </div>
+  <div class="code-only">
+    <span class="code-badge">📝 手写题</span>
+    <span style="color:#8892a4;font-size:.88rem;">给定语言模型的 next_token_logits 函数，实现 beam_search(prompt, beam_size=4, max_len=50)，维护 beam_size 条候选序列，按累积 log-prob 排序</span>
+  </div>
+</div>
+
+<!-- C12 -->
+<div class="card">
+  <div class="card-header">
+    <div class="q-num">C12</div>
+    <div>
+      <div class="q-text">实现 Flash Attention 分块计算的伪代码（算法理解）</div>
+      <div class="q-tags"><span class="tag code">代码</span><span class="tag hard">难题</span></div>
+    </div>
+  </div>
+  <div class="code-only">
+    <span class="code-badge">📝 手写题</span>
+    <span style="color:#8892a4;font-size:.88rem;">用 NumPy 实现分块 Attention 计算（Bc 列块 + Br 行块），维护运行时 max/sum 用于 Online Softmax，最终输出与标准 Attention 一致</span>
+  </div>
+</div>
+
+<!-- C13 -->
+<div class="card">
+  <div class="card-header">
+    <div class="q-num">C13</div>
+    <div>
+      <div class="q-text">手写 Layer Normalization 前向 + 反向传播</div>
+      <div class="q-tags"><span class="tag code">代码</span></div>
+    </div>
+  </div>
+  <div class="code-only">
+    <span class="code-badge">📝 手写题</span>
+    <span style="color:#8892a4;font-size:.88rem;">用 NumPy 实现 LayerNorm.forward(x) 和 LayerNorm.backward(dout)，不使用 PyTorch autograd，正确处理 gamma/beta 梯度</span>
+  </div>
+</div>
+
+</section>
+
+</main>
+
+<footer>
+  <p>生成基模团队面试题全集 · 整理自互联网技术博客及论文 · 2025年</p>
+  <p style="margin-top:6px">Transformer · 预训练 · RLHF · 推理优化 · Diffusion · 多模态 · 系统设计</p>
+</footer>
+
+<script>
+  function toggle(card) {
+    card.classList.toggle('open');
+  }
+  // Nav highlight
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('nav a');
+  window.addEventListener('scroll', () => {
+    let cur = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 80) cur = s.id;
+    });
+    navLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#'+cur);
+    });
+  });
+</script>
+</body>
+</html>
