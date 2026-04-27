@@ -136,9 +136,11 @@
     pre code { background: none; padding: 0; }
     .formula {
       background: var(--code-bg); border-left: 3px solid var(--accent);
-      padding: 12px 16px; margin: 10px 0; border-radius: 0 8px 8px 0;
-      font-family: 'Fira Code', Consolas, monospace; font-size: .92em; color: #e5c07b;
+      padding: 14px 20px; margin: 10px 0; border-radius: 0 8px 8px 0;
+      overflow-x: auto;
     }
+    .formula .katex-display { margin: 0.2em 0; }
+    .formula .katex { color: #e5c07b; font-size: 1.05em; }
     .tip {
       background: #1a2a1a; border-left: 3px solid #00d4aa;
       padding: 10px 14px; margin: 10px 0; border-radius: 0 8px 8px 0; font-size: .9em;
@@ -172,6 +174,17 @@
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
   </style>
+  <!-- KaTeX for math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });"></script>
 </head>
 <body>
 
@@ -240,7 +253,7 @@
     <span class="chevron">▼</span>
   </div>
   <div class="answer"><div class="answer-inner">
-    <div class="formula">Attention(Q, K, V) = softmax( QKᵀ / √d_k ) · V</div>
+    <div class="formula">$$\text{Attention}(Q,K,V)=\text{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right)V$$</div>
     <p><strong>为什么除以 √d_k？</strong></p>
     <p>QK 点积结果的方差约为 d_k（若 Q、K 各分量均值 0、方差 1），随 d_k 增大，点积绝对值变大，softmax 进入极度饱和区（梯度消失）。除以 √d_k 将方差归一化为 1，使 softmax 在可训练区间工作。</p>
     <div class="tip">💡 推导：若 q_i, k_i ~ N(0,1)，则 q·k = Σq_i·k_i，方差 = d_k，标准差 = √d_k。</div>
@@ -259,7 +272,7 @@
   </div>
   <div class="answer"><div class="answer-inner">
     <p>多头注意力将 d_model 维度划分为 h 个子空间，每个 head 独立计算注意力后拼接：</p>
-    <div class="formula">MultiHead(Q,K,V) = Concat(head_1,...,head_h) · W_O<br>head_i = Attention(QW_i^Q, KW_i^K, VW_i^V)</div>
+    <div class="formula">$$\text{MultiHead}(Q,K,V)=\text{Concat}(\text{head}_1,\ldots,\text{head}_h)W^O$$ $$\text{head}_i=\text{Attention}(QW_i^Q,KW_i^K,VW_i^V)$$</div>
     <p><strong>优点：</strong></p>
     <ul>
       <li><strong>多空间建模</strong>：不同 head 捕获不同类型的依赖（语法/语义/位置）</li>
@@ -288,11 +301,7 @@
       <tr><td><strong>RoPE</strong></td><td>旋转矩阵编码相对位置，作用于 Q/K</td><td><strong>LLaMA、GPT-NeoX</strong></td></tr>
     </table>
     <p><strong>RoPE 原理：</strong>对位置 m 的 query 向量分量 (x_{2i}, x_{2i+1}) 进行旋转变换：</p>
-    <div class="formula">
-      [x_{2i}·cos(mθ_i) − x_{2i+1}·sin(mθ_i),<br>
-       x_{2i}·sin(mθ_i) + x_{2i+1}·cos(mθ_i)]<br>
-      θ_i = 10000^(−2i/d)
-    </div>
+    <div class="formula">$$\begin{bmatrix}x_{2i}\cos(m\theta_i)-x_{2i+1}\sin(m\theta_i)\\x_{2i}\sin(m\theta_i)+x_{2i+1}\cos(m\theta_i)\end{bmatrix},\quad\theta_i=10000^{-2i/d}$$</div>
     <p>两个位置 m、n 的内积只与相对位置 m−n 有关，天然建模相对位置，且可外推到更长上下文（配合 YaRN/NTK 插值）。</p>
   </div></div>
 </div>
@@ -311,7 +320,7 @@
     <p><strong>Post-LN（原始 Transformer）：</strong>残差后才 normalize，梯度在深层容易爆炸，训练不稳定。</p>
     <p><strong>Pre-LN（GPT-2/LLaMA）：</strong>每个子层输入先 normalize，梯度路径稳定，可直接训练深层模型，无需 warm-up 也能收敛。</p>
     <p><strong>RMSNorm（进一步简化）：</strong>去掉均值项，只做方差归一化，更快，LLaMA 使用。</p>
-    <div class="formula">RMSNorm(x) = x / RMS(x) · γ，其中 RMS(x) = √(1/n Σx_i²)</div>
+    <div class="formula">$$\text{RMSNorm}(x)=\frac{x}{\text{RMS}(x)}\cdot\gamma,\quad\text{RMS}(x)=\sqrt{\frac{1}{n}\sum_i x_i^2}$$</div>
   </div></div>
 </div>
 
@@ -350,7 +359,7 @@
   </div>
   <div class="answer"><div class="answer-inner">
     <p>MoE 在 FFN 层用多个"专家网络"替代单一 FFN，通过 <strong>Router（门控网络）</strong>为每个 token 选 Top-K 个专家激活：</p>
-    <div class="formula">output = Σ g_i(x) · Expert_i(x)，g = TopK(Softmax(Wx))</div>
+    <div class="formula">$$\text{output}=\sum_i g_i(x)\cdot\text{Expert}_i(x),\quad g=\text{TopK}(\text{Softmax}(Wx))$$</div>
     <p><strong>优点：</strong>参数量大但计算量可控（每 token 只激活部分专家），如 Mixtral-8×7B 有 47B 参数但每 token 激活 12B。</p>
     <p><strong>训练挑战：</strong></p>
     <ul>
@@ -381,7 +390,7 @@
   </div>
   <div class="answer"><div class="answer-inner">
     <p><strong>Causal LM（自回归，GPT 系列）：</strong>给定前 t−1 个 token，预测第 t 个 token。损失为交叉熵：</p>
-    <div class="formula">L = −Σ log P(x_t | x_1,...,x_{t-1})</div>
+    <div class="formula">$$\mathcal{L}=-\sum_t\log P(x_t\mid x_1,\ldots,x_{t-1})$$</div>
     <p><strong>Masked LM（BERT）：</strong>随机 mask 15% token，预测被 mask 的词；双向注意力，不能直接做生成。</p>
     <table>
       <tr><th></th><th>Causal LM</th><th>Masked LM</th></tr>
@@ -405,7 +414,7 @@
   <div class="answer"><div class="answer-inner">
     <p><strong>OpenAI Scaling Law（Kaplan et al.）：</strong>模型 Loss 与模型参数量 N、数据量 D、计算量 C 之间满足幂律关系。</p>
     <p><strong>Chinchilla Scaling Law（Hoffmann et al.）：</strong>在固定计算预算 C 下，最优分配是 <em>N ≈ D</em>（参数量约等于 token 数），即 1B 参数需约 20B tokens。</p>
-    <div class="formula">最优 N = √(C/6)，最优 D = √(6C)</div>
+    <div class="formula">$$N^*=\sqrt{\frac{C}{6}},\quad D^*=\sqrt{6C}$$</div>
     <p>实践指导：不要一味扩大模型，同等算力下同比增加数据和参数更优。LLaMA 系列有意"欠训练参数"但"过训练数据"，以获得更强推理效率比。</p>
   </div></div>
 </div>
@@ -522,11 +531,11 @@
     <ol>
       <li><strong>SFT</strong>：基座 → 指令微调模型</li>
       <li><strong>RM（奖励模型）训练</strong>：收集同一 prompt 下多个回答的人类偏好排序，用 BradleyTerry 模型训练：
-        <div class="formula">L_RM = −log σ(r(y_w) − r(y_l))</div>
+        <div class="formula">$$\mathcal{L}_\text{RM}=-\log\sigma\!\left(r(y_w)-r(y_l)\right)$$</div>
         y_w 为人类更偏好的回答，y_l 为较差回答
       </li>
       <li><strong>PPO 强化学习优化</strong>：用 RM 打分作为 reward，用 PPO 更新策略模型，同时加 KL 散度惩罚防止偏离 SFT 模型：
-        <div class="formula">R = r_θ(x,y) − β·KL(π_θ || π_ref)</div>
+        <div class="formula">$$R=r_\theta(x,y)-\beta\cdot\mathrm{KL}(\pi_\theta\|\pi_\text{ref})$$</div>
       </li>
     </ol>
     <div class="tip">💡 PPO 的 clip 机制防止策略更新过大：L_CLIP = min(r_t·A_t, clip(r_t, 1-ε, 1+ε)·A_t)</div>
@@ -545,7 +554,7 @@
   </div>
   <div class="answer"><div class="answer-inner">
     <p>DPO 绕过了显式奖励模型和 PPO，直接用偏好数据优化策略模型：</p>
-    <div class="formula">L_DPO = −log σ( β·log(π_θ(y_w|x)/π_ref(y_w|x)) − β·log(π_θ(y_l|x)/π_ref(y_l|x)) )</div>
+    <div class="formula">$$\mathcal{L}_\text{DPO}=-\log\sigma\!\left(\beta\log\frac{\pi_\theta(y_w\mid x)}{\pi_\text{ref}(y_w\mid x)}-\beta\log\frac{\pi_\theta(y_l\mid x)}{\pi_\text{ref}(y_l\mid x)}\right)$$</div>
     <table>
       <tr><th></th><th>RLHF+PPO</th><th>DPO</th></tr>
       <tr><td>是否需要 RM</td><td>是</td><td>否</td></tr>
@@ -569,7 +578,7 @@
   </div>
   <div class="answer"><div class="answer-inner">
     <p><strong>LoRA（Low-Rank Adaptation）：</strong>冻结原始权重 W₀，在其旁边并联两个低秩矩阵 A（d×r）和 B（r×d）：</p>
-    <div class="formula">W = W₀ + ΔW = W₀ + B·A，其中 r ≪ d</div>
+    <div class="formula">$$W=W_0+\Delta W=W_0+BA,\quad r\ll d$$</div>
     <p>推理时合并 ΔW，无额外延迟。训练参数量仅为原始的 0.1%~1%。</p>
     <p><strong>QLoRA：</strong>将基础模型用 <em>NF4（4-bit Normal Float）</em>量化存储，LoRA 权重用 BF16 训练，通过<em>双重量化</em>和<em>分页优化器</em>实现在单卡 48GB 上微调 65B 模型。</p>
     <table>
@@ -686,7 +695,7 @@
   </div>
   <div class="answer"><div class="answer-inner">
     <p><strong>量化原理：</strong>将浮点权重/激活映射到低精度整数：</p>
-    <div class="formula">x_q = round( x / scale ) + zero_point<br>scale = (x_max − x_min) / (2^b − 1)</div>
+    <div class="formula">$$x_q=\mathrm{round}\!\left(\frac{x}{\text{scale}}\right)+z_p,\quad\text{scale}=\frac{x_{\max}-x_{\min}}{2^b-1}$$</div>
     <table>
       <tr><th></th><th>INT8</th><th>INT4</th></tr>
       <tr><td>显存压缩</td><td>~4×（vs FP32）</td><td>~8×</td></tr>
@@ -741,11 +750,11 @@
   </div>
   <div class="answer"><div class="answer-inner">
     <p><strong>前向过程（加噪）：</strong>逐步向数据 x₀ 添加高斯噪声，经 T 步后趋近标准高斯分布：</p>
-    <div class="formula">q(x_t | x_{t-1}) = N(x_t; √(1-β_t)·x_{t-1}, β_t·I)</div>
+    <div class="formula">$$q(x_t\mid x_{t-1})=\mathcal{N}\!\left(x_t;\sqrt{1-\beta_t}\,x_{t-1},\beta_t I\right)$$</div>
     <p>任意时刻可直接采样：</p>
-    <div class="formula">x_t = √ᾱ_t·x₀ + √(1-ᾱ_t)·ε，ε~N(0,I)，ᾱ_t = Π β_s</div>
+    <div class="formula">$$x_t=\sqrt{\bar\alpha_t}\,x_0+\sqrt{1-\bar\alpha_t}\,\varepsilon,\quad\varepsilon\sim\mathcal{N}(0,I),\quad\bar\alpha_t=\prod_s(1-\beta_s)$$</div>
     <p><strong>反向过程（去噪）：</strong>学习神经网络 ε_θ(x_t, t) 预测噪声，逐步去噪恢复 x₀：</p>
-    <div class="formula">L = E[||ε − ε_θ(x_t, t)||²]（简化训练目标）</div>
+    <div class="formula">$$\mathcal{L}=\mathbb{E}\!\left[\|\varepsilon-\varepsilon_\theta(x_t,t)\|^2\right]$$</div>
     <div class="tip">💡 DDPM（Ho et al. 2020）是奠基性工作；DDIM 通过确定性采样大幅减少采样步数（1000→50步）。</div>
   </div></div>
 </div>
@@ -786,7 +795,7 @@
   <div class="answer"><div class="answer-inner">
     <p>VAE 用 Encoder 将输入 x 编码为隐变量 z 的概率分布（均值 μ 和方差 σ²），再用 Decoder 从 z 重建 x，通过<em>重参数化技巧</em>实现可微分采样。</p>
     <p><strong>ELBO 损失：</strong></p>
-    <div class="formula">L = E_{q(z|x)}[log p(x|z)] − KL(q(z|x) || p(z))</div>
+    <div class="formula">$$\mathcal{L}=\mathbb{E}_{q(z|x)}[\log p(x|z)]-\mathrm{KL}(q(z|x)\|p(z))$$</div>
     <ul>
       <li><strong>重建项</strong>：−E[log p(x|z)]，使 Decoder 重建准确</li>
       <li><strong>KL 散度项</strong>：使编码分布接近先验 N(0,I)，保证隐空间结构性</li>
@@ -807,7 +816,7 @@
   </div>
   <div class="answer"><div class="answer-inner">
     <p>GAN 包含 <strong>生成器 G</strong> 和 <strong>判别器 D</strong>，博弈训练：</p>
-    <div class="formula">min_G max_D E[log D(x)] + E[log(1−D(G(z)))]</div>
+    <div class="formula">$$\min_G\max_D\;\mathbb{E}[\log D(x)]+\mathbb{E}[\log(1-D(G(z)))]$$</div>
     <p><strong>训练不稳定原因：</strong></p>
     <ul>
       <li><em>模式崩溃</em>：G 只生成少数样本以骗过 D</li>
@@ -835,9 +844,9 @@
   </div>
   <div class="answer"><div class="answer-inner">
     <p>Flow Matching 直接学习从噪声到数据的<strong>确定性速度场</strong>（ODE），而非 SDE（扩散模型）：</p>
-    <div class="formula">dx/dt = v_θ(x, t)，t: 0→1</div>
+    <div class="formula">$$\frac{dx}{dt}=v_\theta(x,t),\quad t:0\to 1$$</div>
     <p>训练目标：让模型预测的速度场与简单插值路径（如线性路径）的速度一致：</p>
-    <div class="formula">L = E[||v_θ(x_t, t) − (x₁ − x₀)||²]，x_t = (1-t)x₀ + t·x₁</div>
+    <div class="formula">$$\mathcal{L}=\mathbb{E}\!\left[\|v_\theta(x_t,t)-(x_1-x_0)\|^2\right],\quad x_t=(1-t)x_0+t\cdot x_1$$</div>
     <p><strong>优势：</strong></p>
     <ul>
       <li>训练目标更简单直接，无需复杂噪声调度</li>
@@ -860,7 +869,7 @@
   </div>
   <div class="answer"><div class="answer-inner">
     <p>DDPM 的马尔科夫链定义了展开后验概率 q(x₁:T|x₀)，采样是随机的。DDIM 将前向过程重定义为一类<em>非马尔科夫零方差</em>过程：</p>
-    <div class="formula">x_{t-1} = √ᾱ_{t-1}·( (xₜ − √(1−ᾱₜ)·ε_θ(xₜ,t)) / √ᾱₜ ) + √(1−ᾱ_{t-1})·ε_θ(xₜ,t)</div>
+    <div class="formula">$$x_{t-1}=\sqrt{\bar\alpha_{t-1}}\!\left(\frac{x_t-\sqrt{1-\bar\alpha_t}\,\varepsilon_\theta(x_t,t)}{\sqrt{\bar\alpha_t}}\right)+\sqrt{1-\bar\alpha_{t-1}}\,\varepsilon_\theta(x_t,t)$$</div>
     <p>当 η=0 时采样过程完全<strong>确定性</strong>，同一初始噪声 x_T 永远得到相同输出。</p>
     <p><strong>优势：</strong></p>
     <ul>
@@ -883,7 +892,7 @@
   </div>
   <div class="answer"><div class="answer-inner">
     <p><strong>CFG 公式：</strong></p>
-    <div class="formula">ε_guided = ε_uncond + w · (ε_cond − ε_uncond)</div>
+    <div class="formula">$$\varepsilon_\text{guided}=\varepsilon_\text{uncond}+w\cdot(\varepsilon_\text{cond}-\varepsilon_\text{uncond})$$</div>
     <p>w 为 Guidance Scale，等价于在<em>条件方向</em>上拉长梯度。</p>
     <p><strong>训练方式：</strong>随机以 10%~20% 概率丢弃 condition（设为空字符串），训练同一个 U-Net 同时学有条件/无条件两种路径。</p>
     <p><strong>过饱和原因：</strong>w 过大时，梯度方向被过度放大，模型强行生成与 condition 最相关且概率最高的像素，导致颜色饱和、细节丢失、artifact 增加。</p>
@@ -1001,7 +1010,7 @@
   </div>
   <div class="answer"><div class="answer-inner">
     <p>图像 VAE：仅在空间维压缩（H×W ÷ 8）；视频 VAE 额外在时间维压缩（T ÷ 4），进一步降低扩散过程的计算量：</p>
-    <div class="formula">原始视频 T×H×W → Latent (T/4)×(H/8)×(W/8)</div>
+    <div class="formula">原始视频 $T\times H\times W\;\to$ Latent $\dfrac{T}{4}\times\dfrac{H}{8}\times\dfrac{W}{8}$</div>
     <p><strong>时序连贯性保证方法：</strong></p>
     <ul>
       <li><em>3D卷积</em>：在 Encoder/Decoder 里使用 3D Conv 捕捉时空联合特征</li>
@@ -1026,7 +1035,7 @@
     <ol>
       <li>CLIP 图像编码器提取图片特征（使用 patch-level embedding，非仅 CLS token）</li>
       <li>新增一个平行的跨注意力子层（Decoupled Cross-Attention）：
-        <div class="formula">Attn = Attn_text + λ · Attn_image</div>
+        <div class="formula">$$\text{Attn}=\text{Attn}_\text{text}+\lambda\cdot\text{Attn}_\text{image}$$</div>
         文本 Cross-Attention 和图片 Cross-Attention 分开进行，控制权重 λ 平衡内容/文本影响力</li>
       <li>冻结原始 U-Net，只训练新增 Attention 层和图像投影</li>
     </ol>
@@ -1054,7 +1063,7 @@
   </div>
   <div class="answer"><div class="answer-inner">
     <p><strong>训练：</strong>收集 4 亿图文对，用<em>对比学习</em>训练图像编码器和文本编码器：最大化正样本对（配对图文）的余弦相似度，最小化负样本对的相似度。</p>
-    <div class="formula">L = −1/N Σ log exp(sim(I_i, T_i)/τ) / Σ_j exp(sim(I_i, T_j)/τ)</div>
+    <div class="formula">$$\mathcal{L}=-\frac{1}{N}\sum_i\log\frac{\exp(\mathrm{sim}(I_i,T_i)/\tau)}{\sum_j\exp(\mathrm{sim}(I_i,T_j)/\tau)}$$</div>
     <p><strong>零样本分类：</strong>将类别名称格式化为 "a photo of a {class}"，用文本编码器生成所有类别 embedding，对输入图像计算最近邻，即可在未见过类别上分类。</p>
     <p><strong>局限：</strong>对细粒度视觉理解（计数、空间关系）弱；对 OCR 文字识别差。</p>
   </div></div>
@@ -1466,9 +1475,9 @@
       <li><strong>γ ∈ [0,1)</strong>：折扣因子</li>
     </ul>
     <p><strong>贝尔曼方程（状态价值函数）：</strong></p>
-    <div class="formula">V_π(s) = Σ_a π(a|s) · [R(s,a) + γ · Σ_s' P(s'|s,a) · V_π(s')]</div>
+    <div class="formula">$$V_\pi(s)=\sum_a\pi(a|s)\!\left[R(s,a)+\gamma\sum_{s'}P(s'|s,a)\,V_\pi(s')\right]$$</div>
     <p><strong>贝尔曼最优方程：</strong></p>
-    <div class="formula">V*(s) = max_a [R(s,a) + γ · Σ_s' P(s'|s,a) · V*(s')]</div>
+    <div class="formula">$$V^*(s)=\max_a\!\left[R(s,a)+\gamma\sum_{s'}P(s'|s,a)\,V^*(s')\right]$$</div>
     <div class="tip">💡 γ 越接近 1，模型越重视长期收益；γ=0 只看当前奖励（贪心）。</div>
   </div></div>
 </div>
@@ -1485,10 +1494,10 @@
   </div>
   <div class="answer"><div class="answer-inner">
     <p><strong>Q-Learning（off-policy）：</strong></p>
-    <div class="formula">Q(s,a) ← Q(s,a) + α·[r + γ·max_{a'} Q(s',a') − Q(s,a)]</div>
+    <div class="formula">$$Q(s,a)\leftarrow Q(s,a)+\alpha\!\left[r+\gamma\max_{a'}Q(s',a')-Q(s,a)\right]$$</div>
     <p>TD 目标用 max Q(s',·)，与行为策略无关，直接估计最优策略价值 → <strong>off-policy</strong>。</p>
     <p><strong>SARSA（on-policy）：</strong></p>
-    <div class="formula">Q(s,a) ← Q(s,a) + α·[r + γ·Q(s',a') − Q(s,a)]</div>
+    <div class="formula">$$Q(s,a)\leftarrow Q(s,a)+\alpha\!\left[r+\gamma Q(s',a')-Q(s,a)\right]$$</div>
     <p>TD 目标用实际执行的下一动作 a'（由当前策略决定）→ <strong>on-policy</strong>，更保守，学习的是执行策略的价值。</p>
     <table>
       <tr><th></th><th>Q-Learning</th><th>SARSA</th></tr>
@@ -1512,11 +1521,11 @@
   <div class="answer"><div class="answer-inner">
     <p>目标：最大化期望回报 J(θ) = E_τ[R(τ)]。</p>
     <p><strong>策略梯度定理：</strong></p>
-    <div class="formula">∇_θ J(θ) = E_τ[ Σ_t ∇_θ log π_θ(a_t|s_t) · Q^π(s_t, a_t) ]</div>
+    <div class="formula">$$\nabla_\theta J(\theta)=\mathbb{E}_\tau\!\left[\sum_t\nabla_\theta\log\pi_\theta(a_t|s_t)\cdot Q^\pi(s_t,a_t)\right]$$</div>
     <p><strong>REINFORCE（Monte Carlo 策略梯度）：</strong>用完整轨迹的折扣回报 G_t 估计 Q 值：</p>
-    <div class="formula">∇_θ J(θ) ≈ Σ_t ∇_θ log π_θ(a_t|s_t) · G_t</div>
+    <div class="formula">$$\nabla_\theta J(\theta)\approx\sum_t\nabla_\theta\log\pi_\theta(a_t|s_t)\cdot G_t$$</div>
     <p><strong>Baseline 减方差：</strong>引入基线 b（通常为状态价值 V(s_t)），减少梯度方差：</p>
-    <div class="formula">∇_θ J(θ) ≈ Σ_t ∇_θ log π_θ(a_t|s_t) · (G_t − b(s_t))</div>
+    <div class="formula">$$\nabla_\theta J(\theta)\approx\sum_t\nabla_\theta\log\pi_\theta(a_t|s_t)\cdot\bigl(G_t-b(s_t)\bigr)$$</div>
     <div class="warn">⚠️ REINFORCE 方差大，样本效率低，实际更多用 Actor-Critic 架构。</div>
   </div></div>
 </div>
@@ -1538,7 +1547,7 @@
       <li><strong>Critic（价值网络 V_φ）</strong>：负责评估当前策略的价值，提供 TD 误差作为梯度信号</li>
     </ul>
     <p><strong>优势函数（Advantage）：</strong></p>
-    <div class="formula">A(s,a) = r + γ·V(s') − V(s)（TD 误差即单步优势估计）</div>
+    <div class="formula">$$A(s,a)=r+\gamma V(s^{\prime})-V(s)$$</div>
     <p>Actor 更新：∇_θ log π_θ(a|s) · A(s,a)</p>
     <table>
       <tr><th></th><th>A2C（Advantage Actor-Critic）</th><th>A3C（Asynchronous A3C）</th></tr>
@@ -1563,10 +1572,10 @@
     <p>PPO 限制每次策略更新的幅度，防止过大更新破坏策略：</p>
     <p><strong>重要性权重：</strong> r_t(θ) = π_θ(a_t|s_t) / π_θ_old(a_t|s_t)</p>
     <p><strong>Clip 目标函数：</strong></p>
-    <div class="formula">L_CLIP(θ) = E_t[ min( r_t·A_t, clip(r_t, 1-ε, 1+ε)·A_t ) ]</div>
+    <div class="formula">$$\mathcal{L}_\text{CLIP}(\theta)=\mathbb{E}_t\!\left[\min\!\left(r_t A_t,\;\mathrm{clip}(r_t,1{-}\varepsilon,1{+}\varepsilon)A_t\right)\right]$$</div>
     <p>ε 通常取 0.1~0.2。当 r_t > 1+ε（新策略比旧策略提升过多）时，clip 截断不再获益；当 A_t < 0 时，若 r_t < 1-ε 也被截断，防止过度惩罚。</p>
     <p><strong>完整 PPO 损失：</strong></p>
-    <div class="formula">L = L_CLIP − c₁·L_VF + c₂·S[π_θ]</div>
+    <div class="formula">$$\mathcal{L}=\mathcal{L}_\text{CLIP}-c_1\mathcal{L}_\text{VF}+c_2 S[\pi_\theta]$$</div>
     <p>其中 L_VF 是 Critic 均方误差，S 是熵正则防止策略过早收敛。</p>
     <div class="tip">💡 PPO 在 RLHF 中被广泛使用，因为其稳定性好，超参相对较少。</div>
   </div></div>
@@ -1596,7 +1605,7 @@
       <li>每隔 C 步将主网络参数复制给目标网络</li>
       <li>防止"追逐移动目标"导致训练发散</li>
     </ul>
-    <div class="formula">L(θ) = E[(r + γ·max_{a'}Q(s',a';θ⁻) − Q(s,a;θ))²]</div>
+    <div class="formula">$$\mathcal{L}(\theta)=\mathbb{E}\!\left[\Bigl(r+\gamma\max_{a'}Q(s',a';\theta^-)-Q(s,a;\theta)\Bigr)^2\right]$$</div>
   </div></div>
 </div>
 
@@ -1634,7 +1643,7 @@
   </div>
   <div class="answer"><div class="answer-inner">
     <p>GAE 是多步 TD 优势的指数加权平均：</p>
-    <div class="formula">A^GAE(γ,λ)_t = Σ_{l=0}^∞ (γλ)^l · δ_{t+l}</div>
+    <div class="formula">$$A^{\text{GAE}(\gamma,\lambda)}_t=\sum_{l=0}^{\infty}(\gamma\lambda)^l\delta_{t+l}$$</div>
     <p>其中 δ_t = r_t + γ·V(s_{t+1}) − V(s_t) 为单步 TD 误差。</p>
     <table>
       <tr><th>λ 取值</th><th>等价形式</th><th>偏差/方差</th></tr>
@@ -1669,7 +1678,7 @@
       <li>保持语言流畅度（SFT 模型已有好的语言生成能力）</li>
       <li>稳定训练（避免策略更新过大）</li>
     </ul>
-    <div class="formula">R_total = r_θ(x,y) − β·KL(π_θ(y|x) || π_ref(y|x))</div>
+    <div class="formula">$$R_\text{total}=r_\theta(x,y)-\beta\cdot\mathrm{KL}(\pi_\theta(y|x)\|\pi_\text{ref}(y|x))$$</div>
   </div></div>
 </div>
 
