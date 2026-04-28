@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>大模型长文本 Memory Benchmark 综述 (2021–2026)</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #23273a;
+      --border: #2e3350;
+      --accent: #6366f1;
+      --accent2: #22d3ee;
+      --accent3: #f59e0b;
+      --green: #10b981;
+      --pink: #ec4899;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.6;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 60%, #0c1a2e 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 52px 32px 40px;
+      text-align: center;
+    }
+    header h1 {
+      font-size: 2.1rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, #818cf8, #22d3ee, #10b981);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+    header .subtitle { color: var(--muted); font-size: 0.95rem; margin-bottom: 18px; }
+    .meta-badges {
+      display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;
+    }
+    .badge {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 20px; padding: 4px 14px;
+      font-size: 0.8rem; color: var(--muted);
+    }
+
+    /* Nav */
+    nav {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 0 28px; display: flex; gap: 4px; overflow-x: auto;
+      position: sticky; top: 0; z-index: 100;
+    }
+    nav a {
+      color: var(--muted); text-decoration: none; font-size: 0.85rem;
+      padding: 13px 14px; white-space: nowrap;
+      border-bottom: 2px solid transparent; transition: all 0.2s;
+    }
+    nav a:hover { color: var(--text); border-color: var(--accent); }
+
+    /* Layout */
+    .container { max-width: 1280px; margin: 0 auto; padding: 36px 24px; }
+    section { margin-bottom: 52px; }
+
+    /* Section header */
+    .section-header {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 24px; padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+    }
+    .section-header h2 { font-size: 1.3rem; font-weight: 700; }
+    .section-desc { color: var(--muted); font-size: 0.875rem; margin-bottom: 24px; line-height: 1.7; }
+
+    /* Timeline */
+    .timeline {
+      display: flex; flex-direction: column; gap: 0;
+      border-left: 2px solid var(--border);
+      margin-left: 16px; padding-left: 24px;
+      margin-bottom: 32px;
+    }
+    .tl-item {
+      position: relative; padding: 6px 0 18px;
+    }
+    .tl-item::before {
+      content: '';
+      position: absolute; left: -31px; top: 10px;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--accent); border: 2px solid var(--bg);
+    }
+    .tl-item.hot::before { background: var(--accent2); }
+    .tl-item.new::before { background: var(--green); }
+    .tl-year { font-size: 0.75rem; color: var(--accent3); font-weight: 700; margin-bottom: 3px; font-family: monospace; }
+    .tl-title { font-size: 0.92rem; font-weight: 600; color: var(--text); }
+    .tl-desc { font-size: 0.82rem; color: var(--muted); margin-top: 3px; }
+
+    /* Benchmark card grid */
+    .bench-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 16px;
+    }
+    .bench-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px;
+      transition: border-color 0.2s, transform 0.15s;
+      position: relative;
+    }
+    .bench-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .bench-card.featured { border-color: #4f46e5; border-width: 2px; }
+    .bench-card.new-2026 { border-color: var(--green); }
+
+    .bench-year {
+      font-size: 0.72rem; color: var(--muted); font-family: monospace; margin-bottom: 6px;
+    }
+    .bench-name {
+      font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 4px;
+    }
+    .bench-tagline {
+      font-size: 0.82rem; color: var(--accent2); margin-bottom: 10px; font-style: italic;
+    }
+    .bench-motive {
+      font-size: 0.83rem; color: var(--muted); line-height: 1.6; margin-bottom: 10px;
+    }
+    .bench-method {
+      background: var(--surface2); border-radius: 8px; padding: 10px 12px;
+      font-size: 0.8rem; color: var(--text); line-height: 1.6; margin-bottom: 10px;
+    }
+    .bench-method strong { color: var(--accent2); }
+    .bench-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 8px; margin-top: 4px;
+    }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tag {
+      font-size: 0.68rem; padding: 2px 8px; border-radius: 10px;
+      font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;
+    }
+    .tag.conv { background: #312e81; color: #a5b4fc; }
+    .tag.agent { background: #064e3b; color: #6ee7b7; }
+    .tag.persona { background: #4c1d95; color: #c4b5fd; }
+    .tag.longctx { background: #164e63; color: #67e8f9; }
+    .tag.episodic { background: #451a03; color: #fcd34d; }
+    .tag.continual { background: #450a0a; color: #fca5a5; }
+    .tag.multimod { background: #1e3a5f; color: #93c5fd; }
+    .tag.dataset { background: #3b2010; color: #fdba74; }
+    .arxiv-link {
+      font-size: 0.75rem; color: var(--accent); text-decoration: none;
+    }
+    .arxiv-link:hover { text-decoration: underline; }
+    .badge-venue {
+      font-size: 0.7rem; background: #1e293b; color: #94a3b8;
+      padding: 2px 8px; border-radius: 10px; border: 1px solid var(--border);
+    }
+
+    /* Comparison table */
+    .compare-wrap { overflow-x: auto; }
+    .compare-table {
+      width: 100%; border-collapse: collapse; font-size: 0.82rem;
+    }
+    .compare-table th {
+      background: var(--surface2); color: var(--accent2);
+      padding: 10px 14px; text-align: left;
+      border-bottom: 2px solid var(--border); white-space: nowrap;
+    }
+    .compare-table td {
+      padding: 9px 14px; border-bottom: 1px solid var(--border);
+      color: var(--text); vertical-align: top;
+    }
+    .compare-table tr:hover td { background: var(--surface2); }
+    .cell-yes { color: var(--green); font-weight: 700; }
+    .cell-no { color: #64748b; }
+    .cell-partial { color: var(--accent3); }
+
+    /* Taxonomy */
+    .tax-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px;
+    }
+    .tax-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 18px;
+    }
+    .tax-card h4 {
+      font-size: 0.92rem; font-weight: 700; margin-bottom: 8px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .tax-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+    .tax-card ul { margin-top: 8px; padding-left: 16px; }
+    .tax-card li { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+
+    /* Insight cards */
+    .insight-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 14px;
+    }
+    .insight-card {
+      background: var(--surface); border-left: 3px solid var(--accent);
+      border-radius: 0 10px 10px 0; padding: 16px 18px;
+    }
+    .insight-card.warn { border-color: var(--accent3); }
+    .insight-card.good { border-color: var(--green); }
+    .insight-card h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 6px; }
+    .insight-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+
+    footer {
+      background: var(--surface); border-top: 1px solid var(--border);
+      padding: 24px 32px; text-align: center;
+      font-size: 0.8rem; color: var(--muted);
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🧠 大模型长文本 Memory Benchmark 综述</h1>
+  <p class="subtitle">Text Memory Evaluation for Large Language Models · 2021–2026</p>
+  <div class="meta-badges">
+    <span class="badge">📄 14+ Benchmarks</span>
+    <span class="badge">🗓️ 2021–2026</span>
+    <span class="badge">🔍 对话记忆 · Agent记忆 · 个性化 · 情节记忆</span>
+    <span class="badge">✍️ 2026-04-28 整理</span>
+  </div>
+</header>
+
+<nav>
+  <a href="#overview">📌 概览</a>
+  <a href="#taxonomy">🗂️ 分类体系</a>
+  <a href="#benchmarks">📊 Benchmark 详解</a>
+  <a href="#comparison">⚖️ 横向对比</a>
+  <a href="#insights">💡 核心洞察</a>
+  <a href="index.html">← 返回主页</a>
+</nav>
+
+<div class="container">
+
+  <!-- OVERVIEW -->
+  <section id="overview">
+    <div class="section-header">
+      <div class="section-icon" style="background:#1e1b4b">📌</div>
+      <h2>为什么需要 Memory Benchmark？</h2>
+    </div>
+    <p class="section-desc">
+      LLM 的上下文窗口再大也是有限的——真实用户与 AI 的交互往往跨越数周乃至数年，产生数百轮对话。<br>
+      如何让 LLM <strong>记住用户偏好、历史事件、关系演变、知识更新</strong>，并在数千轮之后精准召回，
+      是实现真正个性化 AI 助手的核心挑战。传统的 NIAH（针-草垛）测试只考察<em>能否检索到</em>，
+      而 Memory Benchmark 关注的是更难的问题：<em>跨时间的推理、偏好更新、选择性遗忘、冲突消解</em>。
+    </p>
+
+    <!-- Timeline -->
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-year">2021 · Meta AI (ACL 2022)</div>
+        <div class="tl-title">MSC（Multi-Session Chat）</div>
+        <div class="tl-desc">首个多会话长期对话数据集，奠定跨 session 记忆研究基础</div>
+      </div>
+      <div class="tl-item hot">
+        <div class="tl-year">2024-02 · Snap Research</div>
+        <div class="tl-title">LoCoMo</div>
+        <div class="tl-desc">300轮 / 35 session 超长对话，含事件图谱与多模态，奠定行业基准</div>
+      </div>
+      <div class="tl-item hot">
+        <div class="tl-year">2024-10 · ICLR 2025</div>
+        <div class="tl-title">LongMemEval</div>
+        <div class="tl-desc">500题，覆盖时间推理、知识更新、弃权，现已成为最常引用的对话记忆基准</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2024-10 · ICLR 2025</div>
+        <div class="tl-title">HELMET</div>
+        <div class="tl-desc">7类任务、59个LLM、128K长度，全面评估长上下文能力（含记忆相关任务）</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2024-10</div>
+        <div class="tl-title">PersoBench</div>
+        <div class="tl-desc">评估 persona-aware 对话生成中的个性化能力</div>
+      </div>
+      <div class="tl-item hot">
+        <div class="tl-year">2025-01 · ICLR 2025</div>
+        <div class="tl-title">Episodic Memory Benchmark（Tulving）</div>
+        <div class="tl-desc">受认知科学启发，评估时空情节记忆的召回与推理</div>
+      </div>
+      <div class="tl-item hot">
+        <div class="tl-year">2025-06 · ACL 2025 Findings</div>
+        <div class="tl-title">MemBench</div>
+        <div class="tl-desc">事实记忆 + 反思记忆双层次，兼顾有效性、效率和容量</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2025-07 · ICLR 2026 accepted</div>
+        <div class="tl-title">MemoryAgentBench</div>
+        <div class="tl-desc">四大能力：精准召回、测试时学习、长程理解、选择性遗忘</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2025-10</div>
+        <div class="tl-title">BEAM（Beyond a Million Tokens）</div>
+        <div class="tl-desc">10M token 对话，多领域，配套 LIGHT 认知记忆框架</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2025-10</div>
+        <div class="tl-title">MemoryBench（Continual Learning）</div>
+        <div class="tl-desc">用户反馈驱动的持续学习评估，多域多语言</div>
+      </div>
+      <div class="tl-item hot">
+        <div class="tl-year">2025-12 · 最新版本</div>
+        <div class="tl-title">PersonaMem-v2</div>
+        <div class="tl-desc">1000场景 / 128K 上下文，隐式偏好推断，GPT-5仅37-48%准确率</div>
+      </div>
+      <div class="tl-item new">
+        <div class="tl-year">2026-03 · 最新</div>
+        <div class="tl-title">ATM-Bench（According to Me）</div>
+        <div class="tl-desc">首个多模态多源个人记忆QA，~4年真实生活记录，RAG 系统 &lt;20% 准确率</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAXONOMY -->
+  <section id="taxonomy">
+    <div class="section-header">
+      <div class="section-icon" style="background:#1e3a5f">🗂️</div>
+      <h2>Memory Benchmark 分类体系</h2>
+    </div>
+    <p class="section-desc">按评估目标和设定场景，现有 Memory Benchmark 可归为以下六大类型：</p>
+    <div class="tax-grid">
+      <div class="tax-card">
+        <h4>💬 对话记忆（Conversational）</h4>
+        <p>评估 LLM 在长期多轮对话中记住用户信息、历史事件的能力。</p>
+        <ul>
+          <li>MSC（2021）— 多会话人类对话</li>
+          <li>LoCoMo（2024）— 300轮/35session</li>
+          <li>LongMemEval（2024）— 500题，信息提取+推理</li>
+          <li>Hello Again / LD-Agent（2024）</li>
+        </ul>
+      </div>
+      <div class="tax-card">
+        <h4>🤖 Agent 记忆（Agentic）</h4>
+        <p>评估记忆 Agent 的存储、更新、检索、遗忘能力，强调增量多轮交互。</p>
+        <ul>
+          <li>MemoryAgentBench（2025）— 4核能力</li>
+          <li>StreamBench（2024）— 流式自我进化</li>
+          <li>Memory-R1（2025）— RL驱动记忆管理</li>
+        </ul>
+      </div>
+      <div class="tax-card">
+        <h4>👤 个性化记忆（Personalization）</h4>
+        <p>评估从对话历史中提取并利用用户偏好、兴趣、人格特征的能力。</p>
+        <ul>
+          <li>PersonaMem-v2（2025）— 隐式偏好推断</li>
+          <li>PersoBench（2024）— Persona-aware生成</li>
+          <li>ATM-Bench（2026）— 多模态个人记忆</li>
+        </ul>
+      </div>
+      <div class="tax-card">
+        <h4>📜 情节记忆（Episodic）</h4>
+        <p>评估 LLM 对特定时间地点事件的记忆，参照认知科学 Tulving 框架。</p>
+        <ul>
+          <li>Episodic Memory Benchmark（2025）— 时空情节</li>
+          <li>LoCoMo 的事件图谱部分</li>
+        </ul>
+      </div>
+      <div class="tax-card">
+        <h4>📏 长上下文理解（Long Context）</h4>
+        <p>评估 LLM 在超长上下文中的综合能力，包括检索、推理、摘要等，与记忆强相关。</p>
+        <ul>
+          <li>HELMET（2024）— 7类任务，128K</li>
+          <li>∞Bench（2024）— 100K+ 首个此类</li>
+          <li>BEAM（2025）— 10M token，2000题</li>
+          <li>RULER（2024）— 合成长上下文测试</li>
+        </ul>
+      </div>
+      <div class="tax-card">
+        <h4>🔄 持续学习（Continual Learning）</h4>
+        <p>评估 LLM 从用户反馈中动态更新自身知识和行为的能力，区别于静态长上下文。</p>
+        <ul>
+          <li>MemoryBench（2025）— 用户反馈驱动</li>
+          <li>MemBench（2025）— 事实+反思，效率维度</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- BENCHMARKS -->
+  <section id="benchmarks">
+    <div class="section-header">
+      <div class="section-icon" style="background:#064e3b">📊</div>
+      <h2>Benchmark 详细解析（14篇）</h2>
+    </div>
+    <p class="section-desc">每条包含：一句话动机 + 一句话做法 + 关键数据与发现。</p>
+    <div class="bench-grid">
+
+      <!-- MSC -->
+      <div class="bench-card">
+        <div class="bench-year">2021-07 · ACL 2022 · Meta AI</div>
+        <div class="bench-name">MSC — Multi-Session Chat</div>
+        <div class="bench-tagline">"Beyond Goldfish Memory"</div>
+        <div class="bench-motive">
+          <strong>动机：</strong>现有对话模型只在单轮/短会话上训练，完全无法处理跨 session 的长期人际关系记忆——就像金鱼只有7秒记忆。
+        </div>
+        <div class="bench-method">
+          <strong>做法：</strong>收集人工标注的多会话人-人对话数据集（5个 session），对话者逐渐相互了解；提供 persona 摘要作为记忆载体，评估模型能否利用历史摘要生成一致性回复。
+          <br><strong>规模：</strong>约5K段对话，多轮跨 session
+        </div>
+        <div class="bench-footer">
+          <div class="tags"><span class="tag conv">对话</span><span class="tag dataset">数据集</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2107.07567" target="_blank">↗ 2107.07567</a>
+        </div>
+      </div>
+
+      <!-- LoCoMo -->
+      <div class="bench-card featured">
+        <div class="bench-year">2024-02 · Snap Research</div>
+        <div class="bench-name">LoCoMo</div>
+        <div class="bench-tagline">Long-term Conversational Memory — 最常用对话记忆基准</div>
+        <div class="bench-motive">
+          <strong>动机：</strong>现有长对话数据集不超过5个 session，远不够反映真实的长期人际关系演变和时序动态。
+        </div>
+        <div class="bench-method">
+          <strong>做法：</strong>用 LLM-agent 架构 + 时间事件图谱生成高质量超长对话（300轮，9K token，最多35 session），人工验证一致性；评估任务含 QA、事件摘要、多模态对话生成三类，含时序推理。
+          <br><strong>规模：</strong>50段对话，每段均值9K token，300轮/35 session
+        </div>
+        <div class="bench-footer">
+          <div class="tags"><span class="tag conv">对话</span><span class="tag episodic">时序</span><span class="tag multimod">多模态</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2402.17753" target="_blank">↗ 2402.17753</a>
+        </div>
+      </div>
+
+      <!-- InfBench -->
+      <div class="bench-card">
+        <div class="bench-year">2024-02 · 清华 · COLM 2024</div>
+        <div class="bench-name">∞Bench（InfBench）</div>
+        <div class="bench-tagline">首个平均长度超 100K token 的 LLM 评估基准</div>
+        <div class="bench-motive">
+          <strong>动机：</strong>现有基准最长约 10K token，根本无法评测"真正长上下文"中的记忆和推理能力。
+        </div>
+        <div class="bench-method">
+          <strong>做法：</strong>设计合成+真实任务覆盖多域（英中），平均 100K+ token；任务要求理解长程依赖，不能靠简单片段检索通过；评估书籍理解、代码调试、长对话等场景。
+          <br><strong>发现：</strong>现有长上下文 LLM 在 100K+ 场景中仍大幅落后，急需改进
+        </div>
+        <div class="bench-footer">
+          <div class="tags"><span class="tag longctx">长上下文</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2402.13718" target="_blank">↗ 2402.13718</a>
+        </div>
+      </div>
+
+      <!-- RULER -->
+      <div class="bench-card">
+        <div class="bench-year">2024-04 · NVIDIA · COLM 2024</div>
+        <div class="bench-name">RULER</div>
+        <div class="bench-tagline">揭示 NIAH 测试的虚假繁荣</div>
+        <div class="bench-motive">
+          <strong>动机：</strong>几乎所有 LLM 在 NIAH（针-草垛）测试上接近满分，但这是假象——NIAH 太简单，无法反映真实长上下文能力。
+        </div>
+        <div class="bench-method">
+          <strong>做法：</strong>在 NIAH 基础上扩展出多类针、多跳追踪、聚合任务等 13 种任务，支持灵活的序列长度和复杂度配置，评估 17 个 LLM。
+          <br><strong>发现：</strong>声称支持 32K+ 的模型只有一半能在 32K 下保持合格性能
+        </div>
+        <div class="bench-footer">
+          <div class="tags"><span class="tag longctx">长上下文</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2404.06654" target="_blank">↗ 2404.06654</a>
+        </div>
+      </div>
+
+      <!-- StreamBench -->
+      <div class="bench-card">
+        <div class="bench-year">2024-06 · NeurIPS 2024 Datasets & Benchmarks</div>
+        <div class="bench-name">StreamBench</div>
+        <div class="bench-tagline">评估 LLM Agent 从流式反馈中持续自我提升的能力</div>
+        <div class="bench-motive">
+          <strong>动机：</strong>现有 LLM Benchmark 只测先验能力，没有测 "部署后能否从错误反馈中学习并改进"，而这是真实应用中最关键的能力。
+        </div>
+        <div class="bench-method">
+          <strong>做法：</strong>构建流式在线学习环境，LLM 接收连续任务流和反馈，迭代提升；评估学习速度、记忆利用率和泛化性；提出 ReMem（action-think-memory 循环）基线。
+        </div>
+        <div class="bench-footer">
+          <div class="tags"><span class="tag agent">Agent</span><span class="tag continual">持续学习</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2406.08747" target="_blank">↗ 2406.08747</a>
+        </div>
+      </div>
+
+      <!-- LD-Agent / Hello Again -->
+      <div class="bench-card">
+        <div class="bench-year">2024-06 · NAACL 2025</div>
+        <div class="bench-name">Hello Again! / LD-Agent</div>
+        <div class="bench-tagline">长期个性化对话 Agent 框架 + 评估</div>
+        <div class="bench-motive">
+          <strong>动机：</strong>现有对话系统聚焦短期单 session，缺乏跨时间的事件感知和个性化人格建模，用户体验割裂。
+        </div>
+        <div class="bench-method">
+          <strong>做法：</strong>提出 LD-Agent（Long-term Dialogue Agent），含三个独立可调模块：事件感知（长/短期记忆库 + 主题检索）、persona 提取、回复生成；在 MSC、LoCoMo 等多个 benchmark 上验证。
+        </div>
+        <div class="bench-footer">
+          <div class="tags"><span class="tag conv">对话</span><span class="tag persona">个性化</span><span class="tag agent">Agent</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2406.05925" target="_blank">↗ 2406.05925</a>
+        </div>
+      </div>
+
+      <!-- HELMET -->
+      <div class="bench-card featured">
+        <div class="bench-year">2024-10 · ICLR 2025 · 普林斯顿陈丹琦组</div>
+        <div class="bench-name">HELMET</div>
+        <div class="bench-tagline">How to Evaluate Long-context Models Effectively and Thoroughly</div>
+        <div class="bench-motive">
+          <strong>动机：</strong>现有长上下文评估方法各自为政——用 NIAH 或随机任务子集，覆盖不全、信噪比低、不适配 base 模型，导致排名不稳定。
+        </div>
+        <div class="bench-method">
+          <strong>做法：</strong>7类应用导向任务（RAG、摘要、多跳推理、ICL、代码等），最长 128K，基于 LLM-judge 可靠评估，few-shot 支持 base 模型；评估 59 个主流 LLM。
+          <br><strong>发现：</strong>NIAH 满分≠下游性能；开源模型与闭源差距随长度增大
+        </div>
+        <div class="bench-footer">
+          <div class="tags"><span class="tag longctx">长上下文</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2410.02694" target="_blank">↗ 2410.02694</a>
+        </div>
+      </div>
+
+      <!-- LongMemEval -->
+      <div class="bench-card featured">
+        <div class="bench-year">2024-10 · ICLR 2025</div>
+        <div class="bench-name">LongMemEval ⭐</div>
+        <div class="bench-tagline">对话助手长期记忆综合评测，最广泛引用</div>
+        <div class="bench-motive">
+          <strong>动机：</strong>集成了记忆组件的商业 AI 助手（如 ChatGPT Memory）在长期交互中的记忆能力从未被系统评估过——用户在几周后提到的细节，AI 能记住吗？
+        </div>
+        <div class="bench-method">
+          <strong>做法：</strong>500道精心设计问题嵌入可扩展的用户-助手聊天历史中，覆盖5大能力：信息提取、跨会话推理、时间推理、知识更新、弃权拒答；提出 session 分解 + 事实增强索引 + 时间感知查询扩展三大优化。
+          <br><strong>发现：</strong>商业助手和长上下文 LLM 准确率下降 30%+
+        </div>
+        <div class="bench-footer">
+          <div class="tags"><span class="tag conv">对话</span><span class="tag agent">Agent</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2410.10813" target="_blank">↗ 2410.10813</a>
+        </div>
+      </div>
+
+      <!-- PersoBench -->
+      <div class="bench-card">
+        <div class="bench-year">2024-10</div>
+        <div class="bench-name">PersoBench</div>
+        <div class="bench-tagline">Persona-aware 对话生成个性化能力自动化评测</div>
+        <div class="bench-motive">
+          <strong>动机：</strong>LLM 在对话流畅度上表现出色，但能否真正"用上" persona 信息生成个性化回复尚不清楚，缺乏自动化评测流水线。
+        </div>
+        <div class="bench-method">
+          <strong>做法：</strong>构建自动化评测管道：speaker 标注 → 结构化 prompt 构建 → 多维度评估（流畅度、个性化、多样性、连贯性）；在4开源+4闭源 LLM 上评估，零样本设定。
+        </div>
+        <div class="bench-footer">
+          <div class="tags"><span class="tag persona">个性化</span><span class="tag conv">对话</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2410.03198" target="_blank">↗ 2410.03198</a>
+        </div>
+      </div>
+
+      <!-- Episodic Memory Benchmark -->
+      <div class="bench-card">
+        <div class="bench-year">2025-01 · ICLR 2025 · 华为 + 认知科学</div>
+        <div class="bench-name">Episodic Memory Benchmark（Tulving）</div>
+        <div class="bench-tagline">受认知科学启发的时空情节记忆评测</div>
+        <div class="bench-motive">
+          <strong>动机：</strong>情节记忆（记住"在哪里、什么时候、发生了什么"）是人类认知的核心，但 LLM 缺乏稳健的情节记忆机制，相关评测完全空白。
+        </div>
+        <div class="bench-method">
+          <strong>做法：</strong>基于认知科学框架，对情节事件建模（时间+空间+实体+描述）；合成11个无污染数据集（不同规模和多样性）；评估多种召回和情节推理任务，含时空关系复杂度分析。
+          <br><strong>发现：</strong>GPT-4、Claude、o1-mini 在多事件时空推理上均失败，即便上下文仅 10k-100k
+        </div>
+        <div class="bench-footer">
+          <div class="tags"><span class="tag episodic">情节</span><span class="tag longctx">长上下文</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2501.13121" target="_blank">↗ 2501.13121</a>
+        </div>
+      </div>
+
+      <!-- MemBench -->
+      <div class="bench-card">
+        <div class="bench-year">2025-06 · ACL 2025 Findings</div>
+        <div class="bench-name">MemBench</div>
+        <div class="bench-tagline">双层次记忆 × 多维度评估（有效性 + 效率 + 容量）</div>
+        <div class="bench-motive">
+          <strong>动机：</strong>现有记忆评测局限于单一记忆层次（通常只测事实记忆）和单一交互场景，无法全面反映 Agent 在动态环境中的记忆综合能力。
+        </div>
+        <div class="bench-method">
+          <strong>做法：</strong>提出事实记忆（Factual）+ 反思记忆（Reflective）双层次，以及参与式（Participation）+ 观察式（Observation）两种场景；从有效性、效率、容量三维度评估 Agent 记忆质量。
+        </div>
+        <div class="bench-footer">
+          <div class="tags"><span class="tag agent">Agent</span><span class="tag conv">对话</span><span class="tag continual">持续学习</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2506.21605" target="_blank">↗ 2506.21605</a>
+        </div>
+      </div>
+
+      <!-- MemoryAgentBench -->
+      <div class="bench-card featured">
+        <div class="bench-year">2025-07 · ICLR 2026 accepted</div>
+        <div class="bench-name">MemoryAgentBench ⭐</div>
+        <div class="bench-tagline">首个专为 Memory Agent 设计的增量多轮交互基准</div>
+        <div class="bench-motive">
+          <strong>动机：</strong>现有 LLM 评估聚焦推理/规划/执行，对记忆机制（Agent 如何记忆、更新、检索长期信息）严重欠评估，且没有 benchmark 覆盖所有4项核心记忆能力。
+        </div>
+        <div class="bench-method">
+          <strong>做法：</strong>基于认知科学定义4大核心能力：精准召回（Accurate Retrieval）、测试时学习（Test-time Learning）、长程理解（Long-range Understanding）、选择性遗忘（Selective Forgetting）；将已有长上下文数据集转化为多轮增量交互格式，模拟真实 memory agent 的信息积累过程；评估从简单 RAG 到带外部记忆模块的 agent 谱系。
+          <br><strong>发现：</strong>现有方法无法同时掌握全部4项能力
+        </div>
+        <div class="bench-footer">
+          <div class="tags"><span class="tag agent">Agent</span><span class="tag episodic">情节</span><span class="tag continual">持续学习</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2507.05257" target="_blank">↗ 2507.05257</a>
+        </div>
+      </div>
+
+      <!-- Memory-R1 -->
+      <div class="bench-card">
+        <div class="bench-year">2025-08 · 慕尼黑 + 爱丁堡等</div>
+        <div class="bench-name">Memory-R1</div>
+        <div class="bench-tagline">用 RL 训练 LLM 主动管理外部记忆（在 LoCoMo/MSC/LongMemEval 上验证）</div>
+        <div class="bench-motive">
+          <strong>动机：</strong>现有 LLM 记忆管理是静态启发式的，缺乏"决定什么值得存储/更新/删除"的学习机制，导致记忆质量和利用率低下。
+        </div>
+        <div class="bench-method">
+          <strong>做法：</strong>提出双 Agent RL 框架：Memory Manager（学习 ADD/UPDATE/DELETE/NOOP 操作，PPO 训练）+ Answer Agent（从记忆中提炼关键信息，GRPO 训练）；仅用 152 训练 QA 对，在 LoCoMo、MSC、LongMemEval 三基准验证；3B–14B 模型规模泛化。
+        </div>
+        <div class="bench-footer">
+          <div class="tags"><span class="tag agent">Agent</span><span class="tag conv">对话</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2508.19828" target="_blank">↗ 2508.19828</a>
+        </div>
+      </div>
+
+      <!-- BEAM -->
+      <div class="bench-card">
+        <div class="bench-year">2025-10</div>
+        <div class="bench-name">BEAM（Beyond a Million Tokens）</div>
+        <div class="bench-tagline">100K–10M token 对话，2000题，配套 LIGHT 认知记忆框架</div>
+        <div class="bench-motive">
+          <strong>动机：</strong>现有 benchmark 叙事不连贯、域覆盖窄、只测简单召回，无法评测百万 token 级对话场景下的真实记忆能力。
+        </div>
+        <div class="bench-method">
+          <strong>做法：</strong>自动生成框架创建最长 10M token 的连贯多域对话，含 100 段对话 + 2000 个验证问题；配套 LIGHT 框架（长期情节记忆 + 短期工作记忆 + 事实摘要板），在各主流 LLM 上实现 3.5–12.69% 性能提升。
+        </div>
+        <div class="bench-footer">
+          <div class="tags"><span class="tag longctx">长上下文</span><span class="tag conv">对话</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2510.27246" target="_blank">↗ 2510.27246</a>
+        </div>
+      </div>
+
+      <!-- MemoryBench Continual -->
+      <div class="bench-card">
+        <div class="bench-year">2025-10</div>
+        <div class="bench-name">MemoryBench（Continual Learning）</div>
+        <div class="bench-tagline">用户反馈驱动的 LLM 持续学习能力评测</div>
+        <div class="bench-motive">
+          <strong>动机：</strong>现有 LLM 记忆 benchmark 聚焦于长形输入的阅读理解，不测"服务中从用户反馈中学习并持续优化"，而后者才是实际产品最需要的。
+        </div>
+        <div class="bench-method">
+          <strong>做法：</strong>构建用户反馈模拟框架，覆盖多域（通用+专业）、多语言、多任务类型；评估 LLM 在累积反馈下的持续学习有效性和效率；现有方法均大幅不达预期。
+        </div>
+        <div class="bench-footer">
+          <div class="tags"><span class="tag continual">持续学习</span><span class="tag agent">Agent</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2510.17281" target="_blank">↗ 2510.17281</a>
+        </div>
+      </div>
+
+      <!-- PersonaMem-v2 -->
+      <div class="bench-card featured">
+        <div class="bench-year">2025-12 · UPenn / MIT / UW 等</div>
+        <div class="bench-name">PersonaMem-v2 ⭐</div>
+        <div class="bench-tagline">隐式偏好推断 × 128K 上下文 × RL 微调</div>
+        <div class="bench-motive">
+          <strong>动机：</strong>真实世界中用户偏好多为隐式表达（从言行中推断），现有个性化 benchmark 大多测显式偏好，与实际场景严重脱节。
+        </div>
+        <div class="bench-method">
+          <strong>做法：</strong>模拟 1000 个现实用户-聊天机器人交互场景，300+ 场景类别，20000+ 用户偏好，128K 上下文窗口；偏好多为隐式；用 RL 微调（强化学习）让 Qwen3-4B 学会长上下文隐式个性化推理，超过 GPT-5（53% vs 37-48%）；Agentic Memory 框架用 2K token 记忆替代 32K 历史，达 55% 最优。
+          <br><strong>发现：</strong>前沿 LLM 隐式个性化仅 37-48%，推理是瓶颈而非上下文长度
+        </div>
+        <div class="bench-footer">
+          <div class="tags"><span class="tag persona">个性化</span><span class="tag agent">Agent</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2512.06688" target="_blank">↗ 2512.06688</a>
+        </div>
+      </div>
+
+      <!-- ATM-Bench -->
+      <div class="bench-card new-2026">
+        <div class="bench-year">2026-03 · 最新 · Cambridge + 剑桥</div>
+        <div class="bench-name">ATM-Bench（According to Me）🆕</div>
+        <div class="bench-tagline">首个多模态多源长期个人记忆 QA Benchmark</div>
+        <div class="bench-motive">
+          <strong>动机：</strong>现有长期记忆 benchmark 局限于对话历史，无法捕捉真实的个人记忆——图像、视频、邮件等多源信息交织，且充满个人指称（"我上次去的那家餐厅"）。
+        </div>
+        <div class="bench-method">
+          <strong>做法：</strong>基于约4年真实个人生活记录（隐私保护处理），含图像/视频/邮件等多源，人工标注 QA 对并附真实记忆证据；设计 Hard 子集（需多证据推理、冲突消解、个人指称解析）；提出 Schema-Guided Memory（SGM）结构化记忆表示。
+          <br><strong>发现：</strong>5个 SOTA 记忆系统在 Hard 集上准确率 &lt;20%，SGM 优于描述式记忆
+        </div>
+        <div class="bench-footer">
+          <div class="tags"><span class="tag persona">个性化</span><span class="tag multimod">多模态</span><span class="tag episodic">情节</span></div>
+          <a class="arxiv-link" href="https://arxiv.org/abs/2603.01990" target="_blank">↗ 2603.01990</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- COMPARISON TABLE -->
+  <section id="comparison">
+    <div class="section-header">
+      <div class="section-icon" style="background:#451a03">⚖️</div>
+      <h2>横向对比总览</h2>
+    </div>
+    <div class="compare-wrap">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Benchmark</th>
+            <th>年份</th>
+            <th>场景</th>
+            <th>最大长度</th>
+            <th>多轮增量</th>
+            <th>时序推理</th>
+            <th>个性化</th>
+            <th>知识更新</th>
+            <th>多模态</th>
+            <th>发表</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>MSC</strong></td>
+            <td>2021</td>
+            <td>多 session 对话</td>
+            <td>~5K</td>
+            <td class="cell-yes">✓</td>
+            <td class="cell-no">–</td>
+            <td class="cell-yes">✓</td>
+            <td class="cell-no">–</td>
+            <td class="cell-no">–</td>
+            <td>ACL 2022</td>
+          </tr>
+          <tr>
+            <td><strong>LoCoMo</strong></td>
+            <td>2024</td>
+            <td>超长对话</td>
+            <td>9K avg / 35 session</td>
+            <td class="cell-yes">✓</td>
+            <td class="cell-yes">✓</td>
+            <td class="cell-yes">✓</td>
+            <td class="cell-partial">△</td>
+            <td class="cell-yes">✓</td>
+            <td>arXiv</td>
+          </tr>
+          <tr>
+            <td><strong>∞Bench</strong></td>
+            <td>2024</td>
+            <td>长文档/代码/对话</td>
+            <td>100K+ avg</td>
+            <td class="cell-no">–</td>
+            <td class="cell-partial">△</td>
+            <td class="cell-no">–</td>
+            <td class="cell-no">–</td>
+            <td class="cell-no">–</td>
+            <td>COLM 2024</td>
+          </tr>
+          <tr>
+            <td><strong>RULER</strong></td>
+            <td>2024</td>
+            <td>合成长上下文</td>
+            <td>128K+</td>
+            <td class="cell-no">–</td>
+            <td class="cell-partial">△</td>
+            <td class="cell-no">–</td>
+            <td class="cell-no">–</td>
+            <td class="cell-no">–</td>
+            <td>COLM 2024</td>
+          </tr>
+          <tr>
+            <td><strong>HELMET</strong></td>
+            <td>2024</td>
+            <td>7类长上下文任务</td>
+            <td>128K</td>
+            <td class="cell-no">–</td>
+            <td class="cell-partial">△</td>
+            <td class="cell-no">–</td>
+            <td class="cell-no">–</td>
+            <td class="cell-no">–</td>
+            <td>ICLR 2025</td>
+          </tr>
+          <tr>
+            <td><strong>LongMemEval</strong></td>
+            <td>2024</td>
+            <td>对话助手记忆</td>
+            <td>可扩展</td>
+            <td class="cell-yes">✓</td>
+            <td class="cell-yes">✓</td>
+            <td class="cell-partial">△</td>
+            <td class="cell-yes">✓</td>
+            <td class="cell-no">–</td>
+            <td>ICLR 2025</td>
+          </tr>
+          <tr>
+            <td><strong>StreamBench</strong></td>
+            <td>2024</td>
+            <td>流式在线学习</td>
+            <td>流式</td>
+            <td class="cell-yes">✓</td>
+            <td class="cell-no">–</td>
+            <td class="cell-no">–</td>
+            <td class="cell-yes">✓</td>
+            <td class="cell-no">–</td>
+            <td>NeurIPS 2024</td>
+          </tr>
+          <tr>
+            <td><strong>Episodic Bench</strong></td>
+            <td>2025</td>
+            <td>情节记忆</td>
+            <td>10K–100K</td>
+            <td class="cell-no">–</td>
+            <td class="cell-yes">✓</td>
+            <td class="cell-no">–</td>
+            <td class="cell-no">–</td>
+            <td class="cell-no">–</td>
+            <td>ICLR 2025</td>
+          </tr>
+          <tr>
+            <td><strong>MemBench</strong></td>
+            <td>2025</td>
+            <td>Agent 记忆</td>
+            <td>多轮</td>
+            <td class="cell-yes">✓</td>
+            <td class="cell-no">–</td>
+            <td class="cell-yes">✓</td>
+            <td class="cell-no">–</td>
+            <td class="cell-no">–</td>
+            <td>ACL 2025 Findings</td>
+          </tr>
+          <tr>
+            <td><strong>MemoryAgentBench</strong></td>
+            <td>2025</td>
+            <td>Memory Agent</td>
+            <td>增量多轮</td>
+            <td class="cell-yes">✓</td>
+            <td class="cell-yes">✓</td>
+            <td class="cell-yes">✓</td>
+            <td class="cell-yes">✓</td>
+            <td class="cell-no">–</td>
+            <td>ICLR 2026</td>
+          </tr>
+          <tr>
+            <td><strong>BEAM</strong></td>
+            <td>2025</td>
+            <td>超长对话</td>
+            <td>10M token</td>
+            <td class="cell-yes">✓</td>
+            <td class="cell-partial">△</td>
+            <td class="cell-no">–</td>
+            <td class="cell-no">–</td>
+            <td class="cell-no">–</td>
+            <td>arXiv</td>
+          </tr>
+          <tr>
+            <td><strong>PersonaMem-v2</strong></td>
+            <td>2025</td>
+            <td>隐式个性化</td>
+            <td>128K</td>
+            <td class="cell-yes">✓</td>
+            <td class="cell-no">–</td>
+            <td class="cell-yes">✓</td>
+            <td class="cell-yes">✓</td>
+            <td class="cell-no">–</td>
+            <td>arXiv</td>
+          </tr>
+          <tr>
+            <td><strong>ATM-Bench</strong></td>
+            <td>2026</td>
+            <td>多模态个人记忆</td>
+            <td>~4年数据</td>
+            <td class="cell-yes">✓</td>
+            <td class="cell-yes">✓</td>
+            <td class="cell-yes">✓</td>
+            <td class="cell-yes">✓</td>
+            <td class="cell-yes">✓</td>
+            <td>arXiv 2026</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="color:var(--muted);font-size:0.78rem;margin-top:12px">✓ 支持 &nbsp;△ 部分支持 &nbsp;– 不支持/不涉及</p>
+  </section>
+
+  <!-- INSIGHTS -->
+  <section id="insights">
+    <div class="section-header">
+      <div class="section-icon" style="background:#1e3a5f">💡</div>
+      <h2>核心洞察与趋势</h2>
+    </div>
+    <div class="insight-grid">
+      <div class="insight-card warn">
+        <h4>⚠️ NIAH 不等于真实记忆能力</h4>
+        <p>RULER、HELMET 均证明：在 NIAH 上接近满分的 LLM，在真实长程推理任务上仍大幅落后。"能找到针" ≠ "能理解干草垛"。</p>
+      </div>
+      <div class="insight-card warn">
+        <h4>⚠️ 隐式个性化是当前最大短板</h4>
+        <p>PersonaMem-v2 显示前沿 LLM 在隐式偏好推断上仅 37–48%，远低于显式个性化场景。用户从不直说"我喜欢 X"，AI 需要从行为中推断。</p>
+      </div>
+      <div class="insight-card warn">
+        <h4>⚠️ 多模态多源记忆几乎未被解决</h4>
+        <p>ATM-Bench 的 Hard 集：5个 SOTA 记忆系统准确率 &lt;20%。图像+邮件+对话交织的个人记忆对现有 RAG 系统来说几乎不可解。</p>
+      </div>
+      <div class="insight-card good">
+        <h4>✅ RL 训练是解锁记忆管理的关键</h4>
+        <p>Memory-R1 和 PersonaMem-v2 均证明：RL 微调（PPO/GRPO）能让小模型（3B–7B）在记忆操作和隐式推理上超越更大的基础模型，数据效率极高（152 QA 对）。</p>
+      </div>
+      <div class="insight-card good">
+        <h4>✅ 外部记忆比超长上下文更高效</h4>
+        <p>PersonaMem-v2：2K token 外部记忆替代 32K 原始历史，达到更高精度（55% vs 48%），同时节省 16× 输入 token。上下文长度是必要非充分条件。</p>
+      </div>
+      <div class="insight-card">
+        <h4>📈 趋势：从"检索"到"认知"</h4>
+        <p>早期 benchmark 测"能否找到信息"（检索层），最新工作（MemoryAgentBench、ATM-Bench、Episodic Bench）开始评测"选择性遗忘、冲突消解、时空情节推理"——向人类认知靠拢。</p>
+      </div>
+      <div class="insight-card">
+        <h4>📈 趋势：增量多轮 > 静态长上下文</h4>
+        <p>MemoryAgentBench 明确指出：书级 QA（如 NarrativeQA）不能评估 Memory Agent，因为现实中信息是逐步增量到来的，而非一次性全量输入。</p>
+      </div>
+      <div class="insight-card">
+        <h4>📈 趋势：个性化记忆成为独立子方向</h4>
+        <p>从 PersonaMem-v2 到 ATM-Bench，"了解这个具体用户"正成为独立研究方向，区别于通用长上下文理解，要求模型维护随时间演变的用户画像。</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  数据来源：ArXiv · ACL · ICLR · NeurIPS &nbsp;|&nbsp;
+  整理日期：2026-04-28 &nbsp;|&nbsp;
+  收录 Benchmark：14篇 &nbsp;|&nbsp;
+  覆盖范围：2021–2026 &nbsp;|&nbsp;
+  <a href="index.html">← 返回 World Model & VLA 主页</a>
+</footer>
+
+</body>
+</html>
