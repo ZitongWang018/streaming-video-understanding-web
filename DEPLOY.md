@@ -53,7 +53,7 @@ Streaming 专题正文快照来源：<https://github.com/ydyhello/Awesome-VLM-St
 ### 覆盖上游 README 全文（含 pdf / docs / GitHub 链接）
 
 1. 用浏览器打开 upstream Raw：`https://raw.githubusercontent.com/ydyhello/Awesome-VLM-Streaming-Video/main/README.md`，全文复制替换本地的 `streaming-video-understanding-source.md`。
-2. **务必替换其中的「📖 Contents」整块**：上游 TOC 锚点与正文标题 id 不一致，会导致页面内跳转失效；请以本仓库中当前版本的 Contents（第一节 Introduction → Resources）为准覆盖粘贴。
+2. **务必替换其中的「📖 Contents」整块**为本仓库当前版本（锚点与 HTML 标题 id 一致，否则页内目录跳转失效）。除此之外应保持与 upstream README **字节级一致**（不在该 md 内手写本站说明）。
 3. 在项目根目录执行：
 
 ```bash
