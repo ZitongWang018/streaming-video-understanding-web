@@ -1,11 +1,8 @@
 
 
 # Awesome-VLM-Streaming-Video 🎬
- 
- 
- 
- 
- 
+
+（网页快照：本文件内容对齐上游仓库根目录 [README.md](https://github.com/ydyhello/Awesome-VLM-Streaming-Video/blob/main/README.md)；仅「📖 Contents」章节锚点已做网页端兼容修正，其余表格与 URL 与 upstream 一致。）
 
 ## 📒 Introduction
 

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Streaming-Video-Understanding：连续视频流 VLM/MLLM 论文、PDF、代码与评测资源，镜像自 Awesome-VLM-Streaming-Video，附中文综合评析。" />
-  <title>Streaming-Video-Understanding · VLM 流视频综述镜像</title>
+  <meta name="description" content="Awesome-VLM-Streaming-Video：开源 README.md 的结构化网页镜像，收录流媒体场景 VLM/MLLM 论文 pdf/docs、GitHub 与评测表格；文末附中文综合评析（本站）。" />
+  <title>Awesome-VLM-Streaming-Video · README 网页镜像（Streaming-Video-Understanding）</title>
   <style>
     :root {
       --bg: #0f1117;
@@ -72,14 +72,64 @@
       position: relative;
       z-index: 1;
     }
+    header .subtitle-en {
+      color: var(--text);
+      font-size: 0.95rem;
+      max-width: 800px;
+      margin: 0 auto 14px;
+      position: relative;
+      z-index: 1;
+      line-height: 1.55;
+    }
     header .subtitle {
       color: var(--muted);
-      font-size: 0.95rem;
-      max-width: 720px;
+      font-size: 0.88rem;
+      max-width: 820px;
       margin: 0 auto;
       position: relative;
       z-index: 1;
+      line-height: 1.65;
     }
+    .mirror-banner {
+      background: linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(8,145,178,0.08) 100%);
+      border: 1px solid rgba(99,102,241,0.35);
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-bottom: 22px;
+      font-size: 0.86rem;
+      color: var(--text);
+      line-height: 1.65;
+    }
+    .mirror-banner h2.mirror-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--accent2);
+      margin-bottom: 12px;
+      letter-spacing: 0.02em;
+    }
+    .mirror-banner ul {
+      margin: 10px 0 14px 1.15rem;
+      color: var(--muted);
+    }
+    .mirror-banner ul li { margin-bottom: 6px; }
+    .mirror-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 18px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      font-size: 0.82rem;
+    }
+    .mirror-links a {
+      color: var(--accent2);
+      text-decoration: none;
+      border: 1px solid rgba(34,211,238,0.35);
+      border-radius: 10px;
+      padding: 4px 12px;
+    }
+    .mirror-links a:hover { background: rgba(34,211,238,0.08); }
     nav {
       background: var(--surface);
       border-bottom: 1px solid var(--border);
@@ -328,15 +378,17 @@
   <header>
     <div class="logo-row">
       <a class="org-badge" href="https://github.com/ydyhello/Awesome-VLM-Streaming-Video" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit">
-        <span>📚</span><span>上游仓库 Awesome-VLM-Streaming-Video</span>
+        <span>📚</span><span>ydyhello/Awesome-VLM-Streaming-Video</span>
       </a>
-      <span class="org-badge"><span>🎬</span><span>Streaming · Proactive · KV · Benchmarks</span></span>
-      <span class="org-badge"><span>📅</span><span>README 同步：2026-05（upstream main）</span></span>
+      <span class="org-badge"><span>🌐</span><span>README.md → 网页镜像</span></span>
+      <span class="org-badge"><span>📅</span><span>清单同步 branch：main（定期与上游对齐）</span></span>
     </div>
-    <h1>Streaming-Video-Understanding</h1>
+    <h1>Awesome-VLM-Streaming-Video 🎬</h1>
+    <p class="subtitle-en">📚 A curated collection of papers and open-source code repositories dedicated to the application of Vision-Language Models (VLMs) for streaming video.</p>
     <p class="subtitle">
-      面向连续视频流的 VLM / MLLM：主动交互、长程记忆、实时推理与评测资源汇编。
-      下方正文为上游 README 的结构化镜像（表格内链接与 shields 均指向原始论文与代码）。
+      <strong>Streaming-Video-Understanding</strong>：当前页面即上述仓库根目录 <code>README.md</code> 的<strong>结构化网页版</strong>
+      —— 章节划分、表格行顺序、以及 Paper 列中的 <strong>pdf</strong> / <strong>docs</strong> / <strong>OpenReview</strong> / <strong>厂商 Model Card</strong>、Code 列中的 <strong>GitHub</strong> 与 star shields，均与上游 Markdown 同源（点击即跳转原文链接）。
+      仅在文末保留本站撰写的<strong>中文综合评析</strong>（锚点 <code>#analysis</code>），不参与上游仓库版本控制。
     </p>
   </header>
 
@@ -354,12 +406,30 @@
   </nav>
 
   <div class="container">
+    <section class="mirror-banner" aria-labelledby="mirror-heading">
+      <h2 class="mirror-title" id="mirror-heading">镜像说明 · 与上游 README 的对应关系</h2>
+      <p style="color:var(--muted);margin-bottom:10px">
+        可将本页视为 GitHub 上 Awesome List 的<strong>只读浏览器视图</strong>：便于检索、横向滚动宽表与章节内跳转。更新上游清单时，维护者只需替换仓库中的 <code>streaming-video-understanding-source.md</code>（由 <code>README.md</code> 拷贝而来）并重新运行生成脚本。
+      </p>
+      <ul>
+        <li><strong>完全一致：</strong>Introduction、Contents（目录锚点已校正）、各分区标题、全部表格单元格文案与 URL。</li>
+        <li><strong>Paper 列：</strong><code>pdf</code> 多为 arXiv / OpenReview PDF；亦可能指向 ByteDance Model Card、GitHub 内 PDF 路径等 —— 与上游仓库表格一致。</li>
+        <li><strong>Code 列：</strong><code>GitHub</code> 链至代码仓库；右侧小图标为 shields.io 实时 star 数（需联网加载）。</li>
+        <li><strong>尾部招聘段落</strong>（We're Hiring）亦随 README 一并镜像。</li>
+      </ul>
+      <div class="mirror-links">
+        <a href="https://github.com/ydyhello/Awesome-VLM-Streaming-Video" target="_blank" rel="noopener noreferrer">⌂ 上游仓库主页</a>
+        <a href="https://github.com/ydyhello/Awesome-VLM-Streaming-Video/blob/main/README.md" target="_blank" rel="noopener noreferrer">📄 README.md（GitHub）</a>
+        <a href="https://raw.githubusercontent.com/ydyhello/Awesome-VLM-Streaming-Video/main/README.md" target="_blank" rel="noopener noreferrer">⬇ README.md（Raw）</a>
+      </div>
+    </section>
+
     <div class="insight-box" style="margin-bottom:28px">
-      <strong>使用说明：</strong>右下角「阅读设置」可调整整页字号与表格密度，偏好保存在本机 localStorage（键名 <code>svu_prefs_v1</code>）。
-      Star 徽章图片来自 GitHub shields，需联网显示。
+      <strong>阅读辅助：</strong>右下角「阅读设置」可调字号与紧凑表格；偏好存于本机 <code>localStorage</code>（<code>svu_prefs_v1</code>）。Star 徽章依赖 GitHub shields，离线环境可能不显示。
     </div>
 
-    <article class="readme-bundle" id="upstream-readme" aria-label="Awesome list mirror">
+    <article class="readme-bundle" id="upstream-readme" aria-label="Awesome-VLM-Streaming-Video README mirror">
+<p>（网页快照：本文件内容对齐上游仓库根目录 <a href="https://github.com/ydyhello/Awesome-VLM-Streaming-Video/blob/main/README.md" target="_blank" rel="noopener noreferrer">README.md</a>；仅「📖 Contents」章节锚点已做网页端兼容修正，其余表格与 URL 与 upstream 一致。）</p>
 <h2 class="readme-h2" id="introduction">📒 Introduction</h2>
 <p>📚 A curated collection of papers and open-source code repositories dedicated to the application of Vision-Language Models (VLMs) for streaming video.</p>
 <h2 class="readme-h2" id="contents">📖 Contents</h2>
@@ -491,7 +561,7 @@
   </div>
 
   <div class="insight-box" style="border-left-color:var(--accent2);background:rgba(34,211,238,0.06)">
-    <strong>维护说明：</strong>正文表格与链接（含 pdf/docs/GitHub）同步自上游仓库
+    <strong>维护说明：</strong>正文与上游 <code>README.md</code> 对齐；权威修改请提交至
     <a href="https://github.com/ydyhello/Awesome-VLM-Streaming-Video" target="_blank" rel="noopener noreferrer">ydyhello/Awesome-VLM-Streaming-Video</a>；
     本地源码快照见 <code>streaming-video-understanding-source.md</code>，可用 <code>node tools/readme-to-streaming-fragment.mjs</code> 重新生成 HTML 片段。
   </div>
@@ -500,11 +570,17 @@
   </div>
 
   <footer>
-    数据来源：
-    <a href="https://github.com/ydyhello/Awesome-VLM-Streaming-Video" target="_blank" rel="noopener noreferrer">https://github.com/ydyhello/Awesome-VLM-Streaming-Video</a>
-    &nbsp;|&nbsp; 本地快照：<code>streaming-video-understanding-source.md</code>
-    &nbsp;|&nbsp;
-    <a href="index.html">← World Model &amp; VLA 总览</a>
+    <div style="margin-bottom:10px;line-height:1.55">
+      <strong>内容来源：</strong>
+      <a href="https://github.com/ydyhello/Awesome-VLM-Streaming-Video" target="_blank" rel="noopener noreferrer">ydyhello/Awesome-VLM-Streaming-Video</a>
+      （<code>README.md</code>）· 本地生成用快照 <code>streaming-video-understanding-source.md</code>
+    </div>
+    <div style="margin-bottom:10px;color:var(--muted);font-size:0.74rem;line-height:1.5">
+      论文与代码链接版权归原作者及上游维护者；本站仅提供排版与中文导读，不代表上游立场。发现清单滞后或链接失效请优先向
+      <a href="https://github.com/ydyhello/Awesome-VLM-Streaming-Video/issues" target="_blank" rel="noopener noreferrer">上游 Issues</a>
+      反馈。
+    </div>
+    <a href="index.html">← World Model &amp; VLA 综述站首页</a>
   </footer>
 
   <div class="read-settings" id="read-settings">

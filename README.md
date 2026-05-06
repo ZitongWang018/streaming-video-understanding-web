@@ -18,7 +18,7 @@
 
 This project presents:
 
-- 🎬 **Streaming Video Understanding** — curated tables from [ydyhello/Awesome-VLM-Streaming-Video](https://github.com/ydyhello/Awesome-VLM-Streaming-Video) (pdf/docs/code/shields), Chinese analysis block, reading settings; paths **`/streaming-video-understanding/`** or **`streaming-video-understanding.html`**
+- 🎬 **Streaming Video（README 网页镜像）** — 本仓库内路径 **`/streaming-video-understanding/`** / **`streaming-video-understanding.html`** 即 [ydyhello/Awesome-VLM-Streaming-Video](https://github.com/ydyhello/Awesome-VLM-Streaming-Video) 根目录 **`README.md`** 的结构化 HTML 版（表格 pdf/docs/GitHub 与 upstream 同源）；文末中文「综合评析」为本站追加。
 - 🧠 **World Models** — how agents learn internal representations of the environment
 - 🦾 **VLA Models** — integrating vision, language, and action for robot control
 - 📊 **Taxonomy & Comparisons** — structured categorization of existing approaches
