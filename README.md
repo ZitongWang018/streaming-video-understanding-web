@@ -18,7 +18,7 @@
 
 This project presents:
 
-- 🎬 **Streaming Video（README 网页镜像）** — 本仓库内路径 **`/streaming-video-understanding/`** / **`streaming-video-understanding.html`** 即 [ydyhello/Awesome-VLM-Streaming-Video](https://github.com/ydyhello/Awesome-VLM-Streaming-Video) 根目录 **`README.md`** 的结构化 HTML 版（表格 pdf/docs/GitHub 与 upstream 同源）；文末中文「综合评析」为本站追加。
+- 🎬 **Streaming Video（README 网页镜像）** — 本仓库内路径 **`/streaming-video-understanding/`** / **`streaming-video-understanding.html`** 即 [ydyhello/Awesome-VLM-Streaming-Video](https://github.com/ydyhello/Awesome-VLM-Streaming-Video) 根目录 **`README.md`** 的结构化 HTML 版（表格 pdf/docs/GitHub 与 upstream 同源）；文末中文「趋势时间线 / 2026 焦点 / 会议核验 / 综合评析」由 **`tools/_streaming_trends_zh.html`** + **`tools/build-streaming-page.mjs`** 追加生成。
 - 🧠 **World Models** — how agents learn internal representations of the environment
 - 🦾 **VLA Models** — integrating vision, language, and action for robot control
 - 📊 **Taxonomy & Comparisons** — structured categorization of existing approaches
@@ -57,7 +57,7 @@ No installation required — just open the link in any browser.
 ```
 world-model-vla/
 ├── index.html                          # Survey hub (WM / VLA + links to Streaming topic)
-├── streaming-video-understanding.html    # Full Streaming topic (Awesome-VLM mirror + 中文评析)
+├── streaming-video-understanding.html    # Awesome README 镜像 + 中文趋势/2026/会议核验/评析
 ├── streaming-video-understanding/index.html  # Same topic via path /streaming-video-understanding/
 ├── lingbot.html                        # Redirect → /streaming-video-understanding/
 ├── long-video-memory.html              # Long Video Understanding with Memory Survey (2019–2026)

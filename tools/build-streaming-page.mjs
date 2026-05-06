@@ -7,6 +7,8 @@ const ROOT = path.resolve(__dirname, "..");
 let frag = fs.readFileSync(path.join(__dirname, "_streaming_readme_fragment.html"), "utf8");
 frag = frag.replace(/^<h1 class="readme-h1"[^>]*>[\s\S]*?<\/h1>\s*\n?/, "");
 
+const trendsZh = fs.readFileSync(path.join(__dirname, "_streaming_trends_zh.html"), "utf8");
+
 const analysisZh = `
 <section class="paper-section" id="analysis">
   <div class="ps-header" style="border-color:#f59e0b">
@@ -87,7 +89,7 @@ const html = `<!DOCTYPE html>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Awesome-VLM-Streaming-Video：开源 README.md 的结构化网页镜像，收录流媒体场景 VLM/MLLM 论文 pdf/docs、GitHub 与评测表格；文末附中文综合评析（本站）。" />
+  <meta name="description" content="Awesome-VLM-Streaming-Video：开源 README.md 的结构化网页镜像，收录流媒体场景 VLM/MLLM 论文 pdf/docs、GitHub 与评测表格；文末附中文趋势时间线、2026 焦点对比、OpenReview 会议核验表与综合评析（本站）。" />
   <title>Awesome-VLM-Streaming-Video · README 网页镜像（Streaming-Video-Understanding）</title>
   <style>
     :root {
@@ -452,6 +454,76 @@ const html = `<!DOCTYPE html>
     .read-settings-body { display: none; }
     .read-settings.open .read-settings-body { display: block; }
 
+    .trends-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 8px;
+    }
+    @media (max-width: 960px) {
+      .trends-grid { grid-template-columns: 1fr; }
+    }
+    .timeline-wrap {
+      position: relative;
+      padding-left: 22px;
+      border-left: 2px solid var(--border);
+      margin: 12px 0 8px;
+    }
+    .tl-node {
+      position: relative;
+      padding-bottom: 20px;
+    }
+    .tl-node:last-child { padding-bottom: 4px; }
+    .tl-node::before {
+      content: "";
+      position: absolute;
+      left: -27px;
+      top: 6px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 2px solid var(--bg);
+    }
+    .tl-date {
+      font-size: 0.82rem;
+      color: var(--accent2);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .venue-pill {
+      display: inline-block;
+      font-size: 0.68rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(99, 102, 241, 0.22);
+      color: #c7d2fe;
+      white-space: nowrap;
+    }
+    .venue-pill.arxiv {
+      background: rgba(148, 163, 184, 0.14);
+      color: #cbd5e1;
+    }
+    .paper-mini-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      margin: 14px 0;
+    }
+    .paper-mini-table th,
+    .paper-mini-table td {
+      border: 1px solid var(--border);
+      padding: 9px 11px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .paper-mini-table th {
+      background: var(--surface2);
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .paper-mini-table a { color: var(--accent2); word-break: break-word; }
+
     @media (max-width: 640px) {
       header h1 { font-size: 1.45rem; }
       nav a.tab { padding: 10px 8px; font-size: 0.75rem; }
@@ -472,7 +544,7 @@ const html = `<!DOCTYPE html>
     <p class="subtitle">
       <strong>Streaming-Video-Understanding</strong>：当前页面即上述仓库根目录 <code>README.md</code> 的<strong>结构化网页版</strong>
       —— 章节划分、表格行顺序、以及 Paper 列中的 <strong>pdf</strong> / <strong>docs</strong> / <strong>OpenReview</strong> / <strong>厂商 Model Card</strong>、Code 列中的 <strong>GitHub</strong> 与 star shields，均与上游 Markdown 同源（点击即跳转原文链接）。
-      仅在文末保留本站撰写的<strong>中文综合评析</strong>（锚点 <code>#analysis</code>），不参与上游仓库版本控制。
+      文末附有本站撰写的<strong>中文栏目</strong>：<strong>趋势与时间线</strong>（<code>#trends</code>）、<strong>2026 焦点</strong>（<code>#y2026</code>）、<strong>会议标注</strong>（<code>#venues</code>）、以及<strong>综合评析</strong>（<code>#analysis</code>）；不参与上游仓库版本控制。
     </p>
   </header>
 
@@ -486,6 +558,9 @@ const html = `<!DOCTYPE html>
     <a class="tab" href="#real-time-inference">实时推理</a>
     <a class="tab" href="#streaming-with-thinking">Thinking</a>
     <a class="tab" href="#benchmarks">Benchmarks</a>
+    <a class="tab" href="#trends">趋势时间线</a>
+    <a class="tab" href="#y2026">2026焦点</a>
+    <a class="tab" href="#venues">会议标注</a>
     <a class="tab" href="#analysis">综合评析</a>
   </nav>
 
@@ -500,6 +575,7 @@ const html = `<!DOCTYPE html>
         <li><strong>Paper 列：</strong><code>pdf</code> 多为 arXiv / OpenReview PDF；亦可能指向 ByteDance Model Card、GitHub 内 PDF 路径等 —— 与上游仓库表格一致。</li>
         <li><strong>Code 列：</strong><code>GitHub</code> 链至代码仓库；右侧小图标为 shields.io 实时 star 数（需联网加载）。</li>
         <li><strong>尾部招聘段落</strong>（We're Hiring）亦随 README 一并镜像。</li>
+        <li><strong>本站扩展：</strong>文末中文「趋势时间线 / 2026 焦点 / 会议标注」由 <code>tools/_streaming_trends_zh.html</code> 注入生成；上游 README 不含此文稿。</li>
       </ul>
       <div class="mirror-links">
         <a href="https://github.com/ydyhello/Awesome-VLM-Streaming-Video" target="_blank" rel="noopener noreferrer">⌂ 上游仓库主页</a>
@@ -516,6 +592,7 @@ const html = `<!DOCTYPE html>
 ${frag}
     </article>
 
+${trendsZh}
 ${analysisZh}
   </div>
 

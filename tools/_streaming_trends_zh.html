@@ -1,0 +1,210 @@
+<section class="paper-section" id="trends">
+  <div class="ps-header" style="border-color:#22d3ee">
+    <div class="ps-icon" style="background:rgba(34,211,238,0.15)">📈</div>
+    <div class="ps-title-block">
+      <h2>领域时间线与宏观趋势</h2>
+      <div class="ps-en">Timeline · Taxonomy evolution · 与上方 README 分区同源对照（本站撰写）</div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <strong>阅读范围：</strong>本节依据仓库快照 <code>streaming-video-understanding-source.md</code> 中的<strong>日期列与各分区标签</strong>归纳；不代表学术界完整普查。技术细节请以论文 PDF / OpenReview / 代码仓库为准。
+  </div>
+
+  <div class="trends-grid">
+    <div class="info-block" style="margin:0">
+      <h4>三代范式递进（概念轴）</h4>
+      <ul>
+        <li><strong>第一代（交互语法）：</strong>以 EOS / 沉默 / 信息头等<strong>特殊 token</strong>把「说不说」写进自回归目标（如 VideoLLM-online、ViSpeak、早期 informative head 路线）。</li>
+        <li><strong>第二代（记忆—延迟）：</strong>无限流场景下用<strong>滑窗 + KV 驱逐 / 分层卸载</strong>保持常量显存；代表性路线含 StreamingVLM、各类 StreamKV / InfiniPot 系列。</li>
+        <li><strong>第三代（意图对齐 + 推理内化）：</strong>2026 清单密集出现「<strong>何时回应由证据与查询共同决定</strong>」「<strong>边看边想（streaming CoT）</strong>」「<strong>推理痕迹压缩为记忆</strong>」三条支线，将触发、记忆与 thinking 模块<strong>联合设计</strong>。</li>
+      </ul>
+    </div>
+    <div class="info-block" style="margin:0">
+      <h4>2025→2026 迁移的三个信号</h4>
+      <ul>
+        <li><strong>查询感知（Query-aware）：</strong>从「有变化就重要」转向「与<strong>用户意图</strong>相关的变化才值得保留 token」，如 QueryStream 的差分剪枝与相关性触发回应。</li>
+        <li><strong>结构化触发：</strong>扩散 / 去噪、序列级 activation、gray-scale 门控等，把 timing 从启发式变成<strong>可学习或可优化的序列对象</strong>（STRIDE、ColorTrigger 等）。</li>
+        <li><strong>系统协同：</strong>Codec 侧运动矢量、I-frame 锚点与 RoPE 校正（CodecSight）、CUDA Graph、Prefix KV 复用（AURA）等<strong>全栈优化</strong>与算法并列出现。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 style="margin:28px 0 14px;font-size:1.05rem;color:var(--text)">简史时间线（与清单日期对齐的里程碑）</h3>
+  <div class="timeline-wrap">
+    <div class="tl-node">
+      <div class="tl-date">2024 · 下半年</div>
+      <p><strong>交互格式探索：</strong>MM-Duet 等工作把「何时插入文本反馈」与视频推进绑定；StreamingBench、OVO-Bench 等评测逐步确立<strong>回溯 / 实时 / 前瞻</strong>切片。</p>
+    </div>
+    <div class="tl-node">
+      <div class="tl-date">2025 · 全年</div>
+      <p><strong>记忆与压缩爆发：</strong>分层 KV、检索式记忆、token 削减、边缘卸载大量出现；StreamMind、Open-ended Hierarchical Streaming 等走向<strong>事件门控 + 稀疏调用大模型</strong>。</p>
+      <p><strong>代表性收录：</strong>StreamingVLM（长流常显存）、Flash-VStream、StreamKV、StreamingTOM 等 —— 详见表格「Memory」「Real-time Inference」分区。</p>
+    </div>
+    <div class="tl-node">
+      <div class="tl-date">2026 · Q1–Q2（清单）</div>
+      <p><strong>触发 × 推理 × 部署：</strong>同一时段并列出现 ThinkStream / VST / Think While Watching（流式思维）、STRIDE / StreamReady / ColorTrigger（时机建模）、HERMES / FluxMem / FlexMem / CurveStream（层级与几何记忆）、CodecSight / SimpleStream（codec 与强基线）。产品侧 Seed2.0、Proact-VL、AURA 强调<strong>实时助手形态</strong>。</p>
+    </div>
+  </div>
+</section>
+
+<section class="paper-section" id="y2026">
+  <div class="ps-header" style="border-color:#a78bfa">
+    <div class="ps-icon" style="background:rgba(167,139,250,0.15)">🔬</div>
+    <div class="ps-title-block">
+      <h2>2026 年条目梳理 · 对比与焦点</h2>
+      <div class="ps-en">Dedup by title · Thematic comparison · 链接指向与正文表格一致</div>
+    </div>
+  </div>
+
+  <div class="insight-box" style="border-left-color:#a78bfa;background:rgba(167,139,250,0.06)">
+    <strong>去重说明：</strong>同一论文在不同 README 分区重复出现时只在本节<strong>讨论一次</strong>；表格中的「Date」若不一致（如 StreamMind 与 arXiv 编号年份），以<strong>上游清单为准</strong>并建议对照 PDF。
+  </div>
+
+  <h3 style="margin:22px 0 12px;font-size:1.02rem">按主题的横向对比（2026 清单内）</h3>
+  <table class="paper-mini-table" aria-label="2026 主题对比">
+    <thead>
+      <tr><th>主题</th><th>核心矛盾</th><th>代表条目（节选）</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>触发与时机</strong></td>
+        <td>语义就绪 vs 交互打断；稀疏调用下游 VLM</td>
+        <td>STRIDE（序列级 activation 去噪）、StreamReady（readiness / evidence gate）、Event-VStream（边界分数）、ColorTrigger（灰度门控 RGB）、StreamMind（事件门控认知）</td>
+      </tr>
+      <tr>
+        <td><strong>查询与剪枝</strong></td>
+        <td>动态冗余 ≠ 任务无关信息</td>
+        <td>QueryStream（QDP + RTAR，可与离线长视频互通）</td>
+      </tr>
+      <tr>
+        <td><strong>层级记忆</strong></td>
+        <td>固定预算下保留何种时空证据</td>
+        <td>HERMES（层级 KV 类认知结构）、FluxMem / FlexMem、CurveStream（曲率分层）、FreshMem（频域混合）、MemStream（动态 KV 选择 + MoE 检索）、WAT（短FIFO+长程驱逐）</td>
+      </tr>
+      <tr>
+        <td><strong>流式推理（Thinking）</strong></td>
+        <td>推理增益 vs TTFT / 并行约束</td>
+        <td>ThinkStream（Watch-Think-Speak + RCSM + streaming RLVR）、VST、Think-as-You-See、Think While Watching、Speak While Watching（位置编码解耦并行感知–生成）</td>
+      </tr>
+      <tr>
+        <td><strong>个性化与场景</strong></td>
+        <td>用户概念与时间轴上的私有语义</td>
+        <td>PEARL（双流记忆 + 概念检索）、Vista（事后查询下的场景压缩）、WeaveTime（不确定度触发回溯）</td>
+      </tr>
+      <tr>
+        <td><strong>系统与基线</strong></td>
+        <td>可复现延迟–精度曲线</td>
+        <td>CodecSight（码流信号）、SimpleStream（固定近帧窗口强基线）、AURA（静音占位 token + 窗口批处理与 KV 策略）</td>
+      </tr>
+      <tr>
+        <td><strong>数据与评测</strong></td>
+        <td>触发-centric 代理指标</td>
+        <td>Learning to Respond（TV-Online 规模化触发数据集 + 渐进训练）</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 style="margin:26px 0 12px;font-size:1.02rem">按月份索引（清单 Date，标题去重）</h3>
+  <table class="paper-mini-table" aria-label="2026 年月索引">
+    <thead>
+      <tr><th>月份</th><th>论文 / 报告（标题）</th><th>备注</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>2026.01</strong></td>
+        <td>
+          <a href="https://openreview.net/pdf?id=gmpnSSiJt7" target="_blank" rel="noopener noreferrer">Learning to Respond…</a>；
+          <a href="https://openreview.net/pdf?id=738HjJEbml" target="_blank" rel="noopener noreferrer">QueryStream</a>；
+          <a href="https://arxiv.org/pdf/2601.15655" target="_blank" rel="noopener noreferrer">Event-VStream</a>；
+          <a href="https://arxiv.org/pdf/2601.06843" target="_blank" rel="noopener noreferrer">Speak While Watching</a>；
+          <a href="https://arxiv.org/pdf/2601.14724" target="_blank" rel="noopener noreferrer">HERMES</a>
+        </td>
+        <td>Learning to Respond 详见下方「会议标注」OpenReview 状态</td>
+      </tr>
+      <tr>
+        <td><strong>2026.02</strong></td>
+        <td>
+          Seed2.0（Model Card）；
+          <a href="https://arxiv.org/pdf/2602.01683" target="_blank" rel="noopener noreferrer">FreshMem</a>；
+          <a href="https://arxiv.org/pdf/2602.18434" target="_blank" rel="noopener noreferrer">MemStream</a>；
+          <a href="https://arxiv.org/pdf/2602.08448" target="_blank" rel="noopener noreferrer">Vista</a>；
+          <a href="https://arxiv.org/pdf/2602.22142" target="_blank" rel="noopener noreferrer">WeaveTime</a>；
+          <a href="https://arxiv.org/pdf/2602.22455" target="_blank" rel="noopener noreferrer">Exploring Multimodal LMMs… Edge</a>
+        </td>
+        <td>清单中 QueryStream 亦标为 2026.02，与 2026.01 OpenReview 记录实为<strong>同一稿件</strong></td>
+      </tr>
+      <tr>
+        <td><strong>2026.03</strong></td>
+        <td>
+          Proact-VL、StreamReady、STRIDE、Thinking in Streaming Video、FluxMem、CurveStream、StreamingClaw TR、WAT、FlexMem、PEARL、Click-to-Ask、VST、TaYS、Think While Watching、ColorTrigger、StreamMind（条目日期）、及其他 Thinking/Memory/Interaction 分区重复行 —— 均见正文表格
+        </td>
+        <td>2026.03 为清单<strong>密度峰值</strong>：记忆与 thinking 交错刊登</td>
+      </tr>
+      <tr>
+        <td><strong>2026.04</strong></td>
+        <td>
+          <a href="https://arxiv.org/pdf/2604.04184" target="_blank" rel="noopener noreferrer">AURA</a>；
+          <a href="https://arxiv.org/pdf/2604.06036" target="_blank" rel="noopener noreferrer">CodecSight</a>；
+          <a href="https://arxiv.org/pdf/2604.02317" target="_blank" rel="noopener noreferrer">A Simple Baseline for Streaming Video Understanding</a>
+        </td>
+        <td>偏<strong>系统侧</strong>与<strong>可复现基线</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="compare-section" style="margin-top:28px">
+    <h3>综合对比结论（供选型）</h3>
+    <ul style="color:var(--muted);line-height:1.75;margin-left:1.2rem">
+      <li>若以<strong>最低接入成本</strong>为先：SimpleStream、Training-free 的 QueryStream 插件式剪枝、或 StreamMind 类浅层门控可作为第一站。</li>
+      <li>若以<strong>长流语义一致性</strong>为先：优先考察层级 KV / 曲率–频率混合记忆（HERMES、FluxMem、CurveStream、FreshMem）与推理摘要记忆（ThinkStream）。</li>
+      <li>若以<strong>人机共生交互</strong>为先：AURA / Proact-VL / Seed2.0 产品线论文通常 bundled <strong>benchmark</strong>，适合做端到端场景对齐。</li>
+    </ul>
+  </div>
+</section>
+
+<section class="paper-section" id="venues">
+  <div class="ps-header" style="border-color:#34d399">
+    <div class="ps-icon" style="background:rgba(52,211,153,0.15)">🏛️</div>
+    <div class="ps-title-block">
+      <h2>会议与录用标注（可核验来源）</h2>
+      <div class="ps-en">Verified via OpenReview titles · arXiv / Model Card 标注策略</div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <strong>核验策略：</strong>本站只对<strong>亲自核对 OpenReview 页面标题栏出现录用字样</strong>的条目标注会议；其余保持「预印本 / 技术报告」待更新。<strong>CVPR / ICCV / ACM MM</strong> 等请以 <a href="https://openaccess.thecvf.com/" target="_blank" rel="noopener noreferrer">CVF Open Access</a>、会议官方日程或作者主页为准 —— 避免未核实猜测。
+  </div>
+
+  <table class="paper-mini-table" aria-label="录用核验表">
+    <thead>
+      <tr><th>条目</th><th>来源链接</th><th>标注</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>StreamingVLM（清单日期 2025.10）</td>
+        <td><a href="https://openreview.net/forum?id=gVbPWbA97s" target="_blank" rel="noopener noreferrer">OpenReview</a></td>
+        <td><span class="venue-pill">ICLR 2026 Poster</span>（页面标题栏）</td>
+      </tr>
+      <tr>
+        <td>QueryStream</td>
+        <td><a href="https://openreview.net/forum?id=738HjJEbml" target="_blank" rel="noopener noreferrer">OpenReview</a></td>
+        <td><span class="venue-pill">ICLR 2026 Poster</span></td>
+      </tr>
+      <tr>
+        <td>Learning to Respond…</td>
+        <td><a href="https://openreview.net/forum?id=gmpnSSiJt7" target="_blank" rel="noopener noreferrer">OpenReview</a></td>
+        <td><span class="venue-pill arxiv">Submitted to ICLR 2026</span>（页面所示；是否口头 / Poster 请以终版议程为准）</td>
+      </tr>
+      <tr>
+        <td>其余 2026 arXiv / Model Card</td>
+        <td>正文表格 pdf 链</td>
+        <td><span class="venue-pill arxiv">预印本或未标注会议</span> — 欢迎勘误 PR</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p style="margin-top:18px;color:var(--muted);font-size:0.88rem;line-height:1.65">
+    <strong>维护提示：</strong>录用信息公开时间各异（录用通知 → OpenReview 更新 → CVF 上线）。若你发现某篇已在官网列出录用而本节未更新，可向本仓库提 Issue / PR，并附上<strong>官方 PDF 页眉或 OpenReview 决策截图对应的稳定 URL</strong>。
+  </p>
+</section>

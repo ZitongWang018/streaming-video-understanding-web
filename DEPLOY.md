@@ -76,6 +76,7 @@ node tools/build-streaming-page.mjs
 因此：
 
 - 只改了 **`streaming-video-understanding-source.md`** → 必须再跑一次 **`node tools/sync-streaming.mjs`**，然后用浏览器 **强刷**（如 Ctrl+F5）打开的 `streaming-video-understanding.html`。
+- 只改了 **`tools/_streaming_trends_zh.html`**（中文趋势 / 2026 / 会议表正文）或 **`tools/build-streaming-page.mjs`**（模板样式）→ 运行 **`node tools/build-streaming-page.mjs`** 即可（无需从 README 重新解析）；然后强刷本地 HTML。
 - 只改了 **`streaming-video-understanding.html`** → 保存后刷新就能看到；但若之后又运行上面的生成脚本，**手工改动会被覆盖**（除非你改成改脚本模板 `tools/build-streaming-page.mjs`）。
 - 在线 GitHub Pages 的更新 → 需要 **push 到 GitHub**，等 Actions 部署完成后再刷新线上地址。
 
