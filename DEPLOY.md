@@ -2,6 +2,19 @@
 
 本仓库为**静态 HTML**，使用 GitHub Actions 发布到 GitHub Pages。
 
+## 〇、必读（顺序错了 Actions 会失败）
+
+**必须先启用 Pages，再指望 workflow 跑绿。** 若顺序反了，Actions 里会出现：
+
+`Get Pages site failed` / `Not Found`（指向 GitHub REST「Get a GitHub Pages site」）。
+
+正确顺序：
+
+1. **先做下面「二、在 GitHub 上启用 Pages」全部步骤并保存。**
+2. 再推送代码，或在 **Actions** 里对失败的工作流点 **Re-run all jobs**。
+
+> 说明：`actions/configure-pages` 的 `enablement` 参数需要 **PAT 等非 `GITHUB_TOKEN`**，本仓库 workflow 使用默认 `GITHUB_TOKEN`，因此无法在脚本里替你「从零开通」Pages，必须在网页里点一次。
+
 ## 一、首次推送到你的仓库
 
 在本地项目目录执行（已将远程取名为 `streaming-web`，不影响原有 `origin`）：
@@ -15,12 +28,13 @@ git push -u streaming-web main
 
 **HTTPS 推送权限：** GitHub 已不支持账号密码，请使用 **Personal Access Token (classic)**（勾选 `repo`）代替密码，或改用 SSH：`git@github.com:ZitongWang018/streaming-video-understanding-web.git`。
 
-## 二、在 GitHub 上启用 Pages（仅需一次）
+## 二、在 GitHub 上启用 Pages（仅需一次，且须在 workflow 首次成功前完成）
 
 1. 打开仓库：<https://github.com/ZitongWang018/streaming-video-understanding-web>
 2. **Settings** → **Pages**
 3. **Build and deployment** → **Source** 选择 **GitHub Actions**（不要选 “Deploy from a branch”，除非你改用分支静态托管）。
-4. 保存后，向 `main` 推送会触发 `.github/workflows/deploy-pages.yml`。
+4. 若有 **Visibility** / 访问权限选项，按仓库类型设为 Public 或按文档允许 Pages。
+5. 保存后，到 **Actions** 打开失败的 **Deploy site to GitHub Pages**，点击 **Re-run all jobs**（或再推送一次 `main`）。
 
 首次需在 **Actions** 标签页等待 workflow 绿灯；成功后站点一般为：
 

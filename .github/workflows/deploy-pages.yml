@@ -1,3 +1,6 @@
+# 首次部署必读：
+# 先到仓库 Settings → Pages → Build and deployment → Source 选「GitHub Actions」并保存。
+# 若未启用，`configure-pages` 会因 REST GET /repos/{repo}/pages 返回 404 而失败。
 name: Deploy site to GitHub Pages
 
 on:
