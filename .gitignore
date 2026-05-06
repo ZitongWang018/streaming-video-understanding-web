@@ -1,0 +1,2 @@
+# 构建生成的 HTML 片段（可由 tools/readme-to-streaming-fragment.mjs 重新生成）
+tools/_streaming_readme_fragment.html

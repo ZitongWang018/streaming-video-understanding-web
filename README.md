@@ -40,6 +40,15 @@ The surveys are hosted as interactive HTML pages via GitHub Pages:
 
 **🔗 DS-OCR: visual-context-compression:** https://song2yu.github.io/world-model-vla/visual-context-compression.html
 
+**🔗 Streaming-Video-Understanding:** （同源镜像托管参见下方部署仓库）
+
+### 部署本站到自有仓库（GitHub Pages）
+
+若要将本站推到 **[ZitongWang018/streaming-video-understanding-web](https://github.com/ZitongWang018/streaming-video-understanding-web)** 并启用 Pages，请按 **[DEPLOY.md](./DEPLOY.md)** 操作（远程 `streaming-web`、Actions 发布）。
+
+静态站点生成后即可访问：`https://zitongwang018.github.io/streaming-video-understanding-web/`（以仓库 Pages 设置为准）。
+
+---
 
 No installation required — just open the link in any browser.
 
@@ -50,7 +59,8 @@ No installation required — just open the link in any browser.
 ```
 world-model-vla/
 ├── index.html                          # World Model & VLA Survey (self-contained)
-├── lingbot.html                        # LingBot Tech Stack Survey
+├── streaming-video-understanding.html  # Streaming Video Understanding (Awesome-VLM mirror + 中文评析)
+├── lingbot.html                        # 301-style redirect → streaming-video-understanding.html
 ├── long-video-memory.html              # Long Video Understanding with Memory Survey (2019–2026)
 ├── visual-context-compression.html     # Visual context compression (2024–2026)
 └── genai_interview.html                # 🆕 生成面试题（Transformer/预训练/RLHF/推理优化/生成模型）

@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Streaming-Video-Understanding · VLM 流视频综述镜像</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #23273a;
+      --border: #2e3350;
+      --accent: #6366f1;
+      --accent2: #22d3ee;
+      --accent3: #f59e0b;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --font-scale: 1;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: calc(16px * var(--font-scale)); }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.65;
+    }
+    header {
+      background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 50%, #0c1a2e 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 48px 28px 36px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(99,102,241,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .logo-row {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 18px;
+      position: relative;
+      z-index: 1;
+    }
+    .org-badge {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 6px 16px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    header h1 {
+      font-size: 2rem;
+      font-weight: 900;
+      background: linear-gradient(90deg, #a78bfa, #22d3ee, #f59e0b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+      letter-spacing: -0.02em;
+      position: relative;
+      z-index: 1;
+    }
+    header .subtitle {
+      color: var(--muted);
+      font-size: 0.95rem;
+      max-width: 720px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+    nav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      flex-wrap: wrap;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-back {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      padding: 12px 14px 12px 0;
+      border-right: 1px solid var(--border);
+      margin-right: 10px;
+      white-space: nowrap;
+    }
+    .nav-back:hover { color: var(--text); }
+    nav a.tab {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      padding: 12px 10px;
+      white-space: nowrap;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    nav a.tab:hover { color: var(--text); border-color: var(--accent); }
+    .container { max-width: 1180px; margin: 0 auto; padding: 36px 22px 48px; }
+    .readme-bundle {
+      background: transparent;
+    }
+    .readme-h2 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      margin: 2.2rem 0 1rem;
+      scroll-margin-top: 72px;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+    .readme-h3 {
+      font-size: 1.08rem;
+      font-weight: 700;
+      margin: 1.4rem 0 0.75rem;
+      scroll-margin-top: 68px;
+      color: var(--accent2);
+    }
+    .readme-bundle p {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin-bottom: 12px;
+    }
+    .readme-ul {
+      margin: 10px 0 18px 1.2rem;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+    .readme-ul li { margin-bottom: 6px; }
+    .readme-ul a { color: var(--accent2); }
+    .table-wrap {
+      overflow-x: auto;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    .mtable {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+      margin: 0;
+    }
+    .mtable th {
+      background: var(--surface2);
+      color: var(--muted);
+      font-weight: 600;
+      padding: 8px 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .mtable td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      color: var(--text);
+    }
+    .mtable tr:hover td { background: rgba(35,39,58,0.45); }
+    .mtable a { color: var(--accent2); }
+    .star-badge { vertical-align: middle; margin-left: 4px; max-height: 20px; }
+    body.compact-tables .readme-table { font-size: 0.68rem; }
+    body.compact-tables .mtable th,
+    body.compact-tables .mtable td { padding: 5px 6px; }
+
+    .paper-section { margin-top: 48px; scroll-margin-top: 60px; }
+    .ps-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 22px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #f59e0b;
+    }
+    .ps-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.45rem;
+      flex-shrink: 0;
+    }
+    .ps-title-block h2 { font-size: 1.35rem; font-weight: 800; margin-bottom: 4px; }
+    .ps-title-block .ps-en { font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; }
+
+    .insight-box {
+      background: rgba(99,102,241,0.08);
+      border: 1px solid rgba(99,102,241,0.28);
+      border-left: 3px solid var(--accent);
+      border-radius: 8px;
+      padding: 16px 18px;
+      margin-bottom: 18px;
+      font-size: 0.88rem;
+      color: var(--text);
+      line-height: 1.65;
+    }
+    .insight-box strong { color: var(--accent2); }
+    .compare-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px;
+      margin-bottom: 22px;
+    }
+    .compare-section h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+    .compare-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
+    }
+    .cg-item {
+      text-align: center;
+      padding: 14px;
+      background: var(--bg);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .cg-item .cg-name { font-size: 0.85rem; font-weight: 700; margin-bottom: 8px; }
+    .cg-item .cg-role { font-size: 0.76rem; color: var(--muted); margin-bottom: 10px; line-height: 1.5; }
+    .cg-item .cg-arrow { color: var(--accent3); font-size: 0.78rem; }
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    @media (max-width: 720px) {
+      .info-grid { grid-template-columns: 1fr; }
+    }
+    .info-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+    }
+    .info-block h4 {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 10px;
+    }
+    .info-block ul { list-style: none; }
+    .info-block ul li {
+      font-size: 0.84rem;
+      color: var(--text);
+      padding: 5px 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .info-block ul li:last-child { border: none; }
+    .info-block ul li::before { content: '▸'; color: var(--accent3); flex-shrink: 0; margin-top: 1px; }
+
+    footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 22px 28px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    .read-settings {
+      position: fixed;
+      bottom: 18px;
+      right: 18px;
+      z-index: 240;
+      font-size: 0.78rem;
+    }
+    .read-settings-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+      padding: 12px 14px;
+      min-width: 200px;
+    }
+    .read-settings-panel label { display: block; margin-bottom: 10px; color: var(--muted); }
+    .read-settings-panel input[type="range"] { width: 100%; }
+    .read-settings-toggle {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text);
+      cursor: pointer;
+      margin-bottom: 8px;
+      font-size: 0.78rem;
+    }
+    .read-settings-toggle:hover { border-color: var(--accent); }
+    .read-settings-body { display: none; }
+    .read-settings.open .read-settings-body { display: block; }
+
+    @media (max-width: 640px) {
+      header h1 { font-size: 1.45rem; }
+      nav a.tab { padding: 10px 8px; font-size: 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-row">
+      <a class="org-badge" href="https://github.com/ydyhello/Awesome-VLM-Streaming-Video" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit">
+        <span>📚</span><span>上游仓库 Awesome-VLM-Streaming-Video</span>
+      </a>
+      <span class="org-badge"><span>🎬</span><span>Streaming · Proactive · KV · Benchmarks</span></span>
+      <span class="org-badge"><span>📅</span><span>同步快照 2026-05</span></span>
+    </div>
+    <h1>Streaming-Video-Understanding</h1>
+    <p class="subtitle">
+      面向连续视频流的 VLM / MLLM：主动交互、长程记忆、实时推理与评测资源汇编。
+      下方正文为上游 README 的结构化镜像（表格内链接与 shields 均指向原始论文与代码）。
+    </p>
+  </header>
+
+  <nav>
+    <a class="nav-back" href="index.html">← 返回总览</a>
+    <a class="tab" href="#introduction">导读</a>
+    <a class="tab" href="#contents">目录</a>
+    <a class="tab" href="#project">Project</a>
+    <a class="tab" href="#proactive-interaction">主动交互</a>
+    <a class="tab" href="#long-term-memory-management">记忆</a>
+    <a class="tab" href="#real-time-inference">实时推理</a>
+    <a class="tab" href="#streaming-with-thinking">Thinking</a>
+    <a class="tab" href="#benchmarks">Benchmarks</a>
+    <a class="tab" href="#analysis">综合评析</a>
+  </nav>
+
+  <div class="container">
+    <div class="insight-box" style="margin-bottom:28px">
+      <strong>使用说明：</strong>右下角「阅读设置」可调整整页字号与表格密度，偏好保存在本机 localStorage（键名 <code>svu_prefs_v1</code>）。
+      Star 徽章图片来自 GitHub shields，需联网显示。
+    </div>
+
+    <article class="readme-bundle" id="upstream-readme" aria-label="Awesome list mirror">
+<h2 class="readme-h2" id="introduction">📒 Introduction</h2>
+<p>📚 A curated collection of papers and open-source code repositories dedicated to the application of Vision-Language Models (VLMs) for streaming video.</p>
+<h2 class="readme-h2" id="contents">📖 Contents</h2>
+<ul class="readme-ul"><li><a href="#introduction">📒 Introduction</a></li><li><a href="#project">🛠️ Project</a></li><li><a href="#technical-report">📋 Technical Report</a></li><li><a href="#proactive-interaction">💬 Proactive Interaction</a></li><li><a href="#auxiliary-response-head">Auxiliary Response Head</a></li><li><a href="#generative-token-based-trigger">Generative Token-based Trigger</a></li><li><a href="#rl-optimized-proactive-response">RL-optimized Proactive Response</a></li><li><a href="#training-free--feature-based-trigger">Training-free / Feature-based Trigger</a></li><li><a href="#hybrid-trigger-framework">Hybrid Trigger Framework</a></li><li><a href="#learned-response-timing">Learned Response Timing</a></li><li><a href="#long-term-memory-management">🧠 Long-term Memory Management</a></li><li><a href="#hierarchical-multi-level-memory">Hierarchical Multi-level Memory</a></li><li><a href="#sliding-window--eviction">Sliding-window / Eviction</a></li><li><a href="#token-compression--pruning">Token Compression / Pruning</a></li><li><a href="#kv-cache-compression--retrieval--reuse">KV-Cache Compression / Retrieval / Reuse</a></li><li><a href="#retrieval-augmented-memory">Retrieval-augmented Memory</a></li><li><a href="#semantictextual-abstraction">Semantic/Textual Abstraction</a></li><li><a href="#event-centric-structured-memory">Event-centric Structured Memory</a></li><li><a href="#spatial--3d-memory">Spatial / 3D Memory</a></li><li><a href="#parametric--fast-weight-memory">Parametric / Fast-weight Memory</a></li><li><a href="#real-time-inference">⚡ Real-time Inference</a></li><li><a href="#encoding-decoding-parallelism">Encoding-Decoding Parallelism</a></li><li><a href="#selective-model-invocation">Selective Model Invocation</a></li><li><a href="#visual-token-reduction">Visual Token Reduction</a></li><li><a href="#kv-cache-optimization">KV-Cache Optimization</a></li><li><a href="#streaming-with-thinking">💭 Streaming with Thinking</a></li><li><a href="#benchmarks">📊 Benchmarks</a></li><li><a href="#training-datasets">📦 Training Datasets</a></li><li><a href="#survey">📝 Survey</a></li><li><a href="#resources">🔗 Resources</a></li></ul>
+<h2 class="readme-h2" id="project">🛠️ Project</h2>
+<div class="table-wrap"><table class="mtable readme-table"><thead><tr><th>Date</th><th>Title</th><th>Paper</th><th>Code</th><th>Comment</th></tr></thead><tbody><tr><td>2025.11</td><td>Live VLM WebUI</td><td><a href="https://build.nvidia.com/spark/live-vlm-webui/overview" target="_blank" rel="noopener noreferrer">docs</a></td><td><a href="https://github.com/NVIDIA-AI-IOT/live-vlm-webui" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/NVIDIA-AI-IOT/live-vlm-webui.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Real-Time Vision Language Model Interaction with Webcam Streaming</td></tr></tbody></table></div>
+<h2 class="readme-h2" id="technical-report">📋 Technical Report</h2>
+<div class="table-wrap"><table class="mtable readme-table"><thead><tr><th>Date</th><th>Title</th><th>Paper</th><th>Code</th><th>Comment</th></tr></thead><tbody><tr><td>2026.02</td><td>Seed2.0</td><td><a href="https://lf3-static.bytednsdoc.com/obj/eden-cn/lapzild-tss/ljhwZthlaukjlkulzlp/seed2/0214/Seed2.0%20Model%20Card.pdf" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/ByteDance-Seed/Seed2.0" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/ByteDance-Seed/Seed2.0.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Doubao Video Calling; OVBench &amp; LiveSports-3K &amp; OVOBench &amp; ODVBench &amp; ViSpeak</td></tr><tr><td>2025.12</td><td>Seed1.8</td><td><a href="https://github.com/ByteDance-Seed/Seed-1.8/blob/main/Seed-1.8-Modelcard.pdf" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/ByteDance-Seed/Seed-1.8" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/ByteDance-Seed/Seed-1.8.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Doubao Video Calling; OVBench &amp; LiveSports-3K &amp; OVOBench &amp; ViSpeak &amp; StreamingBench &amp; OmniMMI</td></tr></tbody></table></div>
+<h2 class="readme-h2" id="proactive-interaction">💬 Proactive Interaction</h2>
+<h3 class="readme-h3" id="auxiliary-response-head">Auxiliary Response Head</h3>
+<div class="table-wrap"><table class="mtable readme-table"><thead><tr><th>Date</th><th>Title</th><th>Paper</th><th>Code</th><th>Comment</th></tr></thead><tbody><tr><td>2026.03</td><td>Proact-VL: A Proactive VideoLLM for Real-Time AI Companions</td><td><a href="https://arxiv.org/pdf/2603.03447" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/microsoft/AnthropomorphicIntelligence/tree/main/Proact-VL" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/microsoft/AnthropomorphicIntelligence.svg?style=social" alt="" loading="lazy" height="20" /></td><td>\&lt;|FLAG|\&gt;Token Response Head with Transition-Smoothed Classification &amp; Stability Regularization</td></tr><tr><td>2026.03</td><td>StreamReady: Learning What to Answer and When in Long Streaming Videos</td><td><a href="https://arxiv.org/pdf/2603.08620" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Learnable \ Token with Readiness Head for Evidence-Gated Response Triggering</td></tr><tr><td>2025.05</td><td>StreamBridge: Turning Your Offline Video Large Language Model into a Proactive Streaming Assistant</td><td><a href="https://arxiv.org/pdf/2505.05467" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/apple/ml-streambridge" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/apple/ml-streambridge.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Activation Model via \ Token with Binary Score Head</td></tr><tr><td>2025.03</td><td>ViSpeak: Visual Instruction Feedback in Streaming Videos</td><td><a href="https://arxiv.org/pdf/2503.12769" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/HumanMLLM/ViSpeak" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/HumanMLLM/ViSpeak.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Informative Head for \ Token</td></tr><tr><td>2025.03</td><td>StreamMind: Unlocking Full Frame Rate Streaming Video Dialogue through Event-Gated Cognition</td><td><a href="https://arxiv.org/pdf/2503.06220" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/xinding-sys/StreamMind" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/xinding-sys/StreamMind.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Cognition Gate Network (Shallow Layer Transfer from LLM) for Binary \ / \ Classification</td></tr><tr><td>2025.01</td><td>Dispider: Enabling Video LLMs with Active Real-Time Interaction via Disentangled Perception, Decision, and Reaction</td><td><a href="https://arxiv.org/pdf/2501.03218" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/Mark12Ding/Dispider" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/Mark12Ding/Dispider.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Binary Classification Head on \ Token Embedding (BCE Loss); \ for History Marking; \ for Reaction-Stage Filtering</td></tr><tr><td>2024.11</td><td>VideoLLM Knows When to Speak: Enhancing Time-Sensitive Video Comprehension with Video-Text Duet Interaction Format</td><td><a href="https://arxiv.org/pdf/2411.17991" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/yellow-binary-tree/mmduet" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/yellow-binary-tree/mmduet.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Informative Head &amp; Relevance Head</td></tr></tbody></table></div>
+<h3 class="readme-h3" id="generative-token-based-trigger">Generative Token-based Trigger</h3>
+<div class="table-wrap"><table class="mtable readme-table"><thead><tr><th>Date</th><th>Title</th><th>Paper</th><th>Code</th><th>Comment</th></tr></thead><tbody><tr><td>2026.04</td><td>AURA: Always-On Understanding and Real-Time Assistance via Video Streams</td><td><a href="https://arxiv.org/pdf/2604.04184" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/aurateam2026/AURA" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/aurateam2026/AURA.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Unified \&lt;|silent|\&gt; Token for Silent Observation with Real-Time QA / Proactive QA / Multi-Response QA; Silent-Speech Balanced Loss</td></tr><tr><td>2026.03</td><td>STRIDE: When to Speak Meets Sequence Denoising for Streaming Video Understanding</td><td><a href="https://arxiv.org/pdf/2603.27593" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/interlive-team/STRIDE" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/interlive-team/STRIDE.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Activation Token Denoising over 0/1/[M]; Sequence Duplication; Selective Re-masking</td></tr><tr><td>2025.12</td><td>Streaming Video Instruction Tuning</td><td><a href="https://arxiv.org/pdf/2512.21334" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/maifoundations/Streamo" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/maifoundations/Streamo.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Three-State Response Tokens (\, \,\) via Unified Next-Token Prediction; Focal Loss for Response Imbalance</td></tr><tr><td>2025.06</td><td>Proactive Assistant Dialogue Generation from Streaming Egocentric Videos</td><td><a href="https://arxiv.org/pdf/2506.05904" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/pro-assist/ProAssist" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/pro-assist/ProAssist.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Frame-Level [EOS] Silence Prediction with Negative Frame Sub-Sampling</td></tr><tr><td>2025.03</td><td>LION-FS: Fast &amp; Slow Video-Language Thinker as Online Video Assistant</td><td><a href="https://arxiv.org/pdf/2503.03663" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/JiuTian-VL/LION-FS" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/JiuTian-VL/LION-FS.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Streaming EOS Prediction via Fast-Slow Dual-Path; Token Aggregation &amp; Dropping Router for Visual Feature Compression</td></tr><tr><td>2025.03</td><td>AssistPDA: An Online Video Surveillance Assistant for Video Anomaly Prediction, Detection, and Analysis</td><td><a href="https://arxiv.org/pdf/2503.21904" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>EOS Prediction with Task-Adaptive Threshold for Anomaly Alerting</td></tr><tr><td>2024.07</td><td>What to Say and When to Say it: Live Fitness Coaching as a Testbed for Situated Interaction</td><td><a href="https://arxiv.org/pdf/2407.08101" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/Qualcomm-AI-research/FitCoach" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/Qualcomm-AI-research/FitCoach.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Action Tokens \ and \</td></tr><tr><td>2024.06</td><td>VideoLLM-online: Online Video Large Language Model for Streaming Video</td><td><a href="https://arxiv.org/pdf/2406.11816" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/showlab/videollm-online" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/showlab/videollm-online.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Streaming EOS Token Prediction</td></tr></tbody></table></div>
+<h3 class="readme-h3" id="rl-optimized-proactive-response">RL-optimized Proactive Response</h3>
+<div class="table-wrap"><table class="mtable readme-table"><thead><tr><th>Date</th><th>Title</th><th>Paper</th><th>Code</th><th>Comment</th></tr></thead><tbody><tr><td>2026.03</td><td>Thinking in Streaming Video</td><td><a href="https://arxiv.org/pdf/2603.12938" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/johncaged/ThinkStream" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/johncaged/ThinkStream.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Watch-Think-Speak with \ &amp; \ Action Tokens; Streaming RLVR (Format + Time + Accuracy Reward)</td></tr><tr><td>2026.01</td><td>Learning to Respond: A Large-Scale Benchmark and Progressive Learning Framework for Trigger-Centric Online Video Understanding</td><td><a href="https://openreview.net/pdf?id=gmpnSSiJt7" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Trigger-Centric Online Video Understanding</td></tr><tr><td>2025.12</td><td>MMDuet2: Enhancing Proactive Interaction of Video MLLMs with Multi-Turn Reinforcement Learning</td><td><a href="https://arxiv.org/pdf/2512.06810" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/yellow-binary-tree/MMDuet2" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/yellow-binary-tree/MMDuet2.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Text-to-Text &quot;NO REPLY&quot; Response Decision with Multi-Objective Reward (PAUC + Replication + In-Span + Prefix) GRPO</td></tr></tbody></table></div>
+<h3 class="readme-h3" id="training-free--feature-based-trigger">Training-free / Feature-based Trigger</h3>
+<div class="table-wrap"><table class="mtable readme-table"><thead><tr><th>Date</th><th>Title</th><th>Paper</th><th>Code</th><th>Comment</th></tr></thead><tbody><tr><td>2026.03</td><td>FluxMem: Adaptive Hierarchical Memory for Streaming Video Understanding</td><td><a href="https://arxiv.org/pdf/2603.02096" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/YiwengXie/FluxMem" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/YiwengXie/FluxMem.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Scene-Change Ratio Trigger Reusing Temporal Adjacency Selection Statistics</td></tr><tr><td>2026.01</td><td>QueryStream: Advancing Streaming Video Understanding with Query-Aware Pruning and Proactive Response</td><td><a href="https://openreview.net/pdf?id=738HjJEbml" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Relevance-Triggered Active Response</td></tr><tr><td>2026.01</td><td>Event-VStream: Event-Driven Real-Time Understanding for Long Video Streams</td><td><a href="https://arxiv.org/pdf/2601.15655" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Motion-Semantic-Prediction Boundary Score; Adaptive Threshold; Event-triggered Decoding</td></tr><tr><td>2025.11</td><td>LiveStar: Live Streaming Assistant for Real-World Online Video Understanding</td><td><a href="https://arxiv.org/pdf/2511.05299" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/sotayang/LiveStar" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/sotayang/LiveStar.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Streaming Verification Decoding Perplexity Gate for Response &amp; Silence</td></tr><tr><td>2025.08</td><td>StreamAgent: Towards Anticipatory Agents for Streaming Video Understanding</td><td><a href="https://arxiv.org/pdf/2508.01875" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Reactive/Proactive/Speculative Planning; Heuristic Trigger; Tool-Guided Information Hunting</td></tr></tbody></table></div>
+<h3 class="readme-h3" id="hybrid-trigger-framework">Hybrid Trigger Framework</h3>
+<div class="table-wrap"><table class="mtable readme-table"><thead><tr><th>Date</th><th>Title</th><th>Paper</th><th>Code</th><th>Comment</th></tr></thead><tbody><tr><td>2026.03</td><td>Em-Garde: A Propose-Match Framework for Proactive Streaming Video Understanding</td><td><a href="https://arxiv.org/pdf/2603.19054" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/air-embodied-brain/Em-Garde" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/air-embodied-brain/Em-Garde.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Query-Time Instruction-Guided Visual Proposal Generation (SFT+GRPO); Lightweight Embedding Cosine Similarity Surge Triggering</td></tr><tr><td>2026.03</td><td>StreamingClaw Technical Report</td><td><a href="https://arxiv.org/pdf/2603.22120" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Training-Free (Reminder Node); Training-Based (Scenario-Specific Trigger Tokens)</td></tr></tbody></table></div>
+<h3 class="readme-h3" id="learned-response-timing">Learned Response Timing</h3>
+<div class="table-wrap"><table class="mtable readme-table"><thead><tr><th>Date</th><th>Title</th><th>Paper</th><th>Code</th><th>Comment</th></tr></thead><tbody><tr><td>2025.10</td><td>Eyes Wide Open: Ego Proactive Video-LLM for Streaming Video</td><td><a href="https://arxiv.org/pdf/2510.14560" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/SooLab/EyeWO" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/SooLab/EyeWO.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Weighted Interval Supervision &amp; Uncertainty-Guided High-Resolution Requests</td></tr><tr><td>2025.02</td><td>EgoSpeak: Learning When to Speak for Egocentric Conversational Agents in the Wild</td><td><a href="https://arxiv.org/pdf/2502.14892" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/jun297/EgoSpeak" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/jun297/EgoSpeak.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Standalone Audio-Visual Frame-Level Three-Way Classifier (Background / Self / Other) with Anticipatory Prediction</td></tr></tbody></table></div>
+<h2 class="readme-h2" id="long-term-memory-management">🧠 Long-term Memory Management</h2>
+<h3 class="readme-h3" id="hierarchical-multi-level-memory">Hierarchical Multi-level Memory</h3>
+<div class="table-wrap"><table class="mtable readme-table"><thead><tr><th>Date</th><th>Title</th><th>Paper</th><th>Code</th><th>Comment</th></tr></thead><tbody><tr><td>2026.03</td><td>CurveStream: Boosting Streaming Video Understanding in MLLMs via Curvature-Aware Hierarchical Visual Memory Management</td><td><a href="https://arxiv.org/pdf/2603.19571" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Curvature-Aware Scorer (Motion Variation + Geometric Curvature); EMA-Based K-Sigma Dynamic Thresholding; Hierarchical Clear/Blurred/Discard Memory with FIFO Eviction</td></tr><tr><td>2026.03</td><td>StreamingClaw Technical Report</td><td><a href="https://arxiv.org/pdf/2603.22120" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Hierarchical Memory Evolution</td></tr><tr><td>2026.03</td><td>StreamReady: Learning What to Answer and When in Long Streaming Videos</td><td><a href="https://arxiv.org/pdf/2603.08620" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>3-Level Visual Memory Tree (FIFO-Centroid-Prototype) &amp; Contextual Memory Bank</td></tr><tr><td>2026.03</td><td>WAT: Online Video Understanding Needs Watching Before Thinking</td><td><a href="https://arxiv.org/pdf/2603.13412" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Dual-Level Memory: Short-Term FIFO Queue + Long-Term Memory with Redundancy-Aware Eviction Policy</td></tr><tr><td>2026.03</td><td>Scaling the Long Video Understanding of Multimodal Large Language Models via Visual Memory Mechanism</td><td><a href="https://arxiv.org/pdf/2603.29252" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/city1517/FlexMem" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/city1517/FlexMem.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Dual-Pathway Compression for Context Memory and Local Memory; Visual KV-Cache Memory Bank; Cross-attention Memory Recall &amp; MemIndex</td></tr><tr><td>2026.03</td><td>FluxMem: Adaptive Hierarchical Memory for Streaming Video Understanding</td><td><a href="https://arxiv.org/pdf/2603.02096" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/YiwengXie/FluxMem" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/YiwengXie/FluxMem.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Three-Level Hierarchical Memory (Short/Mid/Long-Term); Temporal Adjacency Selection &amp; Spatial Domain Consolidation</td></tr><tr><td>2026.02</td><td>FreshMem: Brain-Inspired Frequency-Space Hybrid Memory for Streaming Video Understanding</td><td><a href="https://arxiv.org/pdf/2602.01683" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Short-term Sliding Window + Multi-scale Frequency Memory + Space Thumbnail Memory</td></tr><tr><td>2026.01</td><td>HERMES: KV Cache as Hierarchical Memory for Efficient Streaming Video Understanding</td><td><a href="https://arxiv.org/pdf/2601.14724" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/haowei-freesky/HERMES" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/haowei-freesky/HERMES.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Hierarchical KV-Cache (Sensory-Working-Long-Term Memory); Exponential Forgetting Curve &amp; Frame-Level Anchor Tokens; Cross-Layer Memory Smoothing &amp; Position Re-Indexing</td></tr><tr><td>2025.12</td><td>Venus: An Efficient Edge Memory-and-Retrieval System for VLM-based Online Video Understanding</td><td><a href="https://arxiv.org/pdf/2512.07344" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Hierarchical Raw Data Layer &amp; Semantic Index Layer; Scene Segmentation and Incremental Clustering for Sparse Memory Construction</td></tr><tr><td>2025.08</td><td>StreamAgent: Towards Anticipatory Agents for Streaming Video Understanding</td><td><a href="https://arxiv.org/pdf/2508.01875" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Streaming KV-Cache; CPU Long-Term &amp; GPU Short-Term Hierarchical Memory; Layer-Adaptive KV Recall</td></tr><tr><td>2025.07</td><td>StreamVLN: Streaming Vision-and-Language Navigation via SlowFast Context Modeling</td><td><a href="https://arxiv.org/pdf/2507.05240" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/InternRobotics/StreamVLN" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/InternRobotics/StreamVLN.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Sliding-Window KV-Cache with Selective Offloading; 3D Voxel-Based Spatial Token Pruning for Cross-Frame Redundancy Removal</td></tr><tr><td>2025.01</td><td>Streaming Video Understanding and Multi-round Interaction with Memory-enhanced Knowledge</td><td><a href="https://arxiv.org/pdf/2501.13468" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/hmxiong/StreamChat" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/hmxiong/StreamChat.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Hierarchical Memory: Ebbinghaus Forgetting Curve Short-Term + Tree-Structured Clustering Long-Term + FAISS Dialogue Memory; Forgetting Probability-Based Frame Sampling</td></tr><tr><td>2024.09</td><td>VideoLLaMB: Long Streaming Video Understanding with Recurrent Memory Bridges</td><td><a href="https://arxiv.org/pdf/2409.01071" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/bigai-nlco/VideoLLaMB" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/bigai-nlco/VideoLLaMB.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Recurrent Memory Bridge with Self-Attention Recursive Update &amp; Retrieval Attention; SceneTiling Semantic Segmentation; Linear Memory Scaling</td></tr></tbody></table></div>
+<h3 class="readme-h3" id="sliding-window--eviction">Sliding-window / Eviction</h3>
+<div class="table-wrap"><table class="mtable readme-table"><thead><tr><th>Date</th><th>Title</th><th>Paper</th><th>Code</th><th>Comment</th></tr></thead><tbody><tr><td>2026.04</td><td>AURA: Always-On Understanding and Real-Time Assistance via Video Streams</td><td><a href="https://arxiv.org/pdf/2604.04184" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/aurateam2026/AURA" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/aurateam2026/AURA.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Dual Sliding-Window Context over Recent Video and QA History; Out-of-Window Video Chunks and \&lt;|silent|\&gt; Tokens Discarded</td></tr><tr><td>2026.04</td><td>A Simple Baseline for Streaming Video Understanding</td><td><a href="https://arxiv.org/pdf/2604.02317" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/EvolvingLMMs-Lab/SimpleStream" target="_blank" rel="noopener noreferrer">GitHub</a><img class="star-badge" src="https://img.shields.io/github/stars/EvolvingLMMs-Lab/SimpleStream.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Fixed Recent-frame Sliding Window; Old-frame Eviction without External Memory</td></tr><tr><td>2026.03</td><td>Proact-VL: A Proactive VideoLLM for Real-Time AI Companions</td><td><a href="https://arxiv.org/pdf/2603.03447" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/microsoft/AnthropomorphicIntelligence/tree/main/Proact-VL" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/microsoft/AnthropomorphicIntelligence.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Dual-Cache (System &amp; Streaming) Sliding Window with Reverse-RoPE Eviction for Infinite Streaming</td></tr><tr><td>2026.03</td><td>STRIDE: When to Speak Meets Sequence Denoising for Streaming Video Understanding</td><td><a href="https://arxiv.org/pdf/2603.27593" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/interlive-team/STRIDE" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/interlive-team/STRIDE.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Bounded Visual Cache Eviction; Sliding-window Frame Retention</td></tr></tbody></table></div>
+<h3 class="readme-h3" id="token-compression--pruning">Token Compression / Pruning</h3>
+<div class="table-wrap"><table class="mtable readme-table"><thead><tr><th>Date</th><th>Title</th><th>Paper</th><th>Code</th><th>Comment</th></tr></thead><tbody><tr><td>2025.10</td><td>Recurrent Attention-based Token Selection for Efficient Streaming Video-LLMs</td><td><a href="https://arxiv.org/pdf/2510.17364" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Attention-Score-Based Visual Token Selection with Recurrent FIFO Token Queue; Maximal Marginal Relevance Caption Retrieval</td></tr><tr><td>2025.05</td><td>StreamBridge: Turning Your Offline Video Large Language Model into a Proactive Streaming Assistant</td><td><a href="https://arxiv.org/pdf/2505.05467" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/apple/ml-streambridge" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/apple/ml-streambridge.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Producer-Consumer Memory Buffer with Conditional Round-Decayed Token Compression (Prioritizing Recent Frames)</td></tr><tr><td>2025.04</td><td>TimeChat-Online: 80% Visual Tokens are Naturally Redundant in Streaming Videos</td><td><a href="https://arxiv.org/pdf/2504.17343" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/yaolinli/TimeChat-Online" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/yaolinli/TimeChat-Online.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Differential Token Drop (Primary); FIFO Slimmed Token Memory Bank (Supplementary)</td></tr><tr><td>2025.03</td><td>VideoScan: Enabling Efficient Streaming Video Understanding via Frame-level Semantic Carriers</td><td><a href="https://arxiv.org/pdf/2503.09387" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/LyliAgave/VideoScan" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/LyliAgave/VideoScan.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Single Semantic Carrier Token per Frame (Avg-Pool Embedding + Reused KV Aggregation); Cosine Similarity-Based Dynamic Memory Bank Eviction</td></tr></tbody></table></div>
+<h3 class="readme-h3" id="kv-cache-compression--retrieval--reuse">KV-Cache Compression / Retrieval / Reuse</h3>
+<div class="table-wrap"><table class="mtable readme-table"><thead><tr><th>Date</th><th>Title</th><th>Paper</th><th>Code</th><th>Comment</th></tr></thead><tbody><tr><td>2026.02</td><td>Going Down Memory Lane: Scaling Tokens for Video Stream Understanding with Dynamic KV-Cache Memory</td><td><a href="https://arxiv.org/pdf/2602.18434" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/vatsalag99/MemStream" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/vatsalag99/MemStream.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Adaptive Key Selection for Sparse Sliding-Window Encoding; Training-Free Retrieval MoE via Reciprocal Rank Fusion of Internal &amp; External Signals</td></tr><tr><td>2025.12</td><td>V-Rex: Real-Time Streaming Video LLM Acceleration via Dynamic KV Cache Retrieval</td><td><a href="https://arxiv.org/pdf/2512.12284" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Hash-Bit Hamming Clustering &amp; Weighted Cumulative Sum Early-Exit Thresholding for Dynamic KV-Cache Retrieval; Hierarchical Memory Offloading</td></tr><tr><td>2025.11</td><td>StreamKV: Streaming Video Question-Answering with Segment-based KV Cache Retrieval and Compression</td><td><a href="https://arxiv.org/pdf/2511.07278" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/sou1p0wer/StreamKV" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/sou1p0wer/StreamKV.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Cosine Similarity-Based Dynamic Semantic Segmentation; Summary-Vector Representative Key Retrieval; Guidance-Prompt-Driven KV Compression with Layer-Adaptive Budget Allocation</td></tr><tr><td>2025.11</td><td>LiveStar: Live Streaming Assistant for Real-World Online Video Understanding</td><td><a href="https://arxiv.org/pdf/2511.05299" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/sotayang/LiveStar" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/sotayang/LiveStar.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Peak-End Memory Compression &amp; Dual-Level Streaming KV Cache</td></tr><tr><td>2025.10</td><td>StreamingTOM: Streaming Token Compression for Efficient Video Understanding</td><td><a href="https://arxiv.org/pdf/2510.18269" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/YIGE24/StreamingTOM" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/YIGE24/StreamingTOM.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Causal Temporal Token Reduction (Static-Dynamic DPC &amp; Attention Selection) + Online 4-bit Quantized KV Memory with Representative-Key Retrieval</td></tr><tr><td>2025.08</td><td>StreamMem: Query-Agnostic KV Cache Memory for Streaming Video Understanding</td><td><a href="https://arxiv.org/pdf/2508.15717" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Chat Template Proxy Query for Query-Agnostic KV-Cache Pruning &amp; Weighted Merging</td></tr><tr><td>2025.06</td><td>InfiniPot-V: Memory-Constrained KV Cache Compression for Streaming Video Understanding</td><td><a href="https://arxiv.org/pdf/2506.15745" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/aiha-lab/InfiniPot-V" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/aiha-lab/InfiniPot-V.svg?style=social" alt="" loading="lazy" height="20" /></td><td>KV-Cache Compression with Temporal-Axis Redundancy Pruning &amp; Value-Norm Ranking with Layer-Adaptive Pooling</td></tr><tr><td>2025.05</td><td>LiveVLM: Efficient Online Video Understanding via Streaming-Oriented KV Cache and Retrieval</td><td><a href="https://arxiv.org/pdf/2505.15269" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Streaming-Oriented KV Cache with Video-Specific KV Compression; Frame-Wise KV Merging &amp; FIFO KV Chunk Memory</td></tr></tbody></table></div>
+<h3 class="readme-h3" id="retrieval-augmented-memory">Retrieval-augmented Memory</h3>
+<div class="table-wrap"><table class="mtable readme-table"><thead><tr><th>Date</th><th>Title</th><th>Paper</th><th>Code</th><th>Comment</th></tr></thead><tbody><tr><td>2026.03</td><td>PEARL: Personalized Streaming Video Understanding Model</td><td><a href="https://arxiv.org/pdf/2603.20422" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/Yuanhong-Zheng/PEARL" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/Yuanhong-Zheng/PEARL.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Dual-Grained Memory (Streaming Memory + Concept Memory); Concept-Aware Retrieval with Query Rewriting for Personalized Concept Grounding</td></tr><tr><td>2026.02</td><td>Vista: Scene-Aware Optimization for Streaming Video Question Answering under Post-Hoc Queries</td><td><a href="https://arxiv.org/pdf/2602.08448" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Scene-aware Segmentation; Temporal-Spatial Scene Token Compression; CPU Offloaded Full Frames with Query-conditioned Top-k Recall</td></tr><tr><td>2026.02</td><td>WeaveTime: Stream from Earlier Frames into Emergent Memory in VideoLLMs</td><td><a href="https://arxiv.org/pdf/2602.22142" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/zhangyl4/weavetime" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/zhangyl4/weavetime.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Uncertainty-Gated Hierarchical Retrieval with Entropy-Threshold Triggered Past Context Access</td></tr><tr><td>2025.12</td><td>CogStream: Context-guided Streaming Video Question Answering</td><td><a href="https://arxiv.org/pdf/2506.10516" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/LiamZhao326/CogStream" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/LiamZhao326/CogStream.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Temporal-Semantic Clustering with Question-Aware Event Compression; Historical Dialogue Retrieval via LLM Selection</td></tr><tr><td>2025.11</td><td>CacheFlow: Compressive Streaming Memory for Efficient Long-Form Video Understanding</td><td><a href="https://arxiv.org/pdf/2511.13644" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Dynamic Token Dropping; GRU-Based Compressive Memory; KV Offloading and Rehydration; Consensus-First Retrieval</td></tr><tr><td>2025.06</td><td>Flash-VStream: Efficient Real-Time Understanding for Long Video Streams</td><td><a href="https://arxiv.org/pdf/2506.23825" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/IVGSZ/Flash-VStream" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/IVGSZ/Flash-VStream.svg?style=social" alt="" loading="lazy" height="20" /></td><td>K-Means Clustered Context Synopsis Memory &amp; Feature-Centric Detail Augmentation Memory with Disk-Offloadable Feature Bank</td></tr><tr><td>2025.03</td><td>Streaming Video Question-Answering with In-context Video KV-Cache Retrieval</td><td><a href="https://arxiv.org/pdf/2503.00540" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/Becomebright/ReKV" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/Becomebright/ReKV.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Sliding-Window Encoding with KV-Cache Offloading to RAM/Disk; Internal (Self-Attention Key Averaging) &amp; External (CLIP Cosine Similarity) Frame-Level Retrieval</td></tr></tbody></table></div>
+<h3 class="readme-h3" id="semantictextual-abstraction">Semantic/Textual Abstraction</h3>
+<div class="table-wrap"><table class="mtable readme-table"><thead><tr><th>Date</th><th>Title</th><th>Paper</th><th>Code</th><th>Comment</th></tr></thead><tbody><tr><td>2026.03</td><td>Click-to-Ask: An AI Live Streaming Assistant with Offline Copywriting and Online Interactive QA</td><td><a href="https://arxiv.org/pdf/2603.18649" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Streaming Event Segmentation; Event-level Historical Caption Memory; Knowledge Extraction Accelerator</td></tr><tr><td>2026.03</td><td>Thinking in Streaming Video</td><td><a href="https://arxiv.org/pdf/2603.12938" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/johncaged/ThinkStream" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/johncaged/ThinkStream.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Reasoning-Compressed Streaming Memory: Visual Sliding Window + Reasoning Tokens as Long-Term Semantic Anchors</td></tr><tr><td>2026.03</td><td>Video Streaming Thinking: VideoLLMs Can Watch and Think Simultaneously</td><td><a href="https://arxiv.org/pdf/2603.12262" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/1ranGuan/VST" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/1ranGuan/VST.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Short-Term Visual Sliding Window &amp; Long-Term Textual Streaming-Thought Memory with FIFO Eviction; Recursive Temporal Segmentation</td></tr><tr><td>2026.02</td><td>Exploring Multimodal LMMs for Online Episodic Memory Question Answering on the Edge</td><td><a href="https://arxiv.org/pdf/2602.22455" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Convert Video into a Lightweight Textual Memory</td></tr><tr><td>2025.06</td><td>Proactive Assistant Dialogue Generation from Streaming Egocentric Videos</td><td><a href="https://arxiv.org/pdf/2506.05904" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/pro-assist/ProAssist" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/pro-assist/ProAssist.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Iterative Progress Summarization as Summary-Based Memory Compression</td></tr><tr><td>2025.04</td><td>Memory-efficient Streaming VideoLLMs for Real-time Procedural Video Understanding</td><td><a href="https://arxiv.org/pdf/2504.13915" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/dibschat/ProVideLLM" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/dibschat/ProVideLLM.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Multimodal Interleaved Cache: Online Verbalization of Visual-to-Text for Long-Term &amp; Short-Term Visual Tokens</td></tr></tbody></table></div>
+<h3 class="readme-h3" id="event-centric-structured-memory">Event-centric Structured Memory</h3>
+<div class="table-wrap"><table class="mtable readme-table"><thead><tr><th>Date</th><th>Title</th><th>Paper</th><th>Code</th><th>Comment</th></tr></thead><tbody><tr><td>2026.02</td><td>EventMemAgent: Hierarchical Event-Centric Memory for Online Video Understanding with Adaptive Tool Use</td><td><a href="https://arxiv.org/pdf/2602.15329" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/lingcco/EventMemAgent" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/lingcco/EventMemAgent.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Event-Centric Dual-Layer Memory (STM with Online Event Segmentation &amp; Reservoir Sampling + LTM with Structured Event Tuples)</td></tr><tr><td>2026.01</td><td>Event-VStream: Event-Driven Real-Time Understanding for Long Video Streams</td><td><a href="https://arxiv.org/pdf/2601.15655" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Event-level Memory Bank; Merge-or-Append Event Consolidation</td></tr><tr><td>2025.12</td><td>VideoScaffold: Elastic-Scale Visual Hierarchies for Streaming Video Understanding in MLLMs</td><td><a href="https://arxiv.org/pdf/2512.22226" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/zheng980629/VideoScaffold" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/zheng980629/VideoScaffold.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Prediction-Guided Elastic-Scale Event Segmentation &amp; Hierarchical Cross-Attention Event Consolidation</td></tr><tr><td>2025.09</td><td>StreamForest: Efficient Online Video Understanding with Persistent Event Memory</td><td><a href="https://arxiv.org/pdf/2509.24871" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/MCG-NJU/StreamForest" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/MCG-NJU/StreamForest.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Event-Level Tree Hierarchy with Adaptive Merging via Similarity &amp; Merge-Count &amp; Temporal Penalty; Short-Term Spatiotemporal Sliding Window</td></tr></tbody></table></div>
+<h3 class="readme-h3" id="spatial--3d-memory">Spatial / 3D Memory</h3>
+<div class="table-wrap"><table class="mtable readme-table"><thead><tr><th>Date</th><th>Title</th><th>Paper</th><th>Code</th><th>Comment</th></tr></thead><tbody><tr><td>2026.01</td><td>OnlineSI: Taming Large Language Model for Online 3D Understanding and Grounding</td><td><a href="https://arxiv.org/pdf/2601.16538" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/StoreBlank/online-spatial-intelligence" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/StoreBlank/online-spatial-intelligence.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Fixed-size Spatial Memory with Time-adaptive Sampling and Concatenation; Explicit Point Cloud and Semantic Memory</td></tr></tbody></table></div>
+<h3 class="readme-h3" id="parametric--fast-weight-memory">Parametric / Fast-weight Memory</h3>
+<div class="table-wrap"><table class="mtable readme-table"><thead><tr><th>Date</th><th>Title</th><th>Paper</th><th>Code</th><th>Comment</th></tr></thead><tbody><tr><td>2025.10</td><td>video-SALMONN S: Streaming Audio-Visual LLMs Beyond Length Limits via Memory</td><td><a href="https://arxiv.org/pdf/2510.11129" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/bytedance/SALMONN/tree/video-salmonn-S" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/bytedance/SALMONN.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Test-Time Training Fast-Weight MLP as Streaming Memory with Dual (Reconstruction + Long-Span Prediction) Objective; Cosine Similarity Token Discarding; Prompt-Dependent Modality-Aware KV-Cache Chunk Reading</td></tr></tbody></table></div>
+<h2 class="readme-h2" id="real-time-inference">⚡ Real-time Inference</h2>
+<h3 class="readme-h3" id="encoding-decoding-parallelism">Encoding-Decoding Parallelism</h3>
+<div class="table-wrap"><table class="mtable readme-table"><thead><tr><th>Date</th><th>Title</th><th>Paper</th><th>Code</th><th>Comment</th></tr></thead><tbody><tr><td>2026.03</td><td>Think-as-You-See: Streaming Chain-of-Thought Reasoning for Large Vision-Language Models</td><td><a href="https://arxiv.org/pdf/2603.02872" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/EIT-NLP/StreamingLLM/tree/main/TaYS" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/EIT-NLP/StreamingLLM.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Parallel Dual KV-Cache with Merge-Generate-Split Loop for Concurrent Encoding-Decoding; Decoupled Cross-Modal RoPE; Near-Zero Time-to-First-Token</td></tr><tr><td>2026.03</td><td>Think While Watching: Online Streaming Segment-Level Memory for Multi-Turn Video Reasoning in MLLMs</td><td><a href="https://arxiv.org/pdf/2603.11896" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/wl666hhh/Think_While_Watching" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/wl666hhh/Think_While_Watching.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Threaded Parallel Watch-Think Pipeline with Async Segment Prefetch &amp; Adaptive Attention Backend</td></tr><tr><td>2026.01</td><td>Speak While Watching: Unleashing TRUE Real-Time Video Understanding Capability of Multimodal Large Language Models</td><td><a href="https://arxiv.org/pdf/2601.06843" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/EIT-NLP/Speak-While-Watching" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/EIT-NLP/Speak-While-Watching.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Decoupled Positional Encoding (Overlapped / Group-Decoupled / Gap-Isolated) for Parallel Perception-Generation Streaming</td></tr></tbody></table></div>
+<h3 class="readme-h3" id="selective-model-invocation">Selective Model Invocation</h3>
+<div class="table-wrap"><table class="mtable readme-table"><thead><tr><th>Date</th><th>Title</th><th>Paper</th><th>Code</th><th>Comment</th></tr></thead><tbody><tr><td>2026.03</td><td>STRIDE: When to Speak Meets Sequence Denoising for Streaming Video Understanding</td><td><a href="https://arxiv.org/pdf/2603.27593" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/interlive-team/STRIDE" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/interlive-team/STRIDE.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Two-stage Activation-to-Generation Pipeline; Event-gated Downstream Video-LLM Invocation</td></tr><tr><td>2026.03</td><td>Color When It Counts: Grayscale-Guided Online Triggering for Always-On Streaming Video Sensing</td><td><a href="https://arxiv.org/pdf/2603.22466" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/lvgd/ColorTrigger" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/lvgd/ColorTrigger.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Windowed Grayscale Affinity Analysis with Quadratic Programming; Credit-Budgeted RGB Activation; Dynamic Token Router with Asymmetric Grayscale and RGB Token Capacity</td></tr><tr><td>2026.03</td><td>StreamMind: Unlocking Full Frame Rate Streaming Video Dialogue through Event-Gated Cognition</td><td><a href="https://arxiv.org/pdf/2503.06220" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/xinding-sys/StreamMind" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/xinding-sys/StreamMind.svg?style=social" alt="" loading="lazy" height="20" /></td><td>SSM-Based Single-Token Perception with Event-Gated Sparse LLM Invocation</td></tr><tr><td>2026.01</td><td>Event-VStream: Event-Driven Real-Time Understanding for Long Video Streams</td><td><a href="https://arxiv.org/pdf/2601.15655" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Boundary-aware Event Pooling; Event-triggered Sparse Decoding; Hysteresis Pacing Control</td></tr><tr><td>2025.09</td><td>Open-ended Hierarchical Streaming Video Understanding with Vision Language Models</td><td><a href="https://arxiv.org/pdf/2509.12145" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Lightweight RNN Streaming Module with Event-Gated Sparse Frozen VLM Invocation</td></tr><tr><td>2025.03</td><td>LION-FS: Fast &amp; Slow Video-Language Thinker as Online Video Assistant</td><td><a href="https://arxiv.org/pdf/2503.03663" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/JiuTian-VL/LION-FS" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/JiuTian-VL/LION-FS.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Routing-Based Response Determination via Fast-Slow Dual-Path; Token Aggregation &amp; Dropping for High-FPS Routing</td></tr></tbody></table></div>
+<h3 class="readme-h3" id="visual-token-reduction">Visual Token Reduction</h3>
+<div class="table-wrap"><table class="mtable readme-table"><thead><tr><th>Date</th><th>Title</th><th>Paper</th><th>Code</th><th>Comment</th></tr></thead><tbody><tr><td>2026.04</td><td>CodecSight: Leveraging Video Codec Signals for Efficient Streaming VLM Inference</td><td><a href="https://arxiv.org/pdf/2604.06036" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Single-pass Compressed-bitstream Ingestion; Motion Vector-guided Patch Pruning; I-frame Anchor KV-Cache Refresh with RoPE-based Position Correction</td></tr><tr><td>2026.04</td><td>A Simple Baseline for Streaming Video Understanding</td><td><a href="https://arxiv.org/pdf/2604.02317" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/EvolvingLMMs-Lab/SimpleStream" target="_blank" rel="noopener noreferrer">GitHub</a><img class="star-badge" src="https://img.shields.io/github/stars/EvolvingLMMs-Lab/SimpleStream.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Fixed Recent-frame Window; Bounded-memory Low-latency Inference</td></tr><tr><td>2026.03</td><td>Thinking in Streaming Video</td><td><a href="https://arxiv.org/pdf/2603.12938" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/johncaged/ThinkStream" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/johncaged/ThinkStream.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Eager Prefill + CUDA Graph Decode-and-Prune</td></tr><tr><td>2026.03</td><td>FluxMem: Adaptive Hierarchical Memory for Streaming Video Understanding</td><td><a href="https://arxiv.org/pdf/2603.02096" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/YiwengXie/FluxMem" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/YiwengXie/FluxMem.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Visual Token Compression via TAS &amp; SDC with Otsu-Based Adaptive Thresholding for Latency &amp; Memory Reduction</td></tr><tr><td>2026.02</td><td>QueryStream: Advancing Streaming Video Understanding with Query-Aware Pruning and Proactive Response</td><td><a href="https://openreview.net/pdf?id=738HjJEbml" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Query-Aware Differential Pruning (QDP) &amp; Relevance-Triggered Active Response (RTAR) Scheduling</td></tr><tr><td>2025.12</td><td>StreamingAssistant: Efficient Visual Token Pruning for Accelerating Online Video Understanding</td><td><a href="https://arxiv.org/pdf/2512.12560" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Checkerboard-Masked Parallel Spatial Pruning with Adjacency-Constrained Redundancy; Query-Agnostic Continuous Pre-Pruning Pipeline</td></tr><tr><td>2025.12</td><td>Accelerating Streaming Video Large Language Models via Hierarchical Token Compression</td><td><a href="https://arxiv.org/pdf/2512.00891" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/lern-to-write/STC" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/lern-to-write/STC.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Hierarchical Token Compression: ViT Cache-Aware Selective Computation &amp; Dual-Anchor Novelty Pruning</td></tr><tr><td>2025.10</td><td>Recurrent Attention-based Token Selection for Efficient Streaming Video-LLMs</td><td><a href="https://arxiv.org/pdf/2510.17364" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Attention-Based Visual Token Compression &amp; Caption-Only Question Answering</td></tr><tr><td>2025.03</td><td>VideoScan: Enabling Efficient Streaming Video Understanding via Frame-level Semantic Carriers</td><td><a href="https://arxiv.org/pdf/2503.09387" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/LyliAgave/VideoScan" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/LyliAgave/VideoScan.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Single Semantic Carrier per Frame; Prefill-Decode Decoupling; Visual Tokens Discarded after Prefill</td></tr><tr><td>2024.08</td><td>VideoLLM-MoD: Efficient Video-Language Streaming with Mixture-of-Depths Vision Computation</td><td><a href="https://arxiv.org/pdf/2408.16730" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Vision Token Computation Skipping with LayerExpert</td></tr></tbody></table></div>
+<h3 class="readme-h3" id="kv-cache-optimization">KV-Cache Optimization</h3>
+<div class="table-wrap"><table class="mtable readme-table"><thead><tr><th>Date</th><th>Title</th><th>Paper</th><th>Code</th><th>Comment</th></tr></thead><tbody><tr><td>2026.04</td><td>AURA: Always-On Understanding and Real-Time Assistance via Video Streams</td><td><a href="https://arxiv.org/pdf/2604.04184" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/aurateam2026/AURA" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/aurateam2026/AURA.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Floating Video/QA Sliding Windows with Batched N' Chunk Truncation for Prefix KV-Cache Reuse and Lower TTFT</td></tr><tr><td>2026.01</td><td>HERMES: KV Cache as Hierarchical Memory for Efficient Streaming Video Understanding</td><td><a href="https://arxiv.org/pdf/2601.14724" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/haowei-freesky/HERMES" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/haowei-freesky/HERMES.svg?style=social" alt="" loading="lazy" height="20" /></td><td>KV-Cache Reuse for Instant Query Response; Hierarchical Token Compression within Fixed Cache Budget</td></tr><tr><td>2025.12</td><td>V-Rex: Real-Time Streaming Video LLM Acceleration via Dynamic KV Cache Retrieval</td><td><a href="https://arxiv.org/pdf/2512.12284" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Hardware-Software Co-Design with Dynamic KV Cache Retrieval Engine Accelerator; Pipelined KV Prediction-Retrieval Overlapped with LLM Computation</td></tr><tr><td>2025.11</td><td>StreamKV: Streaming Video Question-Answering with Segment-based KV Cache Retrieval and Compression</td><td><a href="https://arxiv.org/pdf/2511.07278" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/sou1p0wer/StreamKV" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/sou1p0wer/StreamKV.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Sliding-Window Segment Encoding with Immediate Post-Encoding KV Compression</td></tr><tr><td>2025.10</td><td>StreamingVLM: Real-Time Understanding for Infinite Video Streams</td><td><a href="https://arxiv.org/pdf/2510.09608" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/mit-han-lab/streaming-vlm" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/mit-han-lab/streaming-vlm.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Bounded KV-Cache Eviction for Constant Memory; No Redundant Recomputation across Windows</td></tr><tr><td>2025.10</td><td>StreamingTOM: Streaming Token Compression for Efficient Video Understanding</td><td><a href="https://arxiv.org/pdf/2510.18269" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/YIGE24/StreamingTOM" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/YIGE24/StreamingTOM.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Pre-LLM Causal Token Budget Cap for Prefill Acceleration; Post-LLM Quantized Memory with Selective Dequantization</td></tr><tr><td>2025.05</td><td>LiveVLM: Efficient Online Video Understanding via Streaming-Oriented KV Cache and Retrieval</td><td><a href="https://arxiv.org/pdf/2505.15269" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Pre-Generated Video KV Cache; Mean-Pooled Query-Key Chunk Retrieval with FIFO KV Chunk Management</td></tr><tr><td>2025.03</td><td>Streaming Video Question-Answering with In-context Video KV-Cache Retrieval</td><td><a href="https://arxiv.org/pdf/2503.00540" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/Becomebright/ReKV" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/Becomebright/ReKV.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Multi-Process Parallel Encoding-Answering; Sliding-Window Attention for Stable-Latency Incremental Processing</td></tr></tbody></table></div>
+<h2 class="readme-h2" id="streaming-with-thinking">💭 Streaming with Thinking</h2>
+<div class="table-wrap"><table class="mtable readme-table"><thead><tr><th>Date</th><th>Title</th><th>Paper</th><th>Code</th><th>Comment</th></tr></thead><tbody><tr><td>2026.03</td><td>Think-as-You-See: Streaming Chain-of-Thought Reasoning for Large Vision-Language Models</td><td><a href="https://arxiv.org/pdf/2603.02872" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/EIT-NLP/StreamingLLM/tree/main/TaYS" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/EIT-NLP/StreamingLLM.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Causal Streaming Attention Masking; Decoupled Cross-Modal Positional Encoding; Parallel Dual KV-Cache Mechanism</td></tr><tr><td>2026.03</td><td>Thinking in Streaming Video</td><td><a href="https://arxiv.org/pdf/2603.12938" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/johncaged/ThinkStream" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/johncaged/ThinkStream.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Streaming Watch-Think-Speak Paradigm; Reasoning-Compressed Streaming Memory (RCSM); Streaming RLVR (Format + Time + Accuracy Reward)</td></tr><tr><td>2026.03</td><td>Video Streaming Thinking: VideoLLMs Can Watch and Think Simultaneously</td><td><a href="https://arxiv.org/pdf/2603.12262" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/1ranGuan/VST" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/1ranGuan/VST.svg?style=social" alt="" loading="lazy" height="20" /></td><td>The Video Streaming Thinking Paradigm; VKG-Based Streaming CoT Data Synthesis; Two-Stage VST-SFT &amp; VST-RL Training</td></tr><tr><td>2026.03</td><td>Think While Watching: Online Streaming Segment-Level Memory for Multi-Turn Video Reasoning in MLLMs</td><td><a href="https://arxiv.org/pdf/2603.11896" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/wl666hhh/Think_While_Watching" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/wl666hhh/Think_While_Watching.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Segment-Level Streaming Causal Mask &amp; Positional Encoding; Three-Stage CoT Training; Concurrent Watch-Think Pipeline</td></tr><tr><td>2025.10</td><td>StreamingCoT: A Dataset for Temporal Dynamics and Multimodal Chain-of-Thought Reasoning in Streaming VideoQA</td><td><a href="https://arxiv.org/pdf/2510.25332" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/Fleeting-hyh/StreamingCoT" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/Fleeting-hyh/StreamingCoT.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Streaming VideoQA and multimodal CoT tasks</td></tr></tbody></table></div>
+<h2 class="readme-h2" id="benchmarks">📊 Benchmarks</h2>
+<div class="table-wrap"><table class="mtable readme-table"><thead><tr><th>Date</th><th>Title</th><th>Paper</th><th>Code</th><th>Comment</th></tr></thead><tbody><tr><td>2026.03</td><td>PEARL: Personalized Streaming Video Understanding Model</td><td><a href="https://arxiv.org/pdf/2603.20422" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/Yuanhong-Zheng/PEARL" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/Yuanhong-Zheng/PEARL.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Frame-Level Personalization &amp; Video-Level Personalization; Concept-Definition QA &amp; Real-Time QA &amp; Past-Time QA</td></tr><tr><td>2026.03</td><td>StreamingEval: A Unified Evaluation Protocol towards Realistic Streaming Video Understanding</td><td><a href="https://arxiv.org/pdf/2603.21493" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/wwgTang-111/StreamingEval1" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/wwgTang-111/StreamingEval1.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Streaming Evaluation Protocol</td></tr><tr><td>2026.03</td><td>HomeSafe-Bench: Evaluating Vision-Language Models on Unsafe Action Detection for Embodied Agents in Household</td><td><a href="https://arxiv.org/pdf/2603.11975" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/pujiayue/HomeSafe-Bench" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/pujiayue/HomeSafe-Bench.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Unsafe Action Detection; Early Warning Timing; Severity Assessment</td></tr><tr><td>2026.02</td><td>Artic: AI-oriented Real-time Communication for MLLM Video Assistant</td><td><a href="https://arxiv.org/pdf/2602.12641" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/pku-netvideo/DeViBench" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/pku-netvideo/DeViBench.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Degradation-sensitive QA</td></tr><tr><td>2026.01</td><td>OnlineSI: Taming Large Language Model for Online 3D Understanding and Grounding</td><td><a href="https://arxiv.org/pdf/2601.16538" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/StoreBlank/online-spatial-intelligence" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/StoreBlank/online-spatial-intelligence.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Online 3D Object Detection</td></tr><tr><td>2026.01</td><td>PhoStream: Benchmarking Real-World Streaming for Omnimodal Assistants in Mobile Scenarios</td><td><a href="https://arxiv.org/pdf/2601.22575" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/Lucky-Lance/PhoStream" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/Lucky-Lance/PhoStream.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Mobile-Centric Scenarios; Perception &amp; Interaction &amp; Planning</td></tr><tr><td>2025.12</td><td>StreamEQA: Towards Streaming Video Understanding for Embodied Scenarios</td><td><a href="https://arxiv.org/pdf/2512.04451" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/MrYF-Wang/StreamEQA" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/MrYF-Wang/StreamEQA.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Embodied Scenarios</td></tr><tr><td>2025.12</td><td>StreamGaze: Gaze-Guided Temporal Reasoning and Proactive Understanding in Streaming Videos</td><td><a href="https://arxiv.org/pdf/2512.01707" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/daeunni/StreamGaze" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/daeunni/StreamGaze.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Gaze-Guided Streaming Data; Past &amp; Present &amp; Proactive</td></tr><tr><td>2025.10</td><td>Can Multi-Modal LLMs Provide Live Step-by-Step Task Guidance?</td><td><a href="https://arxiv.org/pdf/2511.21998" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/Qualcomm-AI-research/qualcomm_interactive_cooking_eval" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/Qualcomm-AI-research/qualcomm_interactive_cooking_eval.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Qualcomm Interactive Cooking</td></tr><tr><td>2025.10</td><td>Eyes Wide Open: Ego Proactive Video-LLM for Streaming Video</td><td><a href="https://arxiv.org/pdf/2510.14560" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/zhangyl4/EyeWO" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/zhangyl4/EyeWO.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Explicit Proactives; Implicit Proactive; Contextual Proactive</td></tr><tr><td>2025.07</td><td>OST-Bench: Evaluating the Capabilities of MLLMs in Online Spatio-temporal Scene Understanding</td><td><a href="https://arxiv.org/pdf/2507.07984" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/InternRobotics/OST-Bench" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/InternRobotics/OST-Bench.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Agent State; Agent Visible Info; Agent-Object Spatial Relationship</td></tr><tr><td>2025.07</td><td>ProactiveVideoQA: A Comprehensive Benchmark Evaluating Proactive Interactions in Video Large Language Models</td><td><a href="https://arxiv.org/pdf/2507.09313" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/yellow-binary-tree/ProactiveVideoQA" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/yellow-binary-tree/ProactiveVideoQA.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Proactive Web-Video QA; Proactive Ego-Centric Video QA; Proactive TV-Series Video QA; Proactive Video Anomaly Detection</td></tr><tr><td>2025.07</td><td>Chat with AI: The Surprising Turn of Real-time Video Communication from Human to AI</td><td><a href="https://arxiv.org/pdf/2507.10510" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/JiangkaiWu/DeViBench" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/JiangkaiWu/DeViBench.svg?style=social" alt="" loading="lazy" height="20" /></td><td>DeViBench</td></tr><tr><td>2025.05</td><td>RTV-Bench: Benchmarking MLLM Continuous Perception, Understanding and Reasoning through Real-Time Video</td><td><a href="https://arxiv.org/pdf/2505.02064" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/LJungang/RTV-Bench" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/LJungang/RTV-Bench.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Perception; Understanding; Reasoning</td></tr><tr><td>2025.04</td><td>LiveCC: Learning Video LLM with Streaming Speech Transcription at Scale</td><td><a href="https://arxiv.org/pdf/2504.16030" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/showlab/livecc" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/showlab/livecc.svg?style=social" alt="" loading="lazy" height="20" /></td><td>LiveSports-3K-CC/QA</td></tr><tr><td>2025.03</td><td>OmniMMI: A Comprehensive Multi-modal Interaction Benchmark in Streaming Video Contexts</td><td><a href="https://arxiv.org/pdf/2503.22952" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/OmniMMI/M4" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/OmniMMI/M4.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Streaming Video Understanding; Proactive Reasoning</td></tr><tr><td>2025.02</td><td>SVBench: A Benchmark with Temporal Multi-Turn Dialogues for Streaming Video Understanding</td><td><a href="https://arxiv.org/pdf/2502.10810" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/sotayang/SVBench" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/sotayang/SVBench.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Multi-Turn Dialogues</td></tr><tr><td>2025.01</td><td>Online Video Understanding: OVBench and VideoChat-Online</td><td><a href="https://arxiv.org/pdf/2501.00584" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/MCG-NJU/VideoChat-Online" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/MCG-NJU/VideoChat-Online.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Past; Current; Future</td></tr><tr><td>2025.01</td><td>OVO-Bench: How Far is Your Video-LLMs from Real-World Online Video Understanding?</td><td><a href="https://arxiv.org/pdf/2501.05510" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/JoeLeelyf/OVO-Bench" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/JoeLeelyf/OVO-Bench.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Backward Tracing; Real-Time Understanding; Forward Active Responding</td></tr><tr><td>2025.01</td><td>Streaming Video Understanding and Multi-round Interaction with Memory-enhanced Knowledge</td><td><a href="https://arxiv.org/pdf/2501.13468" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/hmxiong/StreamChat" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/hmxiong/StreamChat.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Object Search; Long-Term Memory Search; Short-Term Memory Search; Conversational Interaction; Knowledge-Based Question Answering; Simple Factual</td></tr><tr><td>2024.11</td><td>StreamingBench: Assessing the Gap for MLLMs to Achieve Streaming Video Understanding</td><td><a href="https://arxiv.org/pdf/2411.03628" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/THUNLP-MT/StreamingBench" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/THUNLP-MT/StreamingBench.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Real-Time Visual Understanding; Omni-Source Understanding; Contextual Understanding</td></tr><tr><td>2024.07</td><td>What to Say and When to Say it: Live Fitness Coaching as a Testbed for Situated Interaction</td><td><a href="https://arxiv.org/pdf/2407.08101" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/Qualcomm-AI-research/FitCoach" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/Qualcomm-AI-research/FitCoach.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Fitness Activity Recognition and Coaching</td></tr><tr><td>2024.03</td><td>MovieChat: From Dense Token to Sparse Memory for Long Video Understanding</td><td><a href="https://arxiv.org/pdf/2307.16449" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/rese1f/MovieChat" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/rese1f/MovieChat.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Movies and TV</td></tr></tbody></table></div>
+<h2 class="readme-h2" id="training-datasets">📦 Training Datasets</h2>
+<div class="table-wrap"><table class="mtable readme-table"><thead><tr><th>Date</th><th>Title</th><th>Paper</th><th>Code</th><th>Comment</th></tr></thead><tbody><tr><td>2026.03</td><td>WAT: Online Video Understanding Needs Watching Before Thinking</td><td><a href="https://arxiv.org/pdf/2603.13412" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Real-Time Perception; Backward Tracing; Forecasting</td></tr><tr><td>2026.03</td><td>Thinking in Streaming Video</td><td><a href="https://arxiv.org/pdf/2603.12938" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/johncaged/ThinkStream" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/johncaged/ThinkStream.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Video Segmentation and Dense Captioning; Diverse Instruction Synthesis; Time-Grounded CoT Generation</td></tr><tr><td>2026.01</td><td>Learning to Respond: A Large-Scale Benchmark and Progressive Learning Framework for Trigger-Centric Online Video Understanding</td><td><a href="https://openreview.net/pdf?id=gmpnSSiJt7" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>TV-Online</td></tr><tr><td>2026.01</td><td>ROMA: Real-time Omni-Multimodal Assistant with Interactive Streaming Understanding</td><td><a href="https://arxiv.org/pdf/2601.10323" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/Eureka-Maggie/ROMA" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/Eureka-Maggie/ROMA.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Online Proactive; Online Narration; Reactive QA</td></tr><tr><td>2025.12</td><td>Streaming Video Instruction Tuning</td><td><a href="https://arxiv.org/pdf/2512.21334" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/maifoundations/Streamo" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/maifoundations/Streamo.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Real-Time Narration; Event Caption; Action Caption; Event Grounding; Time-Sensitive QA</td></tr><tr><td>2025.12</td><td>MMDuet2: Enhancing Proactive Interaction of Video MLLMs with Multi-Turn Reinforcement Learning</td><td><a href="https://arxiv.org/pdf/2512.06810" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/yellow-binary-tree/MMDuet2" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/yellow-binary-tree/MMDuet2.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Scene Segmentation and Captioning; QA Generation; Proactive Dialogue Construction</td></tr><tr><td>2025.12</td><td>CogStream: Context-guided Streaming Video Question Answering</td><td><a href="https://arxiv.org/pdf/2506.10516" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/LiamZhao326/CogStream" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/LiamZhao326/CogStream.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Semi-Automatic QA Pipeline; 1,088 Videos with 59K Hierarchical QA Pairs (Basic, Streaming, Global)</td></tr><tr><td>2025.11</td><td>LiveStar: Live Streaming Assistant for Real-World Online Video Understanding</td><td><a href="https://arxiv.org/pdf/2511.05299" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/sotayang/LiveStar" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/sotayang/LiveStar.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Real-Time Narration Generation; Online Temporal Grounding; Frame-Level Dense QA; Contextual Online QA; Multi-Turn Interactive QA</td></tr><tr><td>2025.10</td><td>StreamingCoT: A Dataset for Temporal Dynamics and Multimodal Chain-of-Thought Reasoning in Streaming VideoQA</td><td><a href="https://arxiv.org/pdf/2510.25332" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/Fleeting-hyh/StreamingCoT" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/Fleeting-hyh/StreamingCoT.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Hierarchical Video Dense Captioning; Dynamic Question-Answer Pairs Construction; Multimodal Chain-of-Thought Generation</td></tr><tr><td>2025.10</td><td>StreamingVLM: Real-Time Understanding for Infinite Video Streams</td><td><a href="https://arxiv.org/pdf/2510.09608" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/mit-han-lab/streaming-vlm" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/mit-han-lab/streaming-vlm.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Sports; Narration</td></tr><tr><td>2025.10</td><td>Eyes Wide Open: Ego Proactive Video-LLM for Streaming Video</td><td><a href="https://arxiv.org/pdf/2510.14560" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/zhangyl4/EyeWO" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/zhangyl4/EyeWO.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Explicit Proactive Tasks; Implicit Proactive Tasks; Contextual Proactive Tasks</td></tr><tr><td>2025.06</td><td>Proactive Assistant Dialogue Generation from Streaming Egocentric Videos</td><td><a href="https://arxiv.org/pdf/2506.05904" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/pro-assist/ProAssist" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/pro-assist/ProAssist.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Multi-Round Dialogue</td></tr><tr><td>2025.04</td><td>LiveCC: Learning Video LLM with Streaming Speech Transcription at Scale</td><td><a href="https://arxiv.org/pdf/2504.16030" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/showlab/livecc" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/showlab/livecc.svg?style=social" alt="" loading="lazy" height="20" /></td><td>ASR Transcripts</td></tr><tr><td>2025.03</td><td>AssistPDA: An Online Video Surveillance Assistant for Video Anomaly Prediction, Detection, and Analysis</td><td><a href="https://arxiv.org/pdf/2503.21904" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>Anomaly Prediction; Anomaly Detection; Anomaly Analysis</td></tr><tr><td>2025.02</td><td>EgoSpeak: Learning When to Speak for Egocentric Conversational Agents in the Wild</td><td><a href="https://arxiv.org/pdf/2502.14892" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/jun297/EgoSpeak" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/jun297/EgoSpeak.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Prediction vs Detection; Frame-Level Speech Labeling</td></tr><tr><td>2024.11</td><td>VideoLLM Knows When to Speak: Enhancing Time-Sensitive Video Comprehension with Video-Text Duet Interaction Format</td><td><a href="https://arxiv.org/pdf/2411.17991" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/yellow-binary-tree/mmduet" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/yellow-binary-tree/mmduet.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Multi-Answer Video Grounded QA; Dense Captioning; Temporal Video Grounding</td></tr><tr><td>2024.07</td><td>What to Say and When to Say it: Live Fitness Coaching as a Testbed for Situated Interaction</td><td><a href="https://arxiv.org/pdf/2407.08101" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/Qualcomm-AI-research/FitCoach" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/Qualcomm-AI-research/FitCoach.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Fitness Activity Recognition and Coaching</td></tr><tr><td>2024.06</td><td>VideoLLM-online: Online Video Large Language Model for Streaming Video</td><td><a href="https://arxiv.org/pdf/2406.11816" target="_blank" rel="noopener noreferrer">pdf</a></td><td><a href="https://github.com/showlab/videollm-online" target="_blank" rel="noopener noreferrer">GitHub</a> <img class="star-badge" src="https://img.shields.io/github/stars/showlab/videollm-online.svg?style=social" alt="" loading="lazy" height="20" /></td><td>Narration Stream</td></tr></tbody></table></div>
+<h2 class="readme-h2" id="survey">📝 Survey</h2>
+<div class="table-wrap"><table class="mtable readme-table"><thead><tr><th>Date</th><th>Title</th><th>Paper</th><th>Code</th><th>Comment</th></tr></thead><tbody><tr><td>2024.01</td><td>A Survey on Generative AI and LLM for Video Generation, Understanding, and Streaming</td><td><a href="https://arxiv.org/pdf/2404.16038" target="_blank" rel="noopener noreferrer">pdf</a></td><td>-</td><td>-</td></tr></tbody></table></div>
+<h2 class="readme-h2" id="resources">🔗 Resources</h2>
+<ul class="readme-ul"><li><a href="https://github.com/JeffShine/Awesome-Streaming-Video-Understanding" target="_blank" rel="noopener noreferrer">JeffShine/Awesome-Streaming-Video-Understanding</a></li><li><a href="https://github.com/sotayang/Awesome-Streaming-Video-Understanding" target="_blank" rel="noopener noreferrer">sotayang/Awesome-Streaming-Video-Understanding</a></li><li><a href="https://github.com/LJungang/Awesome-Video-Reasoning-Landscape" target="_blank" rel="noopener noreferrer">LJungang/Awesome-Video-Reasoning-Landscape</a></li></ul>
+<h2 class="readme-h2" id="were-hiring">☎️ We're Hiring!</h2>
+<p>We're hiring multimodal research scientists and interns at JD Explore Academy! If you have top-tier publications and are passionate about video understanding and VLMs, please send your resume to: siqingyi.phoebus@jd.com. We'd love to hear from you!</p>
+    </article>
+
+
+<section class="paper-section" id="analysis">
+  <div class="ps-header" style="border-color:#f59e0b">
+    <div class="ps-icon" style="background:rgba(245,158,11,0.15)">🔍</div>
+    <div class="ps-title-block">
+      <h2>综合评析：Streaming Video Understanding 的技术拼图</h2>
+      <div class="ps-en">Taxonomy · Trade-offs · Evaluation Landscape（中文导读，可与上方英文表格对照）</div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <strong>问题定义：</strong>与离线「整段看完再问答」不同，Streaming Video Understanding 要求在<strong>连续到达的视觉流</strong>上完成感知、记忆与语言生成；系统的瓶颈通常集中在「何时更新表征」「何时触发回答」「KV / Token 预算如何在时间上分配」三件事。
+  </div>
+
+  <div class="compare-section" style="margin-bottom:28px">
+    <h3>🧩 四条主干轴线（对应 upstream README 分区）</h3>
+    <div class="compare-grid">
+      <div class="cg-item">
+        <div class="cg-name" style="color:#c4b5fd">💬 Proactive Interaction</div>
+        <div class="cg-role">何时说话：辅助头 / 生成式触发 / RL / 免训练信号 / 混合框架 / 学习式时机</div>
+        <div class="cg-arrow">→ 直接影响 TTFT、打断率与用户体验</div>
+      </div>
+      <div class="cg-item">
+        <div class="cg-name" style="color:#67e8f9">🧠 Memory</div>
+        <div class="cg-role">层级记忆、滑窗驱逐、Token 剪枝、KV 压缩与检索、语义摘要、事件记忆、空间记忆、快权重</div>
+        <div class="cg-arrow">→ 长流场景的可扩展性与遗忘曲线</div>
+      </div>
+      <div class="cg-item">
+        <div class="cg-name" style="color:#6ee7b7">⚡ Real-time Inference</div>
+        <div class="cg-role">编解码并行、选择性调用大模型、视觉 Token 削减、KV 优化（含编解码侧协同）</div>
+        <div class="cg-arrow">→ 延迟、功耗与部署可行性</div>
+      </div>
+      <div class="cg-item">
+        <div class="cg-name" style="color:#fed7aa">💭 Thinking</div>
+        <div class="cg-role">边看边想：流式 CoT、分段记忆、因果掩码与训练配方</div>
+        <div class="cg-arrow">→ 复杂推理 vs. 额外延迟成本</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-block">
+      <h4>📊 Benchmarks / Datasets 阅读提示</h4>
+      <ul>
+        <li><strong>交互维度：</strong>OVBench、OVO-Bench、StreamingBench、SVBench、StreamingEval 等覆盖「回溯 / 实时理解 / 前瞻响应」不同切片。</li>
+        <li><strong>场景维度：</strong>PhoStream（移动端）、StreamEQA（具身）、HomeSafe-Bench（家庭风险）、Artic / DeViBench（实时通信退化）等强调部署语境。</li>
+        <li><strong>任务耦合：</strong>同一模型常同时出现在 Benchmarks 与 Training Datasets 分区，建议「论文链路 → 数据构造 → 评测协议」对照阅读。</li>
+      </ul>
+    </div>
+    <div class="info-block">
+      <h4>⚙️ 工程折叠 vs. 算法创新的分界</h4>
+      <ul>
+        <li><strong>KV-Cache 系列：</strong>从「压缩 / 检索 / 层级卸载」到「与触发策略联合设计」，往往是延迟与显存的第一杠杆。</li>
+        <li><strong>Token 侧：</strong>语义载体、差分丢弃、与视频编码（如码流运动矢量）结合，属于「减少无效计算」路线。</li>
+        <li><strong>触发侧：</strong>免训练启发式与学习式策略可混合；混合框架（提案–匹配–余弦突变）代表系统化趋势。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="insight-box" style="border-left-color:var(--accent2);background:rgba(34,211,238,0.06)">
+    <strong>维护说明：</strong>正文表格与链接同步自上游仓库
+    <a href="https://github.com/ydyhello/Awesome-VLM-Streaming-Video" target="_blank" rel="noopener noreferrer">ydyhello/Awesome-VLM-Streaming-Video</a>；
+    本地源码快照见 <code>streaming-video-understanding-source.md</code>，可用 <code>node tools/readme-to-streaming-fragment.mjs</code> 重新生成 HTML 片段。
+  </div>
+</section>
+
+  </div>
+
+  <footer>
+    数据来源：
+    <a href="https://github.com/ydyhello/Awesome-VLM-Streaming-Video" target="_blank" rel="noopener noreferrer">https://github.com/ydyhello/Awesome-VLM-Streaming-Video</a>
+    &nbsp;|&nbsp; 本地快照：<code>streaming-video-understanding-source.md</code>
+    &nbsp;|&nbsp;
+    <a href="index.html">← World Model &amp; VLA 总览</a>
+  </footer>
+
+  <div class="read-settings" id="read-settings">
+    <button type="button" class="read-settings-toggle" id="rs-toggle" aria-expanded="false">阅读设置</button>
+    <div class="read-settings-panel read-settings-body" id="rs-body">
+      <label>字号缩放 <span id="rs-font-lbl">100%</span>
+        <input type="range" id="rs-font" min="85" max="125" value="100" />
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <input type="checkbox" id="rs-compact" /> 紧凑表格（更小字号与行距）
+      </label>
+    </div>
+  </div>
+
+  <script>
+(function () {
+  var KEY = 'svu_prefs_v1';
+  var root = document.documentElement;
+  var wrap = document.getElementById('read-settings');
+  var btn = document.getElementById('rs-toggle');
+  var body = document.getElementById('rs-body');
+  var font = document.getElementById('rs-font');
+  var fontLbl = document.getElementById('rs-font-lbl');
+  var compact = document.getElementById('rs-compact');
+
+  function load() {
+    try {
+      var j = JSON.parse(localStorage.getItem(KEY) || '{}');
+      if (j.font != null) { font.value = String(j.font); applyFont(j.font); }
+      if (j.compact) { compact.checked = true; document.body.classList.add('compact-tables'); }
+      if (j.panelOpen) { wrap.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); }
+    } catch (e) {}
+  }
+  function save() {
+    localStorage.setItem(KEY, JSON.stringify({
+      font: Number(font.value),
+      compact: compact.checked,
+      panelOpen: wrap.classList.contains('open')
+    }));
+  }
+  function applyFont(v) {
+    var s = Number(v) / 100;
+    root.style.setProperty('--font-scale', String(s));
+    fontLbl.textContent = v + '%';
+  }
+  btn.addEventListener('click', function () {
+    wrap.classList.toggle('open');
+    btn.setAttribute('aria-expanded', wrap.classList.contains('open'));
+    save();
+  });
+  font.addEventListener('input', function () { applyFont(font.value); save(); });
+  compact.addEventListener('change', function () {
+    document.body.classList.toggle('compact-tables', compact.checked);
+    save();
+  });
+  load();
+})();
+  </script>
+</body>
+</html>

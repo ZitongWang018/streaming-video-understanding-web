@@ -435,7 +435,7 @@
   <a href="#fusion" data-zh="WM+VLA 融合" data-en="WM+VLA Fusion">WM+VLA 融合</a>
   <a href="#trends" data-zh="趋势分析" data-en="Trends">趋势分析</a>
   <a href="#hot" data-zh="近期热点" data-en="Hot">近期热点</a>
-  <a href="lingbot.html" style="color:#a78bfa;font-weight:600">🤖 LingBot 专栏</a>
+  <a href="streaming-video-understanding.html" style="color:#a78bfa;font-weight:600">🎬 Streaming Video</a>
   <a href="llm-memory-benchmark.html" style="color:#10b981;font-weight:600">🧠 Memory Bench</a>
   <a href="visual-context-compression.html" style="color:#22d3ee;font-weight:600">🔬 视觉压缩</a>
 </nav>
@@ -486,6 +486,14 @@
         <div class="examples">DeepSeek-OCR · Glyph · VIST · C3 · CEPE · ...</div>
         <div style="margin-top:12px">
           <a href="visual-context-compression.html" style="display:inline-block;background:linear-gradient(90deg,#0891b2,#22d3ee);color:white;text-decoration:none;padding:8px 22px;border-radius:20px;font-size:0.85rem;font-weight:700">🌐 查看完整综述 →</a>
+        </div>
+      </div>
+      <div class="trend-card" style="border-left:3px solid #a78bfa">
+        <h4>🎬 Streaming-Video-Understanding</h4>
+        <p>面向连续视频流的 VLM / MLLM 论文与代码汇编（主动交互、长程记忆、实时推理、KV 优化、Benchmark / 数据集），结构化镜像自 Awesome-VLM-Streaming-Video，并附中文综合评析与阅读设置。</p>
+        <div class="examples">OVBench · StreamingBench · ThinkStream · VideoLLM-online · ...</div>
+        <div style="margin-top:12px">
+          <a href="streaming-video-understanding.html" style="display:inline-block;background:linear-gradient(90deg,#7c3aed,#22d3ee);color:white;text-decoration:none;padding:8px 22px;border-radius:20px;font-size:0.85rem;font-weight:700">🌐 查看完整综述 →</a>
         </div>
       </div>
     </div>
@@ -1100,56 +1108,40 @@
   </section>
 
 
-  <!-- ===== LINGBOT ===== -->
-  <section id="lingbot">
+  <!-- ===== STREAMING VIDEO UNDERSTANDING ===== -->
+  <section id="streaming-video-understanding">
     <div class="section-header">
-      <div class="section-icon" style="background:#4c1d95">🤖</div>
-      <h2>LingBot 系列工作专栏</h2>
+      <div class="section-icon" style="background:#134e4a">🎬</div>
+      <h2>Streaming-Video-Understanding</h2>
     </div>
     <p style="color:var(--muted);font-size:0.875rem;margin-bottom:20px">
-      Robbyant 团队构建的垂直整合技术栈：空间感知（Depth）→ 世界仿真（World）→ 因果视频-动作建模（VA）→ 实用 VLA 基础模型（VLA）。四个工作相互依赖，形成完整闭环。
+      本站镜像整理 <a href="https://github.com/ydyhello/Awesome-VLM-Streaming-Video" target="_blank" style="color:var(--accent)">Awesome-VLM-Streaming-Video</a>：
+      面向连续视频流的 VLM / MLLM（主动交互触发、长程记忆与 KV、实时推理、Streaming CoT、评测与数据）。
+      表格内链接、arXiv / GitHub / shields 徽章均指向上游条目。
     </p>
     <div class="paper-grid" style="margin-bottom:20px">
-      <div class="paper-card classic-star" style="border-color:#7c3aed">
-        <div class="date">2026-01-27 · ⭐961 Stars</div>
-        <h4>LingBot-VLA: A Pragmatic VLA Foundation Model</h4>
-        <p class="summary" data-zh="实用主义 VLA 基础模型。20,000小时真实双臂机器人数据预训练，9种机器人配置；原生集成 LingBot-Depth（MoRGBD）；Flow Matching 动作生成；训练效率 1.5–2.8× 提升。GM-100 平均 SR 35.4%，超越 π0.5、GR00T N1.6。" data-en="实用主义 VLA 基础模型。20,000小时真实双臂机器人数据预训练，9种机器人配置；原生集成 LingBot-Depth（MoRGBD）；Flow Matching 动作生成；训练效率 1.5–2.8× 提升。GM-100 平均 SR 35.4%，超越 π0.5、GR00T N1.6。">实用主义 VLA 基础模型。20,000小时真实双臂机器人数据预训练，9种机器人配置；原生集成 LingBot-Depth（MoRGBD）；Flow Matching 动作生成；训练效率 1.5–2.8× 提升。GM-100 平均 SR 35.4%，超越 π0.5、GR00T N1.6。</p>
+      <div class="paper-card classic-star" style="border-color:#6366f1">
+        <div class="date">Curated list · GitHub</div>
+        <h4>Awesome-VLM-Streaming-Video 🎬</h4>
+        <p class="summary">涵盖 Project / Technical Report、Proactive Interaction（多类触发）、Long-term Memory Management（多级子类）、Real-time Inference、Streaming with Thinking、Benchmarks、Training Datasets、Survey 与外链资源。</p>
         <div class="footer">
-          <div class="tags"><span class="tag vla">VLA</span><span class="tag eff">效率</span></div>
-          <a class="arxiv-link" href="https://arxiv.org/abs/2601.18692" target="_blank">↗ 2601.18692</a>
+          <div class="tags"><span class="tag fusion">Streaming</span><span class="tag wm">VLM</span></div>
+          <a class="arxiv-link" href="https://github.com/ydyhello/Awesome-VLM-Streaming-Video" target="_blank">↗ GitHub</a>
         </div>
       </div>
-      <div class="paper-card classic-star" style="border-color:#0891b2">
-        <div class="date">2026-01-29 · ⭐3.2k Stars</div>
-        <h4>LingBot-World: Advancing Open-source World Models</h4>
-        <p class="summary" data-zh="开源顶级世界仿真器。基于 Wan2.2 DiT；&lt;1秒延迟 16fps 实时交互；961帧分钟级时序记忆；双控制信号（相机位姿 + 机器人动作）；覆盖写实/科幻/卡通等多样环境。" data-en="开源顶级世界仿真器。基于 Wan2.2 DiT；&lt;1秒延迟 16fps 实时交互；961帧分钟级时序记忆；双控制信号（相机位姿 + 机器人动作）；覆盖写实/科幻/卡通等多样环境。">开源顶级世界仿真器。基于 Wan2.2 DiT；&lt;1秒延迟 16fps 实时交互；961帧分钟级时序记忆；双控制信号（相机位姿 + 机器人动作）；覆盖写实/科幻/卡通等多样环境。</p>
+      <div class="paper-card classic-star" style="border-color:#22d3ee">
+        <div class="date">本站专题页</div>
+        <h4>结构化 HTML + 中文综合评析</h4>
+        <p class="summary">保留原 LingBot 专题页的导航与版式体验：粘性章节导航、宽表横向滚动、Insights 样式评析块；新增阅读设置（字号缩放、紧凑表格，localStorage <code>svu_prefs_v1</code>）。</p>
         <div class="footer">
-          <div class="tags"><span class="tag wm">WM</span></div>
-          <a class="arxiv-link" href="https://arxiv.org/abs/2601.20540" target="_blank">↗ 2601.20540</a>
-        </div>
-      </div>
-      <div class="paper-card classic-star" style="border-color:#059669">
-        <div class="date">2026-01-29 · ⭐836 Stars</div>
-        <h4>LingBot-VA: Causal World Modeling for Robot Control</h4>
-        <p class="summary" data-zh="因果视频-动作世界模型。双流 MoT 架构将视频帧与动作 token 交织自回归；KV Cache + 异步执行；首个在 RoboTwin 2.0 Easy+Hard 双超90% 的工作（92.9%/91.6%）。" data-en="因果视频-动作世界模型。双流 MoT 架构将视频帧与动作 token 交织自回归；KV Cache + 异步执行；首个在 RoboTwin 2.0 Easy+Hard 双超90% 的工作（92.9%/91.6%）。">因果视频-动作世界模型。双流 MoT 架构将视频帧与动作 token 交织自回归；KV Cache + 异步执行；首个在 RoboTwin 2.0 Easy+Hard 双超90% 的工作（92.9%/91.6%）。</p>
-        <div class="footer">
-          <div class="tags"><span class="tag fusion">WM+VLA</span></div>
-          <a class="arxiv-link" href="https://arxiv.org/abs/2601.21998" target="_blank">↗ 2601.21998</a>
-        </div>
-      </div>
-      <div class="paper-card classic-star" style="border-color:#c2410c">
-        <div class="date">2026-01 · ⭐957 Stars</div>
-        <h4>LingBot-Depth: Masked Depth Modeling for Spatial Perception</h4>
-        <p class="summary" data-zh="机器人深度感知基础模型。掩码深度建模（MDM）自监督预训练；ViT-L + 深度感知注意力；3M RGB-D 数据集训练；度量精确深度图 + 3D 点云；集成于 LingBot-VLA 作为 MoRGBD 感知增强模块。" data-en="机器人深度感知基础模型。掩码深度建模（MDM）自监督预训练；ViT-L + 深度感知注意力；3M RGB-D 数据集训练；度量精确深度图 + 3D 点云；集成于 LingBot-VLA 作为 MoRGBD 感知增强模块。">机器人深度感知基础模型。掩码深度建模（MDM）自监督预训练；ViT-L + 深度感知注意力；3M RGB-D 数据集训练；度量精确深度图 + 3D 点云；集成于 LingBot-VLA 作为 MoRGBD 感知增强模块。</p>
-        <div class="footer">
-          <div class="tags"><span class="tag vla">感知</span></div>
-          <a class="arxiv-link" href="https://arxiv.org/abs/2601.17895" target="_blank">↗ 2601.17895</a>
+          <div class="tags"><span class="tag vla">导读</span></div>
+          <a class="arxiv-link" href="streaming-video-understanding.html#analysis">↗ 综合评析</a>
         </div>
       </div>
     </div>
     <div style="text-align:center;margin-top:8px">
-      <a href="lingbot.html" style="display:inline-block;background:linear-gradient(90deg,#7c3aed,#0891b2);color:white;text-decoration:none;padding:12px 32px;border-radius:24px;font-size:0.9rem;font-weight:700">
-        📖 查看 LingBot 系列完整深度分析 →
+      <a href="streaming-video-understanding.html" style="display:inline-block;background:linear-gradient(90deg,#7c3aed,#0891b2);color:white;text-decoration:none;padding:12px 32px;border-radius:24px;font-size:0.9rem;font-weight:700">
+        📖 打开 Streaming-Video-Understanding 完整页面 →
       </a>
     </div>
   </section>
