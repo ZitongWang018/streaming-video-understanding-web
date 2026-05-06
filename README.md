@@ -6,9 +6,9 @@
 [![HTML](https://img.shields.io/badge/Format-HTML-orange?style=for-the-badge&logo=html5)](https://song2yu.github.io/world-model-vla/)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
-**A comprehensive survey on World Models and Vision-Language-Action (VLA) models in robotics and embodied AI.**
+**A comprehensive survey on World Models and Vision-Language-Action (VLA), plus a dedicated Streaming Video Understanding hub** (structured mirror of [Awesome-VLM-Streaming-Video](https://github.com/ydyhello/Awesome-VLM-Streaming-Video): papers, PDFs, code links, benchmarks).
 
-### 👉 [**Click here to view the interactive survey page →**](https://song2yu.github.io/world-model-vla/)
+### 👉 [**World Model & VLA index →**](https://song2yu.github.io/world-model-vla/) · [**Streaming topic `/streaming-video-understanding/`**](https://zitongwang018.github.io/streaming-video-understanding-web/streaming-video-understanding/) _(mirror deploy; adjust if your Pages URL differs)_
 
 </div>
 
@@ -16,15 +16,13 @@
 
 ## 📖 About
 
-This project presents an interactive survey covering the landscape of **World Models** and **Vision-Language-Action (VLA)** models — two of the most exciting research directions in embodied AI and robotics.
+This project presents:
 
-The survey includes:
-
+- 🎬 **Streaming Video Understanding** — curated tables from [ydyhello/Awesome-VLM-Streaming-Video](https://github.com/ydyhello/Awesome-VLM-Streaming-Video) (pdf/docs/code/shields), Chinese analysis block, reading settings; paths **`/streaming-video-understanding/`** or **`streaming-video-understanding.html`**
 - 🧠 **World Models** — how agents learn internal representations of the environment
 - 🦾 **VLA Models** — integrating vision, language, and action for robot control
 - 📊 **Taxonomy & Comparisons** — structured categorization of existing approaches
 - 🔬 **Key Papers & Benchmarks** — curated references and evaluation metrics
-- 🚀 **Future Directions** — open challenges and promising research trends
 
 ---
 
@@ -32,15 +30,15 @@ The survey includes:
 
 The surveys are hosted as interactive HTML pages via GitHub Pages:
 
-**🔗 World Model & VLA:** https://song2yu.github.io/world-model-vla/
+**🔗 Streaming-Video-Understanding:** `…/streaming-video-understanding/` or `…/streaming-video-understanding.html` on your Pages host (see [DEPLOY.md](./DEPLOY.md)).
+
+**🔗 World Model & VLA (upstream demo):** https://song2yu.github.io/world-model-vla/
 
 **🔗 Long Video Understanding with Memory:** https://song2yu.github.io/world-model-vla/long-video-memory.html
 
 **🔗 生成面试题:** https://song2yu.github.io/world-model-vla/genai_interview.html
 
 **🔗 DS-OCR: visual-context-compression:** https://song2yu.github.io/world-model-vla/visual-context-compression.html
-
-**🔗 Streaming-Video-Understanding:** （同源镜像托管参见下方部署仓库）
 
 ### 部署本站到自有仓库（GitHub Pages）
 
@@ -58,9 +56,10 @@ No installation required — just open the link in any browser.
 
 ```
 world-model-vla/
-├── index.html                          # World Model & VLA Survey (self-contained)
-├── streaming-video-understanding.html  # Streaming Video Understanding (Awesome-VLM mirror + 中文评析)
-├── lingbot.html                        # 301-style redirect → streaming-video-understanding.html
+├── index.html                          # Survey hub (WM / VLA + links to Streaming topic)
+├── streaming-video-understanding.html    # Full Streaming topic (Awesome-VLM mirror + 中文评析)
+├── streaming-video-understanding/index.html  # Same topic via path /streaming-video-understanding/
+├── lingbot.html                        # Redirect → /streaming-video-understanding/
 ├── long-video-memory.html              # Long Video Understanding with Memory Survey (2019–2026)
 ├── visual-context-compression.html     # Visual context compression (2024–2026)
 └── genai_interview.html                # 🆕 生成面试题（Transformer/预训练/RLHF/推理优化/生成模型）

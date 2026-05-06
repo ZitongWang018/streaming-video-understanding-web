@@ -40,7 +40,7 @@ git push -u streaming-web main
 
 **<https://zitongwang018.github.io/streaming-video-understanding-web/>**
 
-（首页为仓库根目录的 `index.html`；Streaming 专题直达：`streaming-video-understanding.html`。）
+（首页为仓库根目录的 `index.html`；Streaming 专题：<code>/streaming-video-understanding/</code>（跳转至完整页）或根目录 <code>streaming-video-understanding.html</code>。）
 
 ## 三、可选：自定义域名
 
@@ -50,9 +50,15 @@ git push -u streaming-web main
 
 Streaming 专题正文快照来源：<https://github.com/ydyhello/Awesome-VLM-Streaming-Video>
 
-本地更新 `streaming-video-understanding-source.md` 后重新生成页面：
+### 覆盖上游 README 全文（含 pdf / docs / GitHub 链接）
+
+1. 用浏览器打开 upstream Raw：`https://raw.githubusercontent.com/ydyhello/Awesome-VLM-Streaming-Video/main/README.md`，全文复制替换本地的 `streaming-video-understanding-source.md`。
+2. **务必替换其中的「📖 Contents」整块**：上游 TOC 锚点与正文标题 id 不一致，会导致页面内跳转失效；请以本仓库中当前版本的 Contents（第一节 Introduction → Resources）为准覆盖粘贴。
+3. 在项目根目录执行：
 
 ```bash
 node tools/readme-to-streaming-fragment.mjs
 node tools/build-streaming-page.mjs
 ```
+
+4. 提交并推送后，GitHub Actions 会更新 Pages。
