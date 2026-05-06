@@ -54,7 +54,13 @@ Streaming 专题正文快照来源：<https://github.com/ydyhello/Awesome-VLM-St
 
 1. 用浏览器打开 upstream Raw：`https://raw.githubusercontent.com/ydyhello/Awesome-VLM-Streaming-Video/main/README.md`，全文复制替换本地的 `streaming-video-understanding-source.md`。
 2. **务必替换其中的「📖 Contents」整块**为本仓库当前版本（锚点与 HTML 标题 id 一致，否则页内目录跳转失效）。除此之外应保持与 upstream README **字节级一致**（不在该 md 内手写本站说明）。
-3. 在项目根目录执行：
+3. 在项目根目录执行（二选一）：
+
+```bash
+node tools/sync-streaming.mjs
+```
+
+或分步：
 
 ```bash
 node tools/readme-to-streaming-fragment.mjs
@@ -62,3 +68,15 @@ node tools/build-streaming-page.mjs
 ```
 
 4. 提交并推送后，GitHub Actions 会更新 Pages。
+
+## FAQ：为什么我改了内容，网页却没有变？
+
+专题页的 **`streaming-video-understanding.html` 是「编译产物」**：浏览器并不会去读旁边的 `.md` 再排版，而是展示已经嵌进 HTML 里的表格与段落。
+
+因此：
+
+- 只改了 **`streaming-video-understanding-source.md`** → 必须再跑一次 **`node tools/sync-streaming.mjs`**，然后用浏览器 **强刷**（如 Ctrl+F5）打开的 `streaming-video-understanding.html`。
+- 只改了 **`streaming-video-understanding.html`** → 保存后刷新就能看到；但若之后又运行上面的生成脚本，**手工改动会被覆盖**（除非你改成改脚本模板 `tools/build-streaming-page.mjs`）。
+- 在线 GitHub Pages 的更新 → 需要 **push 到 GitHub**，等 Actions 部署完成后再刷新线上地址。
+
+若需要「保存 Markdown 就立刻在浏览器里变」的体验，要改成运行时渲染 Markdown（例如前端加载 `.md`），和现在「静态整页、利于 Pages / SEO」的架构不同。

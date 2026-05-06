@@ -69,6 +69,8 @@ world-model-vla/
 
 The entire survey is a **single self-contained HTML file** — all styles, scripts, and content are bundled together, making it easy to share and view offline.
 
+**Streaming 专题：**若修改 `streaming-video-understanding-source.md`，需在仓库根目录执行 **`node tools/sync-streaming.mjs`** 才会更新 `streaming-video-understanding.html`（详见 [DEPLOY.md](./DEPLOY.md) FAQ）。
+
 ---
 
 ## 💾 Offline Access
